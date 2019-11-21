@@ -27,13 +27,13 @@ public class RangerAuto extends LinearOpMode {
     DcMotor rm;
     DcMotor lm;
     final double DRIVE_PWR = 0.8;
+    final double TURN_PWR = 0.1;
+
     double error = 5;
 
     static final double COUNTS_PER_REVOLUTION = 1120; //40:1
-    final double MAX_POS = 1;
-    final double MIN_POS = 0;
 
-    static final double DRIVE_GEAR_REDUCTION = 1; //Thiss is < 1.0 if geared up
+    static final double DRIVE_GEAR_REDUCTION = 1; //This is < 1.0 if geared up
     static final double WHEEL_DIAMETER_INCHES = 3;
     static final double COUNTS_PER_INCH = (COUNTS_PER_REVOLUTION * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
     PIDMichael pid = new PIDMichael(0.001, Math.pow(10, -12), 10000); //experimentally found
@@ -47,7 +47,8 @@ public class RangerAuto extends LinearOpMode {
         initialize();
         waitForStart();
 
-        moveForwardInches(15);
+        mode = true;
+        turnAbsolute(-90, Direction.CLOCKWISE, TURN_PWR);
         sleep(1000);
 
     }
@@ -73,7 +74,7 @@ public class RangerAuto extends LinearOpMode {
     }
 
     public void turnAbsolute(double angle, Direction direction, double power) {
-        double integral = 0.5;
+        double integral = 0.2;
         rm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if (mode) {
@@ -84,6 +85,21 @@ public class RangerAuto extends LinearOpMode {
                     angleLeft = Math.abs(getAbsoluteHeading() - angle);
                     if (power > integral) power = Range.clip(angleLeft / firstDiff, 0, 1) * power;
                     else power = integral;
+                    rm.setPower(power);
+                    lm.setPower(-power);
+                    telemetry.addData("rm_pwr", rm.getPower());
+                    telemetry.addData("lm_pwr", lm.getPower());
+                    telemetry.addData("imu", getAbsoluteHeading());
+                    telemetry.addData("angleLeft", angleLeft);
+                    telemetry.addData("firstDiff", firstDiff);
+                    telemetry.addData("clockwise", "true");
+                    telemetry.update();
+                }
+            } else {
+                while (angleLeft > error) {
+                    angleLeft = Math.abs(getAbsoluteHeading() - angle);
+                    if (power > integral) power = Range.clip(angleLeft / firstDiff, 0, 1) * power;
+                    else power = integral;
                     rm.setPower(-power);
                     lm.setPower(power);
                     telemetry.addData("rm_pwr", rm.getPower());
@@ -94,7 +110,12 @@ public class RangerAuto extends LinearOpMode {
                     telemetry.addData("clockwise", "true");
                     telemetry.update();
                 }
-            } else {
+            }
+        } else {
+            angle = -angle;
+            double angleLeft = Math.abs(getAbsoluteHeading() - angle);
+            double firstDiff = Math.abs(getAbsoluteHeading() - angle);
+            if (direction == Direction.COUNTERCLOCKWISE) {
                 while (angleLeft > error) {
                     angleLeft = Math.abs(getAbsoluteHeading() - angle);
                     if (power > integral) power = Range.clip(angleLeft / firstDiff, 0, 1) * power;
@@ -109,32 +130,13 @@ public class RangerAuto extends LinearOpMode {
                     telemetry.addData("clockwise", "true");
                     telemetry.update();
                 }
-            }
-        } else {
-            double angleLeft = Math.abs(getAbsoluteHeading() - (-angle));
-            double firstDiff = Math.abs(getAbsoluteHeading() - (-angle));
-            if (direction == Direction.COUNTERCLOCKWISE) {
+            } else {
                 while (angleLeft > error) {
-                    angleLeft = Math.abs(getAbsoluteHeading() - (-angle));
+                    angleLeft = Math.abs(getAbsoluteHeading() - angle);
                     if (power > integral) power = Range.clip(angleLeft / firstDiff, 0, 1) * power;
                     else power = integral;
                     rm.setPower(-power);
                     lm.setPower(power);
-                    telemetry.addData("rm_pwr", rm.getPower());
-                    telemetry.addData("lm_pwr", lm.getPower());
-                    telemetry.addData("imu", getAbsoluteHeading());
-                    telemetry.addData("angleLeft", angleLeft);
-                    telemetry.addData("firstDiff", firstDiff);
-                    telemetry.addData("clockwise", "true");
-                    telemetry.update();
-                }
-            } else {
-                while (angleLeft > error) {
-                    angleLeft = Math.abs(getAbsoluteHeading() - (-angle));
-                    if (power > integral) power = Range.clip(angleLeft / firstDiff, 0, 1) * power;
-                    else power = integral;
-                    rm.setPower(power);
-                    lm.setPower(-power);
                     telemetry.addData("rm_pwr", rm.getPower());
                     telemetry.addData("lm_pwr", lm.getPower());
                     telemetry.addData("imu", getAbsoluteHeading());
@@ -147,7 +149,7 @@ public class RangerAuto extends LinearOpMode {
         }
     }
     public void moveForward(double rev) throws InterruptedException {
-        double power = 0.8;
+        double power;
         int target = (int) (rev * COUNTS_PER_REVOLUTION);
         rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -177,6 +179,35 @@ public class RangerAuto extends LinearOpMode {
     }
 
     public void moveForwardInches(double inches) throws InterruptedException {
+        double power;
+        int target = (int) (inches * COUNTS_PER_INCH);
+        rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rm.setTargetPosition(target);
+        lm.setTargetPosition(target);
+
+        rm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        pid.initPID(target, System.nanoTime());
+
+        while(opModeIsActive() && rm.isBusy() && lm.isBusy()) {
+            power = pid.actuator(rm.getCurrentPosition(), System.nanoTime()) * DRIVE_PWR;
+            if (inches < 0) {
+                rm.setPower(-power);
+                lm.setPower(-power);
+            } else {
+                rm.setPower(power);
+                lm.setPower(power);
+            }
+
+            telemetry.addData("rm_pwr", rm.getPower());
+            telemetry.addData("target_left", target - rm.getCurrentPosition());
+            telemetry.addData("lm_pwr", lm.getPower());
+            telemetry.update();
+        }
+        stopMotor();
+    }
+    public void moveForwardInchesTest(double inches) throws InterruptedException {
         double power;
         int target = (int) (inches * COUNTS_PER_INCH);
         rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
