@@ -207,8 +207,9 @@ public class RangerAuto extends LinearOpMode {
         }
         stopMotor();
     }
-    public void moveForwardInchesTest(double inches) throws InterruptedException {
+    public void moveForwardInchesGyro(double inches) throws InterruptedException {
         double power;
+        double initialAngle = getAbsoluteHeading();
         int target = (int) (inches * COUNTS_PER_INCH);
         rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -221,12 +222,23 @@ public class RangerAuto extends LinearOpMode {
 
         while(opModeIsActive() && rm.isBusy() && lm.isBusy()) {
             power = pid.actuator(rm.getCurrentPosition(), System.nanoTime()) * DRIVE_PWR;
+            double tuneConst = 100;
             if (inches < 0) {
-                rm.setPower(-power);
-                lm.setPower(-power);
+                if (initialAngle - getAbsoluteHeading() > 0) {
+                    rm.setPower(-power - (initialAngle - getAbsoluteHeading() / tuneConst));
+                    lm.setPower(-power + (initialAngle - getAbsoluteHeading() / tuneConst));
+                } else {
+                    rm.setPower(-power + (initialAngle - getAbsoluteHeading() / tuneConst));
+                    lm.setPower(-power - (initialAngle - getAbsoluteHeading() / tuneConst));
+                }
             } else {
-                rm.setPower(power);
-                lm.setPower(power);
+                if (initialAngle - getAbsoluteHeading() > 0) {
+                    rm.setPower(power + (initialAngle - getAbsoluteHeading() / tuneConst));
+                    lm.setPower(power - (initialAngle - getAbsoluteHeading() / tuneConst));
+                } else {
+                    rm.setPower(power - (initialAngle - getAbsoluteHeading() / tuneConst));
+                    lm.setPower(power + (initialAngle - getAbsoluteHeading() / tuneConst));
+                }
             }
 
             telemetry.addData("rm_pwr", rm.getPower());
