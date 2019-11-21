@@ -80,9 +80,9 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Disabled
+//@Disabled
 @TeleOp(name="SKYSTONE Vuforia Nav", group ="Concept")
-public class SkystoneIdentificationSample extends LinearOpMode {
+public class SkyStoneVuforiaAuto extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
@@ -134,6 +134,7 @@ public class SkystoneIdentificationSample extends LinearOpMode {
     private float phoneXRotate    = 0;
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
+    private FoundSkyStone foundSkyStone = FoundSkyStone.NOT_FOUND;
 
     @Override public void runOpMode() {
         /*
@@ -316,8 +317,13 @@ public class SkystoneIdentificationSample extends LinearOpMode {
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
 
+
+    }
+
+    public double FoundSkyStoneAngle (VuforiaTrackables targetsSkyStone, List<VuforiaTrackable> allTrackables) {
+
         targetsSkyStone.activate();
-        while (!isStopRequested()) {
+        while (foundSkyStone == FoundSkyStone.NOT_FOUND) {
 
             // check all the trackable targets to see which one (if any) is visible.
             targetVisible = false;
@@ -326,7 +332,8 @@ public class SkystoneIdentificationSample extends LinearOpMode {
                     telemetry.addData("Visible Target", trackable.getName());
 
                     if(trackable.getName().equals("Stone Target")){
-                        telemetry.addLine("Stone Target Is Visible");
+                        telemetry.addLine("Stone Target Found");
+                        targetsSkyStone.deactivate();
                     }
 
                     targetVisible = true;
@@ -367,8 +374,11 @@ public class SkystoneIdentificationSample extends LinearOpMode {
             telemetry.addData("Skystone Position", positionSkystone);
             telemetry.update();
         }
-
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
+        return 2;
+    }
+    enum FoundSkyStone {
+        FOUND, NOT_FOUND
     }
 }

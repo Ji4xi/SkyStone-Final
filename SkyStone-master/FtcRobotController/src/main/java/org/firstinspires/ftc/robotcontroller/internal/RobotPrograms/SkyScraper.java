@@ -31,7 +31,7 @@ public class SkyScraper extends LinearOpMode {
     Servo ls;
     final double driveTrainPwr = 0.3;
     final double intakePwr = 0.8;
-    double error = 5;
+
 
     static final double COUNTS_PER_REVOLUTION = 1120; //40:1
     final double MAX_POS = 1;
@@ -89,6 +89,7 @@ public class SkyScraper extends LinearOpMode {
 
     public void turnAbsolute(double angle, Direction direction, double power) {
         double integral = 0.5;
+        double error = 5;
         rm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if (mode) {
