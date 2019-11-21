@@ -24,14 +24,14 @@ public class RangerAutoRemaster extends LinearOpMode {
     final double COUNTS_PER_REV = 1120;
     double wheelDiameter = 3;
     double wheelCir = wheelDiameter * Math.PI;
+    final int error = 5;
 
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
         waitForStart();
-        driveTest(3, 0.4);
+        driveTest(15, 0.4);
         sleep(1000);
-        turnTest(0.5);
     }
     public void initialize() {
         BNO055IMU.Parameters parameterz = new BNO055IMU.Parameters();
@@ -63,6 +63,20 @@ public class RangerAutoRemaster extends LinearOpMode {
         while (rm.isBusy() && lm.isBusy()) {
             rm.setPower(power);
             lm.setPower(power);
+            int restrain = (int) (0 - getAbsoluteHeading());
+            if (restrain > error) {
+                rm.setPower(0.3);
+                lm.setPower(-0.3);
+            }
+            if (restrain < error) {
+                rm.setPower(-0.3);
+                lm.setPower(0.3);
+            }
+
+            else {
+                rm.setPower(power);
+                lm.setPower(power);
+            }
         }
         stopMotor();
     }
