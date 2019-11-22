@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.internal.Experiments.Michael;
+package org.firstinspires.ftc.robotcontroller.internal.Experiments.Calvin;
 
 import android.graphics.Path;
 
@@ -19,7 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 
 @Autonomous
-public class RangerAuto extends LinearOpMode {
+public class CalvinRangerAuto extends LinearOpMode {
     enum Direction {
         CLOCKWISE, COUNTERCLOCKWISE
     }
@@ -207,9 +207,13 @@ public class RangerAuto extends LinearOpMode {
         }
         stopMotor();
     }
-    public void moveForwardInchesGyro(double inches) throws InterruptedException {
+    public void moveForwardInchesGyro(double inches, double targetHeading) throws InterruptedException {
+
+        double constant = 100;
+
         double power;
-        double initialAngle = getAbsoluteHeading();
+        double error;
+
         int target = (int) (inches * COUNTS_PER_INCH);
         rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -221,29 +225,31 @@ public class RangerAuto extends LinearOpMode {
         pid.initPID(target, System.nanoTime());
 
         while(opModeIsActive() && rm.isBusy() && lm.isBusy()) {
+
             power = pid.actuator(rm.getCurrentPosition(), System.nanoTime()) * DRIVE_PWR;
-            double tuneConst = 100;
+            error = getAbsoluteHeading() - targetHeading;
+
             if (inches < 0) {
-                if (initialAngle - getAbsoluteHeading() > 0) {
-                    rm.setPower(-power - (initialAngle - getAbsoluteHeading() / tuneConst));
-                    lm.setPower(-power + (initialAngle - getAbsoluteHeading() / tuneConst));
+                if (error > 0) {
+                    rm.setPower(-power - (error / constant));
+                    lm.setPower(-power + (error / constant));
                 } else {
-                    rm.setPower(-power + (initialAngle - getAbsoluteHeading() / tuneConst));
-                    lm.setPower(-power - (initialAngle - getAbsoluteHeading() / tuneConst));
+                    rm.setPower(-power + (error / constant));
+                    lm.setPower(-power - (error / constant));
                 }
             } else {
-                if (initialAngle - getAbsoluteHeading() > 0) {
-                    rm.setPower(power + (initialAngle - getAbsoluteHeading() / tuneConst));
-                    lm.setPower(power - (initialAngle - getAbsoluteHeading() / tuneConst));
+                if (error > 0) {
+                    rm.setPower(power + (error / constant));
+                    lm.setPower(power - (error / constant));
                 } else {
-                    rm.setPower(power - (initialAngle - getAbsoluteHeading() / tuneConst));
-                    lm.setPower(power + (initialAngle - getAbsoluteHeading() / tuneConst));
+                    rm.setPower(power - (error / constant));
+                    lm.setPower(power + (error / constant));
                 }
             }
 
             telemetry.addData("rm_pwr", rm.getPower());
-            telemetry.addData("target_left", target - rm.getCurrentPosition());
             telemetry.addData("lm_pwr", lm.getPower());
+            telemetry.addData("target_left", target - rm.getCurrentPosition());
             telemetry.update();
         }
         stopMotor();

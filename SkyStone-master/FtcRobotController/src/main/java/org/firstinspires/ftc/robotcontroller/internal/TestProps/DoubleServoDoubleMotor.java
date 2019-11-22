@@ -24,9 +24,9 @@ public class DoubleServoDoubleMotor extends TeleOpMode {
     @Override
     public void init() {
 //        iml = hardwareMap.dcMotor.get("iml");
-//        iml.setDirection(DcMotorSimple.Direction.FORWARD);
+//        iml.setDirection(DcMotorSimple.turnDirection.FORWARD);
 //        imr = hardwareMap.dcMotor.get("imr");
-//        imr.setDirection(DcMotorSimple.Direction.REVERSE);
+//        imr.setDirection(DcMotorSimple.turnDirection.REVERSE);
 
         rs = hardwareMap.servo.get("rs");
         rs.setDirection(Servo.Direction.FORWARD);

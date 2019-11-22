@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.internal.Experiments.Calvin;
+package org.firstinspires.ftc.robotcontroller.internal.Experiments.Calvin.Testing;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 @Disabled
 @Autonomous
-public class CalvinTurn extends LinearOpMode {
+public class CalvinAutoEncoder extends LinearOpMode {
 
     protected BNO055IMU imu; //For detecting rotation
 
@@ -22,6 +22,7 @@ public class CalvinTurn extends LinearOpMode {
     static final double COUNTS_PER_REVOLUTION = 1120;
 
     static final double DRIVE_SPEED = 0.5;
+    static final double TURN_SPEED = 0.2;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -30,7 +31,10 @@ public class CalvinTurn extends LinearOpMode {
 
         waitForStart();
 
-        turnAbsolute(0.6, 90, 5);
+        for (int i = 0; i < 4; i++) {
+            encoderStraight(DRIVE_SPEED, 5);
+            encoderTurn(TURN_SPEED, 1.25, turnDirection.CLOCKWISE);
+        }
 
     }
 
@@ -54,21 +58,46 @@ public class CalvinTurn extends LinearOpMode {
         return imu.getAngularOrientation(AxesReference.INTRINSIC , AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
 
-    public void turnAbsolute(double speed, double degrees, double error) { //positive degrees is counterclockwise, negative is clockwise
-        leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public void encoderStraight(double speed, double revolutions) {
 
-        double target = getAbsoluteHeading() + degrees;
-        while (Math.abs(target - getAbsoluteHeading()) > error) {
-            if (target - getAbsoluteHeading() > 0) {
-                leftDrive.setPower(-((target-getAbsoluteHeading()) / target + 0.15) * speed);
-                rightDrive.setPower(((target-getAbsoluteHeading()) / target + 0.15) * speed);
-            }
-            else {
-                leftDrive.setPower(((target-getAbsoluteHeading()) / target + 0.15) * speed);
-                rightDrive.setPower(-((target-getAbsoluteHeading()) / target + 0.15) * speed);
-            }
+        leftDrive.setTargetPosition((int) (revolutions * COUNTS_PER_REVOLUTION));
+        rightDrive.setTargetPosition((int) (revolutions * COUNTS_PER_REVOLUTION));
+
+        leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftDrive.setPower(speed);
+        rightDrive.setPower(speed);
+
+        while (opModeIsActive() && (leftDrive.isBusy() && rightDrive.isBusy())) {
+            telemetry.addData("leftDrive", leftDrive.getPower());
+            telemetry.addData("rightDrive", rightDrive.getPower());
+            telemetry.update();
         }
+
+        stopMotorsAndResetEncoders();
+
+        sleep(1000);
+
+    }
+
+    public void encoderTurn(double speed, double revolutions, turnDirection direction) {
+        if (direction == turnDirection.CLOCKWISE)
+        {
+            leftDrive.setTargetPosition((int) (revolutions * COUNTS_PER_REVOLUTION));
+            rightDrive.setTargetPosition(-(int) (revolutions * COUNTS_PER_REVOLUTION));
+        }
+        else if (direction == turnDirection.COUNTERCLOCKWISE)
+        {
+            leftDrive.setTargetPosition(-(int) (revolutions * COUNTS_PER_REVOLUTION));
+            rightDrive.setTargetPosition((int) (revolutions * COUNTS_PER_REVOLUTION));
+        }
+
+        leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftDrive.setPower(speed);
+        rightDrive.setPower(speed);
 
         stopMotorsAndResetEncoders();
 
@@ -83,4 +112,7 @@ public class CalvinTurn extends LinearOpMode {
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
+    public enum turnDirection {
+        CLOCKWISE, COUNTERCLOCKWISE;
+    }
 }
