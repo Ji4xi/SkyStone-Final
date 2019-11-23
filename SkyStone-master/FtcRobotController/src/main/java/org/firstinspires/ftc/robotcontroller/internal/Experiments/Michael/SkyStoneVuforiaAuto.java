@@ -81,11 +81,11 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * is explained below.
  */
 //@Disabled
-@TeleOp(name="SKYSTONE Vuforia Nav", group ="Concept")
+@TeleOp(name="SKYSTONE Vuforia Nav g", group ="Concept")
 public class SkyStoneVuforiaAuto extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
-    // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
+    // 1) Camera Source.  Valid cho0ices are:  BACK (behind screen) or FRONT (selfie side)
     // 2) Phone Orientation. Choices are: PHONE_IS_PORTRAIT = true (portrait) or PHONE_IS_PORTRAIT = false (landscape)
     //
     // NOTE: If you are running on a CONTROL HUB, with only one USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
@@ -135,6 +135,7 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
     private FoundSkyStone foundSkyStone = FoundSkyStone.NOT_FOUND;
+    VuforiaTrackables targetsSkyStone;
 
     @Override public void runOpMode() {
         /*
@@ -155,7 +156,7 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
 
         // Load the data sets for the trackable objects. These particular data
         // sets are stored in the 'assets' part of our application.
-        VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
+        targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
         sleep(10000);
 
         VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
@@ -318,13 +319,18 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
         // Tap the preview window to receive a fresh image.
 
 
+
+        waitForStart();
+        telemetry.addData("skynum", FoundSkyStoneAngle(allTrackables));
+        telemetry.update();
+        sleep(5000);
     }
 
-    public double FoundSkyStoneAngle (VuforiaTrackables targetsSkyStone, List<VuforiaTrackable> allTrackables) {
+
+    public double FoundSkyStoneAngle (List<VuforiaTrackable> allTrackables) {
 
         targetsSkyStone.activate();
         while (foundSkyStone == FoundSkyStone.NOT_FOUND) {
-
             // check all the trackable targets to see which one (if any) is visible.
             targetVisible = false;
             for (VuforiaTrackable trackable : allTrackables) {
@@ -333,7 +339,8 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
 
                     if(trackable.getName().equals("Stone Target")){
                         telemetry.addLine("Stone Target Found");
-                        targetsSkyStone.deactivate();
+                        foundSkyStone = FoundSkyStone.FOUND;
+                        break;
                     }
 
                     targetVisible = true;
