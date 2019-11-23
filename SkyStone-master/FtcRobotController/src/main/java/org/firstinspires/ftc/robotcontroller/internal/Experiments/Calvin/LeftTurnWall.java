@@ -16,7 +16,7 @@ public class LeftTurnWall extends CalvinRangerAuto {
         waitForStart();
 
         moveForwardInches(4);
-        turnAbsolute(90, turnDirection.COUNTERCLOCKWISE, TURN_PWR);
+        turnAbsolute(90, Direction.COUNTERCLOCKWISE, TURN_PWR);
         moveForwardInches(34.5);
     }
 }
