@@ -26,7 +26,7 @@ public class CalvinRangerAuto extends LinearOpMode {
     protected BNO055IMU imu;
     DcMotor rm;
     DcMotor lm;
-    final double DRIVE_PWR = 0.8;
+    final double DRIVE_PWR = 0.6;
     final double TURN_PWR = 0.1;
 
     double error = 5;
@@ -47,8 +47,7 @@ public class CalvinRangerAuto extends LinearOpMode {
         initialize();
         waitForStart();
 
-        mode = true;
-        turnAbsolute(-90, Direction.CLOCKWISE, TURN_PWR);
+        moveForwardInchesGyro(39, 0);
         sleep(1000);
 
     }
@@ -65,8 +64,8 @@ public class CalvinRangerAuto extends LinearOpMode {
         lm = hardwareMap.dcMotor.get("lm");
         rm = hardwareMap.dcMotor.get("rm");
 
-        lm.setDirection(DcMotorSimple.Direction.FORWARD);
-        rm.setDirection(DcMotorSimple.Direction.REVERSE);
+        lm.setDirection(DcMotorSimple.Direction.REVERSE);
+        rm.setDirection(DcMotorSimple.Direction.FORWARD);
 
         rm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -153,7 +152,7 @@ public class CalvinRangerAuto extends LinearOpMode {
         int target = (int) (rev * COUNTS_PER_REVOLUTION);
         rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rm.setTargetPosition(target);
+        rm.setTargetPosition(target + 23004);
         lm.setTargetPosition(target);
 
 
@@ -210,7 +209,7 @@ public class CalvinRangerAuto extends LinearOpMode {
     public void moveForwardInchesGyro(double inches, double targetHeading) throws InterruptedException {
 
         double constant = 100;
-
+        double integral = 0.2;
         double power;
         double error;
 
@@ -226,21 +225,21 @@ public class CalvinRangerAuto extends LinearOpMode {
 
         while(opModeIsActive() && rm.isBusy() && lm.isBusy()) {
 
-            power = pid.actuator(rm.getCurrentPosition(), System.nanoTime()) * DRIVE_PWR;
+            power = Range.clip(pid.actuator(rm.getCurrentPosition(), System.nanoTime()) + integral, -1, 1) * DRIVE_PWR;
             error = getAbsoluteHeading() - targetHeading;
 
             if (inches < 0) {
                 if (error > 0) {
-                    rm.setPower(-power - (error / constant));
-                    lm.setPower(-power + (error / constant));
-                } else {
                     rm.setPower(-power + (error / constant));
                     lm.setPower(-power - (error / constant));
+                } else {
+                    rm.setPower(-power - (error / constant));
+                    lm.setPower(-power + (error / constant));
                 }
             } else {
                 if (error > 0) {
-                    rm.setPower(power + (error / constant));
-                    lm.setPower(power - (error / constant));
+                    rm.setPower(power - (error / constant));
+                    lm.setPower(power + (error / constant));
                 } else {
                     rm.setPower(power - (error / constant));
                     lm.setPower(power + (error / constant));
@@ -250,16 +249,17 @@ public class CalvinRangerAuto extends LinearOpMode {
             telemetry.addData("rm_pwr", rm.getPower());
             telemetry.addData("lm_pwr", lm.getPower());
             telemetry.addData("target_left", target - rm.getCurrentPosition());
+            telemetry.addData("target_left", target - lm.getCurrentPosition());
             telemetry.update();
         }
         stopMotor();
     }
 
     public void stopMotor() {
-        rm.setPower(0);
-        lm.setPower(0);
         rm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rm.setPower(0);
+        lm.setPower(0);
     }
 
     public final void sleep(long time, String input) {

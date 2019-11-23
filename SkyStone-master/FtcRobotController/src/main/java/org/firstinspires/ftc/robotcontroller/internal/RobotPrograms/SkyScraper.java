@@ -222,6 +222,55 @@ public class SkyScraper extends LinearOpMode {
         stopMotor();
     }
 
+    public void moveForwardInchesGyro(double inches, double targetHeading) throws InterruptedException {
+
+        double constant = 100;
+
+        double power;
+        double error;
+
+        int target = (int) (inches * COUNTS_PER_INCH);
+        rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rm.setTargetPosition(target);
+        lm.setTargetPosition(target);
+
+        rm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        pid.initPID(target, System.nanoTime());
+
+        while(opModeIsActive() && rm.isBusy() && lm.isBusy()) {
+
+            power = Range.clip(pid.actuator(rm.getCurrentPosition(), System.nanoTime()), -1, 1) * driveTrainPwr;
+            error = getAbsoluteHeading() - targetHeading;
+
+            if (inches < 0) {
+                if (error > 0) {
+                    rm.setPower(-power + (error / constant));
+                    lm.setPower(-power - (error / constant));
+                } else {
+                    rm.setPower(-power - (error / constant));
+                    lm.setPower(-power + (error / constant));
+                }
+            } else {
+                if (error > 0) {
+                    rm.setPower(power - (error / constant));
+                    lm.setPower(power + (error / constant));
+                } else {
+                    rm.setPower(power - (error / constant));
+                    lm.setPower(power + (error / constant));
+                }
+            }
+
+            telemetry.addData("rm_pwr", rm.getPower());
+            telemetry.addData("lm_pwr", lm.getPower());
+            telemetry.addData("target_left", target - rm.getCurrentPosition());
+            telemetry.update();
+        }
+        stopMotor();
+    }
+
+
     public void stopMotor() {
         rm.setPower(0);
         lm.setPower(0);
