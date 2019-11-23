@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.internal.Experiments.Calvin.Testing;
+package org.firstinspires.ftc.robotcontroller.internal.Experiments.Calvin;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
