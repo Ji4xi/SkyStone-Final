@@ -65,8 +65,8 @@ public class SkyScraper extends LinearOpMode {
         lm = hardwareMap.dcMotor.get("lm");
         rm = hardwareMap.dcMotor.get("rm");
 
-        lm.setDirection(DcMotorSimple.Direction.FORWARD);
-        rm.setDirection(DcMotorSimple.Direction.REVERSE);
+        lm.setDirection(DcMotorSimple.Direction.REVERSE);
+        rm.setDirection(DcMotorSimple.Direction.FORWARD);
 
         rightIntake = hardwareMap.dcMotor.get("rightIntake");
         leftIntake = hardwareMap.dcMotor.get("leftIntake");
