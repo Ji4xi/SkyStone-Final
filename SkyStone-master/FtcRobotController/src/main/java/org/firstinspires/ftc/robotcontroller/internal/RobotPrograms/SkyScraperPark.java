@@ -10,6 +10,6 @@ public class SkyScraperPark extends SkyScraper {
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
         //state 1
-        moveForward( 0.79);
+        moveForwardInchesGyro( 17.25, 0, 3);
     }
 }

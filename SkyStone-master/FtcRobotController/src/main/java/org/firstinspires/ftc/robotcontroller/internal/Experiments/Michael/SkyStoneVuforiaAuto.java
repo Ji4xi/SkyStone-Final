@@ -30,6 +30,7 @@ package org.firstinspires.ftc.robotcontroller.internal.Experiments.Michael;
  */
 
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -81,7 +82,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * is explained below.
  */
 //@Disabled
-@TeleOp(name="SKYSTONE Vuforia Nav g", group ="Concept")
+@Autonomous (name="SKYSTONE Vuforia Nav g", group ="Concept")
 public class SkyStoneVuforiaAuto extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
@@ -91,7 +92,7 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
     // NOTE: If you are running on a CONTROL HUB, with only one USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
     //
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-    private static final boolean PHONE_IS_PORTRAIT = false  ;
+    private static final boolean PHONE_IS_PORTRAIT = true  ;
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -137,7 +138,7 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
     private FoundSkyStone foundSkyStone = FoundSkyStone.NOT_FOUND;
     VuforiaTrackables targetsSkyStone;
 
-    @Override public void runOpMode() {
+    @Override public void runOpMode() throws InterruptedException{
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
@@ -157,7 +158,11 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
         // Load the data sets for the trackable objects. These particular data
         // sets are stored in the 'assets' part of our application.
         targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
-        sleep(10000);
+        telemetry.addData("Loading Asset", "Processing");
+        telemetry.update();
+        sleep(1000); //before was 10000
+        telemetry.addData("Loading Asset", "Finished");
+        telemetry.update();
 
         VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
         stoneTarget.setName("Stone Target");
@@ -320,19 +325,76 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
 
 
 
-        waitForStart();
-        telemetry.addData("skynum", FoundSkyStoneAngle(allTrackables));
-        telemetry.update();
-        sleep(5000);
+//        waitForStart();
+//        telemetry.addData("Found Skystone", "Processing");
+//        telemetry.update();
+//        telemetry.addData("Found Skystone", FoundSkyStoneAngle());
+//        telemetry.update();
+//        sleep(5000);
     }
 
 
-    public double FoundSkyStoneAngle (List<VuforiaTrackable> allTrackables) {
+    public boolean FoundSkyStoneAngle () {
+//        /*
+//         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+//         * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
+//         * If no camera monitor is desired, use the parameter-less constructor instead (commented out below).
+//         */
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+//
+//        // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+//
+//        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+//        parameters.cameraDirection   = CAMERA_CHOICE;
+//
+//        //  Instantiate the Vuforia engine
+//        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+//
+//        // Load the data sets for the trackable objects. These particular data
+//        // sets are stored in the 'assets' part of our application.
+//        targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
+//        telemetry.addData("Loading Asset", "Processing");
+//        telemetry.update();
+//        sleep(1000); //before was 10000
+//        telemetry.addData("Loading Asset", "Finished");
+//        telemetry.update();
+//
+//        VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
+//        stoneTarget.setName("Stone Target");
+//        VuforiaTrackable blueRearBridge = targetsSkyStone.get(1);
+//        blueRearBridge.setName("Blue Rear Bridge");
+//        VuforiaTrackable redRearBridge = targetsSkyStone.get(2);
+//        redRearBridge.setName("Red Rear Bridge");
+//        VuforiaTrackable redFrontBridge = targetsSkyStone.get(3);
+//        redFrontBridge.setName("Red Front Bridge");
+//        VuforiaTrackable blueFrontBridge = targetsSkyStone.get(4);
+//        blueFrontBridge.setName("Blue Front Bridge");
+//        VuforiaTrackable red1 = targetsSkyStone.get(5);
+//        red1.setName("Red Perimeter 1");
+//        VuforiaTrackable red2 = targetsSkyStone.get(6);
+//        red2.setName("Red Perimeter 2");
+//        VuforiaTrackable front1 = targetsSkyStone.get(7);
+//        front1.setName("Front Perimeter 1");
+//        VuforiaTrackable front2 = targetsSkyStone.get(8);
+//        front2.setName("Front Perimeter 2");
+//        VuforiaTrackable blue1 = targetsSkyStone.get(9);
+//        blue1.setName("Blue Perimeter 1");
+//        VuforiaTrackable blue2 = targetsSkyStone.get(10);
+//        blue2.setName("Blue Perimeter 2");
+//        VuforiaTrackable rear1 = targetsSkyStone.get(11);
+//        rear1.setName("Rear Perimeter 1");
+//        VuforiaTrackable rear2 = targetsSkyStone.get(12);
+//        rear2.setName("Rear Perimeter 2");
+
+        // For convenience, gather together all the trackable objects in one easily-iterable collection */
+        List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
+        allTrackables.addAll(targetsSkyStone);
 
         targetsSkyStone.activate();
         while (foundSkyStone == FoundSkyStone.NOT_FOUND) {
             // check all the trackable targets to see which one (if any) is visible.
-            targetVisible = false;
+            //targetVisible = false;
             if (allTrackables.get(0).getName().equals("Stone Target")) {
                 foundSkyStone = FoundSkyStone.FOUND;
                 break;
@@ -386,7 +448,7 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
         }
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
-        return 2;
+        return true;
     }
     enum FoundSkyStone {
         FOUND, NOT_FOUND

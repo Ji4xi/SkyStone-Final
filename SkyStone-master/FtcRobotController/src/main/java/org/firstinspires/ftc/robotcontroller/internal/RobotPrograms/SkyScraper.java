@@ -10,13 +10,14 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.PIDMichael;
 import org.firstinspires.ftc.robotcontroller.internal.Experiments.Michael.RangerAuto;
+import org.firstinspires.ftc.robotcontroller.internal.Experiments.Michael.SkyStoneVuforiaAuto;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.internal.camera.delegating.RefCountedSwitchableCamera;
 
 @Autonomous
-public class SkyScraper extends LinearOpMode {
+public class SkyScraper extends SkyStoneVuforiaAuto {
     enum Direction {
         CLOCKWISE, COUNTERCLOCKWISE
     }
@@ -43,17 +44,16 @@ public class SkyScraper extends LinearOpMode {
     PIDMichael pid = new PIDMichael(0.001, Math.pow(10, -12), 10000); //experimentally found
 
     boolean mode = true;
-
+    double foundSkyStoneAngle;
     @Override
     public void runOpMode() throws InterruptedException {
         //0.1 for turning, 0.8 for moving forward
         // don't get too close to 180 and -180
         initialize();
         waitForStart();
-
     }
 
-    public void initialize() {
+    public void initialize() throws InterruptedException{
         BNO055IMU.Parameters parameterz = new BNO055IMU.Parameters();
         parameterz.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameterz.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -65,8 +65,8 @@ public class SkyScraper extends LinearOpMode {
         lm = hardwareMap.dcMotor.get("lm");
         rm = hardwareMap.dcMotor.get("rm");
 
-        lm.setDirection(DcMotorSimple.Direction.REVERSE);
-        rm.setDirection(DcMotorSimple.Direction.FORWARD);
+        lm.setDirection(DcMotorSimple.Direction.FORWARD);
+        rm.setDirection(DcMotorSimple.Direction.REVERSE);
 
         rightIntake = hardwareMap.dcMotor.get("rightIntake");
         leftIntake = hardwareMap.dcMotor.get("leftIntake");
@@ -85,9 +85,12 @@ public class SkyScraper extends LinearOpMode {
         lm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         moveFoundationServos(1);
+        super.runOpMode();
     }
 
-    public void turnAbsolute(double angle, Direction direction, double power) {
+    public void turnAbsolutePID(double angle, Direction direction, double power) {
+        lm.setDirection(DcMotorSimple.Direction.REVERSE);
+        rm.setDirection(DcMotorSimple.Direction.FORWARD);
         double integral = 0.5;
         double error = 5;
         rm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -96,7 +99,7 @@ public class SkyScraper extends LinearOpMode {
             double angleLeft = Math.abs(getAbsoluteHeading() - angle);
             double firstDiff = Math.abs(getAbsoluteHeading() - angle);
             if (direction == Direction.CLOCKWISE) {
-                while (angleLeft > error) {
+                while (opModeIsActive() && angleLeft > error) {
                     angleLeft = Math.abs(getAbsoluteHeading() - angle);
                     if (power > integral) power = Range.clip(angleLeft / firstDiff, 0, 1) * power;
                     else power = integral;
@@ -111,7 +114,7 @@ public class SkyScraper extends LinearOpMode {
                     telemetry.update();
                 }
             } else {
-                while (angleLeft > error) {
+                while (opModeIsActive() && angleLeft > error) {
                     angleLeft = Math.abs(getAbsoluteHeading() - angle);
                     if (power > integral) power = Range.clip(angleLeft / firstDiff, 0, 1) * power;
                     else power = integral;
@@ -130,7 +133,7 @@ public class SkyScraper extends LinearOpMode {
             double angleLeft = Math.abs(getAbsoluteHeading() - (-angle));
             double firstDiff = Math.abs(getAbsoluteHeading() - (-angle));
             if (direction == Direction.COUNTERCLOCKWISE) {
-                while (angleLeft > error) {
+                while (opModeIsActive() && angleLeft > error) {
                     angleLeft = Math.abs(getAbsoluteHeading() - (-angle));
                     if (power > integral) power = Range.clip(angleLeft / firstDiff, 0, 1) * power;
                     else power = integral;
@@ -145,7 +148,7 @@ public class SkyScraper extends LinearOpMode {
                     telemetry.update();
                 }
             } else {
-                while (angleLeft > error) {
+                while (opModeIsActive() && angleLeft > error) {
                     angleLeft = Math.abs(getAbsoluteHeading() - (-angle));
                     if (power > integral) power = Range.clip(angleLeft / firstDiff, 0, 1) * power;
                     else power = integral;
@@ -161,7 +164,85 @@ public class SkyScraper extends LinearOpMode {
                 }
             }
         }
+        stopMotor();
+        lm.setDirection(DcMotorSimple.Direction.FORWARD);
+        rm.setDirection(DcMotorSimple.Direction.REVERSE);
     }
+    public void turnAbsolute(double angle, Direction direction, double maxpower) {
+        lm.setDirection(DcMotorSimple.Direction.REVERSE);
+        rm.setDirection(DcMotorSimple.Direction.FORWARD);
+        double integral = 0.5;
+        double error = 5;
+        rm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        if (mode) {
+            double angleLeft = Math.abs(getAbsoluteHeading() - angle);
+            double firstDiff = Math.abs(getAbsoluteHeading() - angle);
+            if (direction == Direction.CLOCKWISE) {
+                while (opModeIsActive() && angleLeft > error) {
+                    angleLeft = Math.abs(getAbsoluteHeading() - angle);
+                    rm.setPower(-maxpower);
+                    lm.setPower(maxpower);
+                    telemetry.addData("rm_pwr", rm.getPower());
+                    telemetry.addData("lm_pwr", lm.getPower());
+                    telemetry.addData("imu", getAbsoluteHeading());
+                    telemetry.addData("angleLeft", angleLeft);
+                    telemetry.addData("firstDiff", firstDiff);
+                    telemetry.addData("clockwise", "true");
+                    telemetry.update();
+                }
+            } else {
+                while (opModeIsActive() && angleLeft > error) {
+                    angleLeft = Math.abs(getAbsoluteHeading() - angle);
+                    rm.setPower(maxpower);
+                    lm.setPower(-maxpower);
+                    telemetry.addData("rm_pwr", rm.getPower());
+                    telemetry.addData("lm_pwr", lm.getPower());
+                    telemetry.addData("imu", getAbsoluteHeading());
+                    telemetry.addData("angleLeft", angleLeft);
+                    telemetry.addData("firstDiff", firstDiff);
+                    telemetry.addData("clockwise", "true");
+                    telemetry.update();
+                }
+            }
+        } else {
+            double angleLeft = Math.abs(getAbsoluteHeading() - (-angle));
+            double firstDiff = Math.abs(getAbsoluteHeading() - (-angle));
+            if (direction == Direction.COUNTERCLOCKWISE) {
+                while (opModeIsActive() && angleLeft > error) {
+                    angleLeft = Math.abs(getAbsoluteHeading() - (-angle));
+                    rm.setPower(-maxpower);
+                    lm.setPower(maxpower);
+                    telemetry.addData("rm_pwr", rm.getPower());
+                    telemetry.addData("lm_pwr", lm.getPower());
+                    telemetry.addData("imu", getAbsoluteHeading());
+                    telemetry.addData("angleLeft", angleLeft);
+                    telemetry.addData("firstDiff", firstDiff);
+                    telemetry.addData("clockwise", "true");
+                    telemetry.update();
+                }
+            } else {
+                while (opModeIsActive() && angleLeft > error) {
+                    angleLeft = Math.abs(getAbsoluteHeading() - (-angle));
+                    maxpower = 1;
+                    rm.setPower(maxpower);
+                    lm.setPower(-maxpower);
+                    telemetry.addData("rm_pwr", rm.getPower());
+                    telemetry.addData("lm_pwr", lm.getPower());
+                    telemetry.addData("imu", getAbsoluteHeading());
+                    telemetry.addData("angleLeft", angleLeft);
+                    telemetry.addData("firstDiff", firstDiff);
+                    telemetry.addData("clockwise", "true");
+                    telemetry.update();
+                }
+            }
+        }
+        stopMotor();
+        lm.setDirection(DcMotorSimple.Direction.FORWARD);
+        rm.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+
+
     public void moveForward(double rev) throws InterruptedException {
         double power = 0.8;
         int target = (int) (rev * COUNTS_PER_REVOLUTION);
@@ -222,10 +303,10 @@ public class SkyScraper extends LinearOpMode {
         stopMotor();
     }
 
-    public void moveForwardInchesGyro(double inches, double targetHeading) throws InterruptedException {
+    public void moveForwardInchesGyro(double inches, double targetHeading, long secondsSleep) throws InterruptedException {
 
         double constant = 100;
-
+        double integral = 0.2;
         double power;
         double error;
 
@@ -241,7 +322,7 @@ public class SkyScraper extends LinearOpMode {
 
         while(opModeIsActive() && rm.isBusy() && lm.isBusy()) {
 
-            power = Range.clip(pid.actuator(rm.getCurrentPosition(), System.nanoTime()), -1, 1) * driveTrainPwr;
+            power = Range.clip(pid.actuator(rm.getCurrentPosition(), System.nanoTime()) + integral, -1, 1) * driveTrainPwr;
             error = getAbsoluteHeading() - targetHeading;
 
             if (inches < 0) {
@@ -249,8 +330,8 @@ public class SkyScraper extends LinearOpMode {
                     rm.setPower(-power + (error / constant));
                     lm.setPower(-power - (error / constant));
                 } else {
-                    rm.setPower(-power - (error / constant));
-                    lm.setPower(-power + (error / constant));
+                    rm.setPower(-power + (error / constant));
+                    lm.setPower(-power - (error / constant));
                 }
             } else {
                 if (error > 0) {
@@ -265,11 +346,16 @@ public class SkyScraper extends LinearOpMode {
             telemetry.addData("rm_pwr", rm.getPower());
             telemetry.addData("lm_pwr", lm.getPower());
             telemetry.addData("target_left", target - rm.getCurrentPosition());
+            telemetry.addData("target_left", target - lm.getCurrentPosition());
             telemetry.update();
         }
         stopMotor();
+        sleep(secondsSleep * 1000, "go forward " + inches + " inches");
     }
 
+    public void moveForwardInchesGyro(double inches, double targetHeading) throws InterruptedException {
+        moveForwardInchesGyro(inches, targetHeading, 0);
+    }
 
     public void stopMotor() {
         rm.setPower(0);
