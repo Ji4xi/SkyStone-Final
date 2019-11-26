@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms;
+package org.firstinspires.ftc.robotcontroller.internal.Experiments.Calvin;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
