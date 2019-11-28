@@ -395,10 +395,13 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
         while (foundSkyStone == FoundSkyStone.NOT_FOUND) {
             // check all the trackable targets to see which one (if any) is visible.
             //targetVisible = false;
-            if (allTrackables.get(0).getName().equals("Stone Target")) {
+            if (((VuforiaTrackableDefaultListener)allTrackables.get(0).getListener()).isVisible()) {
                 foundSkyStone = FoundSkyStone.FOUND;
                 break;
             }
+//            if (allTrackables.get(0).getName().equals("Stone Target")) {
+//
+//            }
 //            for (VuforiaTrackable trackable : allTrackables) {
 //                if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
 //                    telemetry.addData("Visible Target", trackable.getName());

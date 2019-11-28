@@ -28,8 +28,8 @@ public class SkyScraperOp extends TeleOpMode {
         lm = hardwareMap.dcMotor.get("lm");
         rm = hardwareMap.dcMotor.get("rm");
 
-        lm.setDirection(DcMotorSimple.Direction.REVERSE);
-        rm.setDirection(DcMotorSimple.Direction.FORWARD);
+        lm.setDirection(DcMotorSimple.Direction.FORWARD);
+        rm.setDirection(DcMotorSimple.Direction.REVERSE);
 
         rightIntake = hardwareMap.dcMotor.get("rightIntake");
         leftIntake = hardwareMap.dcMotor.get("leftIntake");
@@ -77,8 +77,8 @@ public class SkyScraperOp extends TeleOpMode {
     }
     public void updateDriveTrain() {
         double lmPwr, rmPwr;
-        lmPwr = (gamepad1.left_stick_y - gamepad1.right_stick_x) * driveTrainPwr;
-        rmPwr = (gamepad1.left_stick_y + gamepad1.right_stick_x) * driveTrainPwr;
+        lmPwr = (-gamepad1.left_stick_y - gamepad1.right_stick_x) * driveTrainPwr;
+        rmPwr = (-gamepad1.left_stick_y + gamepad1.right_stick_x) * driveTrainPwr;
         lm.setPower(lmPwr);
         rm.setPower(rmPwr);
     }
