@@ -273,7 +273,23 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
         }
         stopMotor();
     }
+    public double moveForwardInches(double inches, boolean LookForSkyStone) throws InterruptedException {
+        double power = 0.2;
+        int target = (int) (inches * COUNTS_PER_INCH);
+        rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rm.setTargetPosition(target);
+        lm.setTargetPosition(target);
 
+        rm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rm.setPower(power);
+        lm.setPower(power);
+
+        FoundSkyStoneAngle();
+        stopMotor();
+        return rm.getCurrentPosition();
+    }
     public void moveForwardInches(double inches, long sleep) throws InterruptedException {
         double power = 0.8;
         int target = (int) (inches * COUNTS_PER_INCH);
