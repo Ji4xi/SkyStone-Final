@@ -30,7 +30,7 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
     DcMotor lift;
     Servo rs;
     Servo ls;
-    final double driveTrainPwr = 0.3;
+    double driveTrainPwr = 0.4;
     final double intakePwr = 0.8;
 
 
@@ -51,6 +51,7 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
         // don't get too close to 180 and -180
         initialize();
         waitForStart();
+
     }
 
     public void initialize() throws InterruptedException{
@@ -273,7 +274,7 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
         stopMotor();
     }
 
-    public void moveForwardInches(double inches) throws InterruptedException {
+    public void moveForwardInches(double inches, long sleep) throws InterruptedException {
         double power = 0.8;
         int target = (int) (inches * COUNTS_PER_INCH);
         rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -301,11 +302,12 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
             telemetry.update();
         }
         stopMotor();
+        sleep(sleep, "go forward " + inches + " inches");
     }
 
-    public void moveForwardInchesGyro(double inches, double targetHeading, long secondsSleep) throws InterruptedException {
+    public void moveForwardInchesGyro(double inches, double targetHeading, long sleep) throws InterruptedException {
 
-        double constant = 100;
+        double constant = 200;
         double integral = 0.2;
         double power;
         double error;
@@ -319,38 +321,53 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
         rm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         pid.initPID(target, System.nanoTime());
+        if (!mode) targetHeading *= -1;
 
         while(opModeIsActive() && rm.isBusy() && lm.isBusy()) {
 
             power = Range.clip(pid.actuator(rm.getCurrentPosition(), System.nanoTime()) + integral, -1, 1) * driveTrainPwr;
             error = getAbsoluteHeading() - targetHeading;
 
+
+
+            //counter-intuitive functions
             if (inches < 0) {
+                if (Math.abs(error) > 200) error = Math.abs(getAbsoluteHeading()) - Math.abs(targetHeading);
                 if (error > 0) {
                     rm.setPower(-power + (error / constant));
                     lm.setPower(-power - (error / constant));
                 } else {
-                    rm.setPower(-power + (error / constant));
-                    lm.setPower(-power - (error / constant));
+                    rm.setPower(-power - (error / constant));//
+                    lm.setPower(-power + (error / constant));//
                 }
             } else {
+                if (Math.abs(error) > 200) error = Math.abs(getAbsoluteHeading()) - Math.abs(targetHeading);
                 if (error > 0) {
-                    rm.setPower(power - (error / constant));
-                    lm.setPower(power + (error / constant));
+                    rm.setPower(power + (error / constant));
+                    lm.setPower(power - (error / constant));
                 } else {
-                    rm.setPower(power - (error / constant));
-                    lm.setPower(power + (error / constant));
+                    rm.setPower(power + (error / constant));//
+                    lm.setPower(power - (error / constant));//
                 }
             }
 
             telemetry.addData("rm_pwr", rm.getPower());
             telemetry.addData("lm_pwr", lm.getPower());
-            telemetry.addData("target_left", target - rm.getCurrentPosition());
-            telemetry.addData("target_left", target - lm.getCurrentPosition());
+            telemetry.addData("target_left rm", target - rm.getCurrentPosition());
+            telemetry.addData("target_left lm", target - lm.getCurrentPosition());
+            telemetry.addData("error", error);
+            telemetry.addData("heading", getAbsoluteHeading());
             telemetry.update();
         }
         stopMotor();
-        sleep(secondsSleep * 1000, "go forward " + inches + " inches");
+        sleep(sleep, "go forward " + inches + " inches");
+    }
+
+    public void moveForwardInchesGyro(double inches, double targetHeading, long secondsSleep, double power) throws InterruptedException{
+        double temp = driveTrainPwr;
+        driveTrainPwr = power;
+        moveForwardInchesGyro(inches, targetHeading, secondsSleep);
+        driveTrainPwr = temp;
     }
 
     public void moveForwardInchesGyro(double inches, double targetHeading) throws InterruptedException {

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous
-public class SkyScraperPullRed extends SkyScraperPullBlue {
+public class SkyScraperPullRedMiddle extends SkyScraperPullBlueMiddle {
 
     @Override
     public void runOpMode() throws InterruptedException {
