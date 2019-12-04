@@ -1,28 +1,24 @@
-package org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi;
+package org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi.OldArchive;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
-
-public class ComboTest1 extends TeleOpMode {
-    DcMotor motor;
-    Servo servo;
-    double MOTOR_MAX_PWR = 0.9;
+@Disabled
+@TeleOp
+public class JiaxiTest1 extends TeleOpMode {
+    double MOTOR_PWR_MAX = 0.9;
     double currentPower;
-    double MAX_POS = 1;
-    double MIN_POS = 0;
-    double currentPosition;
-    boolean switchFunctions = false;
+    boolean activated = false;
+    DcMotor motor;
+
 
     @Override
     public void init() {
-        servo = hardwareMap.servo.get("servo");
         motor = hardwareMap.dcMotor.get("motor");
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        servo.setDirection(Servo.Direction.REVERSE);
     }
 
     @Override
@@ -37,30 +33,35 @@ public class ComboTest1 extends TeleOpMode {
 
     @Override
     public void telemetry() {
-        telemetry.addData("motor", currentPower);
-        telemetry.addData("servo", currentPosition);
+        telemetry.addData("MOTOR_PWR", motor.getPower());
+        telemetry.addData("ACTIVATED", activated);
     }
 
     @Override
     public void updateData() {
-        if (!switchFunctions) {
-            currentPower = currentPower * MOTOR_MAX_PWR;
+        if (!activated) {
+            currentPower = currentPower * MOTOR_PWR_MAX;
         }
-        if (switchFunctions) {
+        if (activated) {
+            if (gamepad1.x) {
+                currentPower = 0.8;
+            }
+            if (gamepad1.y) {
+                currentPower = 0.5;
+            }
             if (gamepad1.dpad_up) {
-                currentPosition += 0.01;
+                currentPower += 0.01;
             }
             if (gamepad1.dpad_down) {
-                currentPosition -= 0.01;
+                currentPower -= 0.01;
             }
         }
         motor.setPower(currentPower);
-        servo.setPosition(currentPosition);
         if (gamepad1.start) {
-            switchFunctions = true;
+            activated = true;
         }
         if (gamepad1.back) {
-            switchFunctions = false;
+            activated = false;
         }
     }
 }

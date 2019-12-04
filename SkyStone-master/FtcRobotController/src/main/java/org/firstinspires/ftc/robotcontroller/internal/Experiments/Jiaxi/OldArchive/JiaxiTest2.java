@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi;
+package org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi.OldArchive;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -6,17 +6,15 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
-/**
- * Depending on whether or not the start button is pressed, there will be different methods
- * in setting the speed of the motor
- **/
+
 @Disabled
 @TeleOp
-public class JiaxiHW2 extends TeleOpMode {
+public class JiaxiTest2 extends TeleOpMode{
     DcMotor motor;
-    double MOTOR_PWR_MAX = 0.9;
+    double MAX_POW = 1;
     double currentPower;
-    boolean flag = false;
+    boolean activated = true;
+
     @Override
     public void init() {
         motor = hardwareMap.dcMotor.get("motor");
@@ -24,33 +22,39 @@ public class JiaxiHW2 extends TeleOpMode {
     }
 
     @Override
-    public void start(){
+    public void start() {
         super.start();
     }
 
     @Override
-    public void stop(){
+    public void stop() {
         super.stop();
     }
 
     @Override
     public void telemetry() {
-        telemetry.addData("MOTOR_PWR", motor.getPower());
-        telemetry.addData("mode", flag);
+        telemetry.addData("motor", motor.getPower());
+        telemetry.addData("activated", activated);
     }
 
     @Override
     public void updateData() {
-        if (!flag) {
-            currentPower = gamepad1.left_stick_y * MOTOR_PWR_MAX;
+        if (activated) {
+            currentPower = currentPower * MAX_POW;
         }
 
-        if (flag) {
+        if (!activated) {
             if (gamepad1.x) {
-                currentPower = 0.8;
+                currentPower = 0.25;
+            }
+            if (gamepad1.b) {
+                currentPower = 0.5;
             }
             if (gamepad1.y) {
-                currentPower = 0.5;
+                currentPower = 0.75;
+            }
+            if (gamepad1.a) {
+                currentPower = 1;
             }
             if (gamepad1.dpad_up) {
                 currentPower += 0.01;
@@ -59,14 +63,12 @@ public class JiaxiHW2 extends TeleOpMode {
                 currentPower -= 0.01;
             }
         }
-
+        motor.setPower(currentPower);
         if (gamepad1.start) {
-            flag = true;
+            activated = true;
         }
         if (gamepad1.back) {
-            flag = false;
+            activated = false;
         }
-
-        motor.setPower(currentPower);
     }
 }
