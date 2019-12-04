@@ -85,12 +85,12 @@ public class SkyScraperOp extends TeleOpMode {
 
     public void updateIntake() {
         if(gamepad2.left_bumper) {
-            rightIntake.setPower(intakePwr);
-            leftIntake.setPower(intakePwr);
+            rightIntake.setPower(0.5 * intakePwr);
+            leftIntake.setPower(0.5 * intakePwr);
         }
         else if(gamepad2.right_bumper) {
-            rightIntake.setPower(-0.4);
-            leftIntake.setPower(-0.4);
+            rightIntake.setPower(-intakePwr);
+            leftIntake.setPower(-intakePwr);
         }
         else {
             rightIntake.setPower(0);
