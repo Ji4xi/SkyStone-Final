@@ -11,7 +11,6 @@ public class SkyScraperPullBlueMiddle extends SkyScraper {
         long sleepTime = 700;
 
 
-
         moveForwardInchesGyro(48, 0, sleepTime);
         turnAbsolutePID(90, Direction.COUNTERCLOCKWISE, 0.3);
         sleep(sleepTime, "turn counterclockwise 90 deg");
@@ -33,21 +32,5 @@ public class SkyScraperPullBlueMiddle extends SkyScraper {
         sleep(sleepTime, "turn toward bridge -90");
         moveForwardInches(12, sleepTime);
 
-
-//        moveForwardInches(39.5);
-//        sleep(3000, "go forward 39.5 inches");
-//        turnAbsolute(90, Direction.COUNTERCLOCKWISE, 0.6);
-//        sleep(3000, "turn counterclockwise 90 deg");
-//        moveForwardInches(2);
-//        sleep(3000, "go forward 2 inches");
-//        rs.setPosition(0);
-//        ls.setPosition(0);
-//        sleep(3000, "hook on");
-//        turnAbsolute(-45, Direction.COUNTERCLOCKWISE, 0.6);
-//        sleep(3000, "turn 135 deg clockwise");
-//        moveForwardInches(6);
-//        sleep(3000, "go forward 6 inches");
-//        moveFoundationServos(1);
-//        sleep(3000, "unlower claw for foundation");
     }
 }

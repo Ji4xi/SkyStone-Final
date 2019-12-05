@@ -287,8 +287,9 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
         lm.setPower(power);
 
         FoundSkyStoneAngle();
+        double position = rm.getCurrentPosition();
         stopMotor();
-        return rm.getCurrentPosition();
+        return position;
     }
     public void moveForwardInches(double inches, long sleep) throws InterruptedException {
         double power = 0.8;
