@@ -9,11 +9,14 @@ public class ParkOutsideLeft extends SkyScraper {
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-        sleep(20000);
-        moveForwardInchesGyro(36, 0, 2);
+
+        long sleepTime = 700;
+
+        sleep(15000);
+        moveForwardInchesGyro(24, 0, sleepTime);
         turnAbsolutePID(90, Direction.COUNTERCLOCKWISE, 0.3);
-        sleep(2000);
-        moveForwardInchesGyro(7, 2);
+        sleep(sleepTime);
+        moveForwardInchesGyro(12, 90, sleepTime);
     }
     
 }
