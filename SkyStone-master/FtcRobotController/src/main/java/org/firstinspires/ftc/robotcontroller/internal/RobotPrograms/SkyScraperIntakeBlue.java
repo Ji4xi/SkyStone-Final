@@ -33,62 +33,72 @@ public class SkyScraperIntakeBlue extends SkyScraper{
             position = Brick.RIGHT;
         }
 
+        //move to skystone
+        double brickDistance = 0;
+        switch (position) {
+            case LEFT:
+                brickDistance = 4;
+                break;
+            case MIDDLE:
+                brickDistance = 12;
+                break;
+            case RIGHT:
+                brickDistance = 20;
+                break;
+        }
+
         sleep(sleepTime, "move to first skystone");
 
         //turn toward skystone
         turnAbsolutePID(0, Direction.COUNTERCLOCKWISE, 0.3);
+        sleep(sleepTime, "turn toward skystone");
 
         // intake skystone
 
         // turn toward bridge
-        turnAbsolutePID(90, Direction.COUNTERCLOCKWISE, 0.3);
+        turnAbsolutePID(135, Direction.COUNTERCLOCKWISE, 0.3);
+        sleep(sleepTime, "turn toward bridge");
 
-        //move to skystone
-        switch (position) {
-            case LEFT:
-                moveForwardInches(4, sleepTime);
-            case MIDDLE:
-                moveForwardInches(12, sleepTime);
-            case RIGHT:
-                moveForwardInches(20, sleepTime);
-        }
+        moveForwardInchesGyro(25, 135, sleepTime);
 
-//        // move toward bridge
-//        moveForwardInches(25, sleepTime);
-//
-//        //finish turning toward bridge
-//        turnAbsolutePID(-90, Direction.CLOCKWISE, 0.3);
-//
-//        // move under bridge
-//        moveForwardInches(35);
-//
-//        //drop stone
-//
-//        //go back
-//        moveForwardInches(-35);
-//        turnAbsolutePID(-135, Direction.COUNTERCLOCKWISE, 0.3);
-//        moveForwardInches(-25);
-//        turnAbsolutePID(-90, Direction.CLOCKWISE, 0.3);
-//
-//        //move to other skystone
-//        moveForwardInches(-24);
-//
-//        //turn toward skystone
-//        turnAbsolutePID(0, Direction.COUNTERCLOCKWISE, 0.3);
-//
-//        // intake skystone
-//
-//        // turn toward bridge
-//        turnAbsolutePID(-135, Direction.COUNTERCLOCKWISE, 0.3);
-//
-//        // move toward bridge
-//        moveForwardInches(25);
-//
-//        //finish turning toward bridge
-//        turnAbsolutePID(-90, Direction.CLOCKWISE, 0.3);
-//
-//        // move under bridge
-//        moveForwardInches(35);
+        turnAbsolutePID(90, Direction.CLOCKWISE, 0.3);
+        sleep(sleepTime, "turn toward parking space");
+
+        // move under bridge
+
+        moveForwardInchesGyro(12 + brickDistance, 90, sleepTime);
+
+        //drop stone
+
+        //go back
+        moveForwardInchesGyro(-12 - brickDistance, 90, sleepTime);
+        turnAbsolutePID(135, Direction.COUNTERCLOCKWISE, 0.3);
+        sleep(sleepTime);
+        moveForwardInches(-25, sleepTime);
+        turnAbsolutePID(90, Direction.CLOCKWISE, 0.3);
+        sleep(sleepTime);
+
+        //move to other skystone
+        moveForwardInches(-24, sleepTime);
+
+        //turn toward skystone
+        turnAbsolutePID(0, Direction.CLOCKWISE, 0.3);
+        sleep(sleepTime, "turn toward skystone");
+
+        // intake skystone
+
+        // turn toward bridge
+        turnAbsolutePID(135, Direction.COUNTERCLOCKWISE, 0.3);
+        sleep(sleepTime, "turn toward bridge");
+
+        moveForwardInchesGyro(25, 135, sleepTime);
+
+        turnAbsolutePID(90, Direction.CLOCKWISE, 0.3);
+        sleep(sleepTime, "turn toward parking space");
+
+        // move under bridge
+
+        moveForwardInchesGyro(36 + brickDistance, 90, sleepTime);
 
         //drop stone
 
