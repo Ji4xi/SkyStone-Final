@@ -274,7 +274,7 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
         stopMotor();
     }
     public double moveForwardInches(double inches, boolean LookForSkyStone) throws InterruptedException {
-        double power = 0.2;
+        double power = 0.08;
         int target = (int) (inches * COUNTS_PER_INCH);
         rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
