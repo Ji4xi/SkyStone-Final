@@ -11,47 +11,58 @@ public class SkyScraperIntakeBlue extends SkyScraper{
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
 
-        long sleepTime = 700;
+        long sleepTime = 200;
 
-        Brick position;
+//        Brick position;
 
         //move toward bricks
         moveForwardInchesGyro(24, 0, sleepTime);
         //turn toward bricks
         turnAbsolutePID(-90, Direction.CLOCKWISE, 0.3);
         sleep(sleepTime, "turn toward bricks");
+        int blockPlace = 0;
 
-        double distance = moveForwardInches(24, true);
-
-        if (distance < 8) {
-            position = Brick.LEFT;
-        }
-        else if (8 < distance && distance < 16) {
-            position = Brick.MIDDLE;
-        }
-        else {
-            position = Brick.RIGHT;
-        }
-
-        //move to skystone
-        double brickDistance = 0;
-        switch (position) {
-            case LEFT:
-                brickDistance = 4;
+        for (int i = 0; i < 2; i++) {
+            blockPlace = i + 1;
+            if (FoundSkyStoneAngle(500)) {
+                telemetry.addData("found", "found");
+                telemetry.update();
                 break;
-            case MIDDLE:
-                brickDistance = 12;
-                break;
-            case RIGHT:
-                brickDistance = 20;
-                break;
+            }
+            moveForwardInchesGyro(8, -90, 0, 0.3);
         }
 
-        sleep(sleepTime, "move to first skystone");
+//        double distance = moveForwardInches(24, true);
+//
+//        if (distance < 8) {
+//            position = Brick.LEFT;
+//        }
+//        else if (8 < distance && distance < 16) {
+//            position = Brick.MIDDLE;
+//        }
+//        else {
+//            position = Brick.RIGHT;
+//        }
+//
+//        //move to skystone
+//        double brickDistance = 0;
+//        switch (position) {
+//            case LEFT:
+//                brickDistance = 4;
+//                break;
+//            case MIDDLE:
+//                brickDistance = 12;
+//                break;
+//            case RIGHT:
+//                brickDistance = 20;
+//                break;
+//        }
+//
+//        sleep(sleepTime, "move to first skystone");
 
         //turn toward skystone
-        moveForwardInchesGyro(2, -90, sleepTime);
-        turnAbsolutePID(20, Direction.COUNTERCLOCKWISE, 0.3);
+        moveForwardInchesGyro(3, -90, sleepTime);
+        turnAbsolutePID(25, Direction.COUNTERCLOCKWISE, 0.45);
         sleep(sleepTime, "turn toward skystone");
 
         // intake skystone
@@ -65,26 +76,30 @@ public class SkyScraperIntakeBlue extends SkyScraper{
 
         sleep(sleepTime, "turn toward bridge");
 
-        moveForwardInchesGyro(25, 135, sleepTime, 0.3);
+        moveForwardInchesGyro(25, 135, sleepTime, 0.5);
 
         turnAbsolutePID(90, Direction.CLOCKWISE, 0.3);
         sleep(sleepTime, "turn toward parking space");
 
         // move under bridge
 
-        moveForwardInchesGyro(12 + brickDistance, 90, sleepTime);
-
-        //drop stone
-        rightIntake.setPower(-0.8);
-        leftIntake.setPower(-0.8);
-        sleep(1000);
-        //go back and park avoid going backward
-//        turnAbsolutePID(-90, Direction.COUNTERCLOCKWISE, 0.3);
-//        moveForwardInchesGyro(5, -90);
-//        moveForwardInchesGyro(-12 - brickDistance, 90, sleepTime);
-        rightIntake.setPower(0);
-        leftIntake.setPower(0);
-//        turnAbsolutePID(134, Direction.COUNTERCLOCKWISE, 0.3);
+        moveForwardInchesGyro(16 + (12 * blockPlace), 90, sleepTime);
+        rightIntake.setPower(-0.4);
+        leftIntake.setPower(-0.4);
+        sleep(500);
+        moveForwardInchesGyro(-5, 90, sleepTime);
+1
+//        //drop stone
+//        rightIntake.setPower(-0.8);
+//        leftIntake.setPower(-0.8);
+//        sleep(1000);
+//        //go back and park avoid going backward
+////        turnAbsolutePID(-90, Direction.COUNTERCLOCKWISE, 0.3);
+////        moveForwardInchesGyro(5, -90);
+////        moveForwardInchesGyro(-12 - brickDistance, 90, sleepTime);
+//        rightIntake.setPower(0);
+//        leftIntake.setPower(0);
+////        turnAbsolutePID(134, Direction.COUNTERCLOCKWISE, 0.3);
 //        sleep(sleepTime);
 //        moveForwardInches(-25, sleepTime);
 //        turnAbsolutePID(90, Direction.CLOCKWISE, 0.3);

@@ -335,7 +335,7 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
     }
 
 
-    public boolean FoundSkyStoneAngle () {
+    public boolean FoundSkyStoneAngle (long time) {
 //        /*
 //         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
 //         * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
@@ -393,7 +393,8 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
         allTrackables.addAll(targetsSkyStone);
 
         targetsSkyStone.activate();
-        while (foundSkyStone == FoundSkyStone.NOT_FOUND) {
+        long startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() < time + startTime) {
             // check all the trackable targets to see which one (if any) is visible.
             //targetVisible = false;
             if (((VuforiaTrackableDefaultListener)allTrackables.get(0).getListener()).isVisible()) {
@@ -454,7 +455,7 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
         }
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
-        return true;
+        return foundSkyStone == FoundSkyStone.FOUND;
     }
     enum FoundSkyStone {
         FOUND, NOT_FOUND

@@ -273,24 +273,26 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
         }
         stopMotor();
     }
-    public double moveForwardInches(double inches, boolean LookForSkyStone) throws InterruptedException {
-        double power = 0.08;
-        int target = (int) (inches * COUNTS_PER_INCH);
-        rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rm.setTargetPosition(target);
-        lm.setTargetPosition(target);
 
-        rm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rm.setPower(power);
-        lm.setPower(power);
 
-        FoundSkyStoneAngle();
-        double position = rm.getCurrentPosition();
-        stopMotor();
-        return position;
-    }
+//    public double moveForwardInches(double inches, boolean LookForSkyStone) throws InterruptedException {
+//        double power = 0.08;
+//        int target = (int) (inches * COUNTS_PER_INCH);
+//        rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        rm.setTargetPosition(target);
+//        lm.setTargetPosition(target);
+//
+//        rm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        lm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        rm.setPower(power);
+//        lm.setPower(power);
+//
+//        FoundSkyStoneAngle();
+//        double position = rm.getCurrentPosition();
+//        stopMotor();
+//        return position;
+//    }
     public void moveForwardInches(double inches, long sleep) throws InterruptedException {
         double power = 0.8;
         int target = (int) (inches * COUNTS_PER_INCH);
@@ -380,10 +382,10 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
         sleep(sleep, "go forward " + inches + " inches");
     }
 
-    public void moveForwardInchesGyro(double inches, double targetHeading, long secondsSleep, double power) throws InterruptedException{
+    public void moveForwardInchesGyro(double inches, double targetHeading, long sleep, double power) throws InterruptedException{
         double temp = driveTrainPwr;
         driveTrainPwr = power;
-        moveForwardInchesGyro(inches, targetHeading, secondsSleep);
+        moveForwardInchesGyro(inches, targetHeading, sleep);
         driveTrainPwr = temp;
     }
 
