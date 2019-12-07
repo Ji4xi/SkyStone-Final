@@ -87,11 +87,11 @@ public class SkyScraperIntakeRed extends SkyScraper{
 
         // move under bridge
 
-        moveForwardInchesGyro(16 + (18 * blockPlace), -90, sleepTime);
+        moveForwardInchesGyro(14 + (20 * blockPlace), -90, sleepTime);
         rightIntake.setPower(-0.4);
         leftIntake.setPower(-0.4);
         sleep(500);
-        moveForwardInchesGyro(-8, -90, sleepTime);
+        moveForwardInchesGyro(-17, -90, sleepTime);
 //        //drop stone
 //        rightIntake.setPower(-0.8);
 //        leftIntake.setPower(-0.8);
