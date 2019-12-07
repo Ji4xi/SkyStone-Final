@@ -11,12 +11,12 @@ public class SkyScraperIntakeBlue extends SkyScraper{
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
 
-        long sleepTime = 200;
+        long sleepTime = 400;
 
 //        Brick position;
 
         //move toward bricks
-        moveForwardInchesGyro(24, 0, sleepTime);
+        moveForwardInchesGyro(22.5, 0, sleepTime);
         //turn toward bricks
         turnAbsolutePID(-90, Direction.CLOCKWISE, 0.3);
         sleep(sleepTime, "turn toward bricks");
@@ -63,9 +63,12 @@ public class SkyScraperIntakeBlue extends SkyScraper{
         //turn toward skystone
         moveForwardInchesGyro(3, -90, sleepTime);
         turnAbsolutePID(25, Direction.COUNTERCLOCKWISE, 0.45);
+        moveForwardInchesGyro(2, 25, 500);
         sleep(sleepTime, "turn toward skystone");
 
         // intake skystone
+        rightIntake.setPower(0.8);
+        leftIntake.setPower(0.8);
         rightIntake.setPower(0.8);
         leftIntake.setPower(0.8);
         moveForwardInchesGyro(15, 10);
@@ -88,7 +91,6 @@ public class SkyScraperIntakeBlue extends SkyScraper{
         leftIntake.setPower(-0.4);
         sleep(500);
         moveForwardInchesGyro(-5, 90, sleepTime);
-1
 //        //drop stone
 //        rightIntake.setPower(-0.8);
 //        leftIntake.setPower(-0.8);
