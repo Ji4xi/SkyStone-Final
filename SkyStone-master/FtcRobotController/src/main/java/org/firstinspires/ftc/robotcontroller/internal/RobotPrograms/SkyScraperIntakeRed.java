@@ -20,11 +20,11 @@ public class SkyScraperIntakeRed extends SkyScraper{
         //turn toward bricks
         turnAbsolutePID(-90, Direction.CLOCKWISE, 0.3);
         sleep(sleepTime, "turn toward bricks");
-        int blockPlace = 0;
+        int blockPlace = 2;
         moveForwardInchesGyro(1.3, -90, sleepTime);
 
-        for (int i = 0; i < 2; i++) {
-            blockPlace = i + 1;
+        for (int i = 2; i > 0; i--) {
+            blockPlace = i;
             if (FoundSkyStoneAngle(500)) {
                 telemetry.addData("found", "found");
                 telemetry.update();
@@ -62,7 +62,7 @@ public class SkyScraperIntakeRed extends SkyScraper{
 //        sleep(sleepTime, "move to first skystone");
 
         //turn toward skystone
-        moveForwardInchesGyro(-12, -90, sleepTime);
+        moveForwardInchesGyro(-11, -90, sleepTime);
         turnAbsolutePID(-20, Direction.COUNTERCLOCKWISE, 0.45);
         moveForwardInchesGyro(2, -25, 500);
         sleep(sleepTime, "turn toward skystone");
@@ -87,7 +87,7 @@ public class SkyScraperIntakeRed extends SkyScraper{
 
         // move under bridge
 
-        moveForwardInchesGyro(24 + (12 * blockPlace), -90, sleepTime);
+        moveForwardInchesGyro(16 + (18 * blockPlace), -90, sleepTime);
         rightIntake.setPower(-0.4);
         leftIntake.setPower(-0.4);
         sleep(500);
