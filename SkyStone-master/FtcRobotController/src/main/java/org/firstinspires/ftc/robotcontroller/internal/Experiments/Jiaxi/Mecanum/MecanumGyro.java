@@ -137,6 +137,7 @@ public class MecanumGyro extends LinearOpMode {
         //math
         double circ = Math.PI * (3.25);
         int target = (int) (inches / circ * tpr);
+        double change;
         //initialize
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -164,9 +165,15 @@ public class MecanumGyro extends LinearOpMode {
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         while (Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4 <= target) {
             double average = Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4;
+            if (direction == Side.RIGHT) {
+                change = getAbsoluteHeading();
+            }
+            else {
+                change = -getAbsoluteHeading();
+            }
             //reset power
-            forwardPower = power + (getAbsoluteHeading() - absoluteHeading)/50;
-            backwardPower = power - (getAbsoluteHeading() - absoluteHeading)/50;
+            forwardPower = power + (change - absoluteHeading)/50;
+            backwardPower = power - (change - absoluteHeading)/50;
             //bounds
             forwardPower= Range.clip(forwardPower, -1, 1);
             backwardPower = Range.clip(backwardPower, -1, 1);
