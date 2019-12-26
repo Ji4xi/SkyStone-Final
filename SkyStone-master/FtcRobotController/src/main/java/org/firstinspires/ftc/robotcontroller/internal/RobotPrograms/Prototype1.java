@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcontroller.internal.Experiments.Kevin.FoundationServoKevin;
 import org.firstinspires.ftc.robotcontroller.internal.Experiments.Michael.AutoAssessement;
 
-//@Disabled
+@Disabled
 @TeleOp
 public class Prototype1 extends FoundationServoKevin {
 }
