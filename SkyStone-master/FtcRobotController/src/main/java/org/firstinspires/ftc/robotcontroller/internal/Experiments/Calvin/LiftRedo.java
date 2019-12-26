@@ -85,7 +85,7 @@ public class LiftRedo extends TeleOpMode {
         if (gamepad1.x) gripPosition = GRIP_MAX_POS;
         else if (gamepad1.y) gripPosition = GRIP_MIN_POS;
 
-        //dpad left and right to adjust grip
+        //dpad servo and right to adjust grip
         if (gamepad1.dpad_right) gripPosition += 0.01;
         else if (gamepad1.dpad_left) gripPosition -= 0.01;
 
