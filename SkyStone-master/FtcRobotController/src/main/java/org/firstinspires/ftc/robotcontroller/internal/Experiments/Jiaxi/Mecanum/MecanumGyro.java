@@ -54,7 +54,7 @@ public class MecanumGyro extends LinearOpMode {
         sleepSeconds(2);
         TurnGyro(90, TurnDirection.CCW, 0.5);
         sleepSeconds(2);
-        TurnGyro(0, TurnDirection.CW, 0.5);
+        TurnGyro(-90, TurnDirection.CW, 0.5);
 
     }
 
@@ -311,20 +311,20 @@ public class MecanumGyro extends LinearOpMode {
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        while (getAbsoluteHeading() != target || getAbsoluteHeading() != target + 5 || getAbsoluteHeading() != target - 5) {
+        while (getAbsoluteHeading() != target || getAbsoluteHeading() != target + 5 || getAbsoluteHeading() != target - 5 ) {
             //set power
             if (getAbsoluteHeading() < target / 2) {
-                fr.setPower((power * (getAbsoluteHeading() / target)) + .2);
-                br.setPower((power * (getAbsoluteHeading() / target)) + .2);
-                bl.setPower((power * (getAbsoluteHeading() / target)) + .2);
-                fl.setPower((power * (getAbsoluteHeading() / target)) + .2);
+                fr.setPower((power * (getAbsoluteHeading() / target)) + .3);
+                br.setPower((power * (getAbsoluteHeading() / target)) + .3);
+                bl.setPower((power * (getAbsoluteHeading() / target)) + .3);
+                fl.setPower((power * (getAbsoluteHeading() / target)) + .3);
             }
             else if (getAbsoluteHeading() > target / 2) {
                 double justSomeMath = target - getAbsoluteHeading();
-                fr.setPower((power * (justSomeMath / target)) + .2);
-                br.setPower((power * (justSomeMath / target)) + .2);
-                bl.setPower((power * (justSomeMath / target)) + .2);
-                fl.setPower((power * (justSomeMath / target)) + .2);
+                fr.setPower((power * (justSomeMath / target)) + .3);
+                br.setPower((power * (justSomeMath / target)) + .3);
+                bl.setPower((power * (justSomeMath / target)) + .3);
+                fl.setPower((power * (justSomeMath / target)) + .3);
             }
             //telemetry
             telemetry();
