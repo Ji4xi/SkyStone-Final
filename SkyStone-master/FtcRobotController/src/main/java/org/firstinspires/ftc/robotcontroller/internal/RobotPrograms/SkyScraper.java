@@ -30,7 +30,7 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
     DcMotor lift;
     Servo rs;
     Servo ls;
-    double driveTrainPwr = 0.4;
+    double driveTrainPwr = 0.45;
     final double intakePwr = 0.8;
 
 
@@ -388,6 +388,14 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
         moveForwardInchesGyro(inches, targetHeading, sleep);
         driveTrainPwr = temp;
     }
+
+//    public void lift(double power, double rev) {
+//        lift.setTargetPosition((int) (rev * COUNTS_PER_REVOLUTION));
+//        while (lift.isBusy()) {
+//            lift.setPower(power);
+//        }
+//        stopMotor();
+//    }
 
     public void moveForwardInchesGyro(double inches, double targetHeading) throws InterruptedException {
         moveForwardInchesGyro(inches, targetHeading, 0);
