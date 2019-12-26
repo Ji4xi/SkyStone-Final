@@ -88,7 +88,7 @@ public class SkyScraperIntakeBlue extends SkyScraper{
         leftIntake.setPower(-0.4);
         sleep(500);
         moveForwardInchesGyro(-5, 90, sleepTime);
-1
+
 //        //drop stone
 //        rightIntake.setPower(-0.8);
 //        leftIntake.setPower(-0.8);
