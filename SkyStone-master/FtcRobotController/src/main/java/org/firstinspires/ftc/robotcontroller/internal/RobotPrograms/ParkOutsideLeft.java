@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.SkyScraper;
 
 @Autonomous
+@Disabled
 public class ParkOutsideLeft extends SkyScraper {
     @Override
     public void runOpMode() throws InterruptedException {

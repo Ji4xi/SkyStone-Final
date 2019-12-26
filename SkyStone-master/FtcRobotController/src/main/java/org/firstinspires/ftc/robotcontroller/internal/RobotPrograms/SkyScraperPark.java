@@ -3,7 +3,7 @@ package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-//@Disabled
+@Disabled
 @Autonomous
 public class SkyScraperPark extends SkyScraper {
     @Override

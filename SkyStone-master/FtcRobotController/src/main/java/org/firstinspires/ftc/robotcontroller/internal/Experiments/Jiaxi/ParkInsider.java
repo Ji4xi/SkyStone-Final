@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.SkyScraper;
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.SkyScraperIntakeBlue;
 
+@Disabled
 @Autonomous
 public class ParkInsider extends SkyScraper {
 

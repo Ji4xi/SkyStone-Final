@@ -392,6 +392,8 @@ public class SkyStoneVuforiaAuto extends LinearOpMode {
         List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targetsSkyStone);
 
+        foundSkyStone = FoundSkyStone.NOT_FOUND;
+
         targetsSkyStone.activate();
         long startTime = System.currentTimeMillis();
         while (System.currentTimeMillis() < time + startTime) {

@@ -25,7 +25,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
-//@Disabled
+@Disabled
 @Autonomous
 public class KevinAutonomousTest extends LinearOpMode {
     protected BNO055IMU imu;
