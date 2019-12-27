@@ -7,53 +7,46 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
-import org.firstinspires.ftc.robotcontroller.internal.RobotSystems.ArcadeDrive;
+import org.firstinspires.ftc.robotcontroller.internal.RobotSystems.MecanumXDrive;
 
-@Disabled
+//@Disabled
 @TeleOp
-public class SkyScraperOp extends TeleOpMode {
-    DcMotor lm;
-    DcMotor rm;
+public class newbotOp extends TeleOpMode {
+
+    MecanumXDrive mecanumXDrive = new MecanumXDrive();
     DcMotor rightIntake;
     DcMotor leftIntake;
-    DcMotor lift;
+    Servo claw;
     Servo rs;
     Servo ls;
-    final double driveTrainPwr = 0.8;
-    final double intakePwr = 0.8;
-    final double liftPwr = 0.4;
+
+    final double intakePwr = 0.4;
 
     @Override
     public void init() {
-        lm = hardwareMap.dcMotor.get("lm");
-        rm = hardwareMap.dcMotor.get("rm");
 
-        lm.setDirection(DcMotorSimple.Direction.FORWARD);
-        rm.setDirection(DcMotorSimple.Direction.REVERSE);
+        mecanumXDrive.syncOpMode(gamepad1, telemetry, hardwareMap);
+        mecanumXDrive.init("fr","fl","br","bl");
 
         rightIntake = hardwareMap.dcMotor.get("rightIntake");
         leftIntake = hardwareMap.dcMotor.get("leftIntake");
         rightIntake.setDirection(DcMotorSimple.Direction.FORWARD);
         leftIntake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        lift = hardwareMap.dcMotor.get("claw");
-        lift.setDirection(DcMotorSimple.Direction.FORWARD);
+        claw = hardwareMap.servo.get("claw");
 
         rs = hardwareMap.servo.get("rs");
         ls = hardwareMap.servo.get("ls");
         rs.setDirection(Servo.Direction.FORWARD);
         ls.setDirection(Servo.Direction.REVERSE);
-
-        rs.setPosition(1);
-        ls.setPosition(1);
     }
 
     @Override
     public void telemetry() {
-        telemetry.addData("left power", lm.getPower());
-        telemetry.addData("right power", rm.getPower());
-        telemetry.addData("Intake Speed", rightIntake.getPower());
-        telemetry.addData("claw power", lift.getPower());
+        mecanumXDrive.telemetry();
+        telemetry.addData("rightIntake_pwr", rightIntake.getPower());
+        telemetry.addData("leftIntake_pwr", leftIntake.getPower());
+        telemetry.addData("lift_pos", claw.getPosition());
         telemetry.addData("rs_ pos", rs.getPosition());
         telemetry.addData("ls_pos", ls.getPosition());
     }
@@ -63,24 +56,21 @@ public class SkyScraperOp extends TeleOpMode {
         updateDriveTrain();
         updateIntake();
         updateClaw();
-        updateLift();
+        updateFoundation();
     }
 
-    public void updateClaw() {
-        if (gamepad2.a) {
+    public void updateFoundation() {
+        if (gamepad1.a) {
             rs.setPosition(0);
             ls.setPosition(0);
-        } else if (gamepad2.y) {
+        } else if (gamepad1.y) {
             rs.setPosition(1);
             ls.setPosition(1);
         }
     }
+
     public void updateDriveTrain() {
-        double lmPwr, rmPwr;
-        lmPwr = (-gamepad1.left_stick_y - gamepad1.right_stick_x) * driveTrainPwr;
-        rmPwr = (-gamepad1.left_stick_y + gamepad1.right_stick_x) * driveTrainPwr;
-        lm.setPower(lmPwr);
-        rm.setPower(rmPwr);
+        mecanumXDrive.update();
     }
 
     public void updateIntake() {
@@ -98,10 +88,11 @@ public class SkyScraperOp extends TeleOpMode {
         }
     }
 
-    public void updateLift() {
-        double lp;
-        lp = gamepad2.left_stick_y > 0 ? 1 : -1;
-        lp = gamepad2.left_stick_y == 0 ? 0 : lp;
-        lift.setPower(lp*liftPwr);
+    public void updateClaw() {
+        if (gamepad2.a) {
+            claw.setPosition(0.5);
+        } else if (gamepad2.y) {
+            claw.setPosition(0);
+        }
     }
 }

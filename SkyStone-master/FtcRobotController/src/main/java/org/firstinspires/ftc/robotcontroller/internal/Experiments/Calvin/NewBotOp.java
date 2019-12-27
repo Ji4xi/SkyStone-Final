@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.robotcontroller.internal.Experiments.Calvin;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -7,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 
-//@Disabled
+@Disabled
 @TeleOp
 public class NewBotOp extends TeleOpMode {
 

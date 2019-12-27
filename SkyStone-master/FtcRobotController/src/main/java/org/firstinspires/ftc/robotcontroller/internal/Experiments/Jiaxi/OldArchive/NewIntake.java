@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 
 @TeleOp
-//@Disabled
+@Disabled
 public class NewIntake extends TeleOpMode {
     DcMotor rs;
     DcMotor ls;
@@ -45,12 +45,12 @@ public class NewIntake extends TeleOpMode {
     public void updateData() {
         //intake
         if (gamepad2.right_bumper) {
-            rs.setPower(0.3);
-            ls.setPower(0.3);
+            rs.setPower(0.5);
+            ls.setPower(0.5);
         }
         else if (gamepad2.left_bumper) {
-            rs.setPower(-0.3);
-            ls.setPower(-0.3);
+            rs.setPower(-0.5);
+            ls.setPower(-0.5);
         }
         else {
             rs.setPower(0);
