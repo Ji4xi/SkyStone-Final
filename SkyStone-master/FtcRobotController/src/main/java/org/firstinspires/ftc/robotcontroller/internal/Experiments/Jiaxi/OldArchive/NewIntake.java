@@ -45,12 +45,12 @@ public class NewIntake extends TeleOpMode {
     public void updateData() {
         //intake
         if (gamepad2.right_bumper) {
-            rs.setPower(0.8);
-            ls.setPower(0.8);
+            rs.setPower(0.3);
+            ls.setPower(0.3);
         }
         else if (gamepad2.left_bumper) {
-            rs.setPower(- 0.8);
-            ls.setPower(- 0.8);
+            rs.setPower(-0.3);
+            ls.setPower(-0.3);
         }
         else {
             rs.setPower(0);

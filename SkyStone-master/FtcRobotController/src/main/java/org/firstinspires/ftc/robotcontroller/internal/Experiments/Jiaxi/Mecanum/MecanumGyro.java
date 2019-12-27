@@ -51,11 +51,6 @@ public class MecanumGyro extends LinearOpMode {
         DiagonalInchesGyro(30, Slope.NEGATIVE, Direction.REVERSE, 0.6, 0);
         sleepSeconds(2);
         DiagonalInchesGyro(30, Slope.POSITIVE, Direction.REVERSE, 0.6, 0);
-        sleepSeconds(2);
-        TurnGyro(90, TurnDirection.CCW, 0.5);
-        sleepSeconds(2);
-        TurnGyro(0, TurnDirection.CW, 0.5);
-
     }
 
     public void initialize() throws InterruptedException {
@@ -84,7 +79,7 @@ public class MecanumGyro extends LinearOpMode {
 
     public void YLinearInchesGyro(double inches, Direction direction, double power, double absoluteHeading) {
         //math
-        double circ = Math.PI * (4.25);
+        double circ = Math.PI * (3.93701);
         int target = (int) (inches / circ * tpr);
         //initialize
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -146,7 +141,7 @@ public class MecanumGyro extends LinearOpMode {
 
     public void XLinearInchesGyro(double inches, Side direction, double power, double absoluteHeading) {
         //math
-        double circ = Math.PI * (4.25);
+        double circ = Math.PI * (3.93701);
         int target = (int) (inches / circ * tpr);
         double change;
         //initialize
@@ -208,7 +203,7 @@ public class MecanumGyro extends LinearOpMode {
 
     public void DiagonalInchesGyro(double inches, Slope directionA, Direction directionB, double power, double absoluteHeading) {
         //math
-        double circ = Math.PI * (4.25);
+        double circ = Math.PI * (3.93701);
         int target = (int) (inches / circ * tpr);
         //initialize
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -285,54 +280,6 @@ public class MecanumGyro extends LinearOpMode {
         motorStop();
         reinitialize();
     }
-
-    public void TurnGyro(double degrees, TurnDirection direction, double power) {
-        //math
-        double target = getAbsoluteHeading() + degrees;
-        //initialize
-        double leftPower;
-        double rightPower;
-        double change;
-        //direction
-        if (direction == TurnDirection.CCW) {
-            fr.setDirection(DcMotorSimple.Direction.REVERSE);
-            br.setDirection(DcMotorSimple.Direction.REVERSE);
-            fl.setDirection(DcMotorSimple.Direction.REVERSE);
-            bl.setDirection(DcMotorSimple.Direction.REVERSE);
-        }
-        else {
-            fr.setDirection(DcMotorSimple.Direction.FORWARD);
-            br.setDirection(DcMotorSimple.Direction.FORWARD);
-            fl.setDirection(DcMotorSimple.Direction.FORWARD);
-            bl.setDirection(DcMotorSimple.Direction.FORWARD);
-        }
-        //run program
-        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        while (getAbsoluteHeading() != target || getAbsoluteHeading() != target + 5 || getAbsoluteHeading() != target - 5) {
-            //set power
-            if (getAbsoluteHeading() < target / 2) {
-                fr.setPower((power * (getAbsoluteHeading() / target)) + .2);
-                br.setPower((power * (getAbsoluteHeading() / target)) + .2);
-                bl.setPower((power * (getAbsoluteHeading() / target)) + .2);
-                fl.setPower((power * (getAbsoluteHeading() / target)) + .2);
-            }
-            else if (getAbsoluteHeading() > target / 2) {
-                double justSomeMath = target - getAbsoluteHeading();
-                fr.setPower((power * (justSomeMath / target)) + .2);
-                br.setPower((power * (justSomeMath / target)) + .2);
-                bl.setPower((power * (justSomeMath / target)) + .2);
-                fl.setPower((power * (justSomeMath / target)) + .2);
-            }
-            //telemetry
-            telemetry();
-        }
-        motorStop();
-        reinitialize();
-    }
-
 
     public void motorStop() {
         //set powers
