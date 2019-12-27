@@ -31,7 +31,7 @@ public class newbot extends LinearOpMode {
     Servo ls;
 
 
-    double drivePwrMax = 0.8;
+    double drivePwrMax = 0.4;
 
     static final double COUNTS_PER_REVOLUTION = 537.6; //20:1
     static final double DRIVE_GEAR_REDUCTION = 1; //This is < 1.0 if geared up
@@ -45,7 +45,9 @@ public class newbot extends LinearOpMode {
         waitForStart();
 
         moveForwardInches(36, 5000);
+        moveForwardInches(-36, 5000);
         moveSideways(3, 5000);
+        moveSideways(-3, 5000);
 
     }
 
