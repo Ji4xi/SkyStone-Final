@@ -2,7 +2,6 @@ package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -11,8 +10,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-
-import java.util.ArrayList;
 
 //@Disabled
 @Autonomous
@@ -31,11 +28,11 @@ public class newbot extends LinearOpMode {
     Servo ls;
 
 
-    double drivePwrMax = 0.8;
+    double drivePwrMax = 0.1;
 
     static final double COUNTS_PER_REVOLUTION = 537.6; //20:1
     static final double DRIVE_GEAR_REDUCTION = 1; //This is < 1.0 if geared up
-    static final double WHEEL_DIAMETER_INCHES = 4.25;
+    static final double WHEEL_DIAMETER_INCHES = 3.93701;
     static final double COUNTS_PER_INCH = (COUNTS_PER_REVOLUTION * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
 
     @Override
@@ -45,7 +42,7 @@ public class newbot extends LinearOpMode {
         waitForStart();
 
         moveForwardInches(36, 5000);
-        moveSideways(3, 5000);
+        moveSidewaysInches(36, 5000);
 
     }
 
@@ -118,9 +115,9 @@ public class newbot extends LinearOpMode {
         sleep(sleep, "moveForwardInches " + inches + " inches");
     }
 
-    public void moveSideways(double revolutions, long sleep) throws InterruptedException {
+    public void moveSidewaysInches(double inches, long sleep) throws InterruptedException {
         double power = drivePwrMax;
-        int target = (int) (revolutions * COUNTS_PER_REVOLUTION);
+        int target = (int) (inches * 57.7272771006);
 
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -140,7 +137,7 @@ public class newbot extends LinearOpMode {
         while(opModeIsActive() &&
                 (fl.isBusy() && fr.isBusy() && bl.isBusy() && br.isBusy())) {
 
-            if (revolutions < 0) {
+            if (inches < 0) {
                 fl.setPower(-power);
                 fr.setPower(power);
                 bl.setPower(power);
@@ -161,7 +158,7 @@ public class newbot extends LinearOpMode {
             telemetry.update();
         }
         stopMotor();
-        sleep(sleep, "moveSideways " + revolutions + " revolutions");
+        sleep(sleep, "moveSidewaysInches " + inches + " inches");
     }
 
     public void stopMotor() {
