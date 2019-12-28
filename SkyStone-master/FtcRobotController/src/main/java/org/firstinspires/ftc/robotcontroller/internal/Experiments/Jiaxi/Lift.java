@@ -9,11 +9,13 @@ import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 @TeleOp
 
 public class Lift extends TeleOpMode {
+    final double tpr = 288;
+
     final double drumDiameter = 2;
     double drumCirc = Math.PI * (drumDiameter);
     final double brickHeight = 5;
-    final double oneBlockHeight = 0.75;
-    double currentPower = 0.4;
+    final double oneBlockHeight = brickHeight / (drumCirc * tpr);
+    double currentPower = 0.3;
 
     //Define Motors
     DcMotor rightLiftMotor;
@@ -54,8 +56,9 @@ public class Lift extends TeleOpMode {
     @Override
     public void updateData() {
         if (gamepad1.y) {
-            leftLiftMotor.setTargetPosition((int) (leftLiftMotor.getCurrentPosition() + oneBlockHeight));
-            rightLiftMotor.setTargetPosition((int) (rightLiftMotor.getCurrentPosition() + oneBlockHeight));
+            leftLiftMotor.setTargetPosition((int) (oneBlockHeight));
+            rightLiftMotor.setTargetPosition((int) (oneBlockHeight));
+            currentPower = 0.4;
             leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             while (leftLiftMotor.isBusy() && rightLiftMotor.isBusy()) {
@@ -69,8 +72,9 @@ public class Lift extends TeleOpMode {
             rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
         else if (gamepad1.a) {
-            leftLiftMotor.setTargetPosition((int) (leftLiftMotor.getCurrentPosition() - oneBlockHeight));
-            rightLiftMotor.setTargetPosition((int) (rightLiftMotor.getCurrentPosition() - oneBlockHeight));
+            leftLiftMotor.setTargetPosition((int) (oneBlockHeight));
+            rightLiftMotor.setTargetPosition((int) (oneBlockHeight));
+            currentPower = -0.2;
             leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             while (leftLiftMotor.isBusy() && rightLiftMotor.isBusy()) {
@@ -83,5 +87,6 @@ public class Lift extends TeleOpMode {
             leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
+
     }
 }
