@@ -1,27 +1,23 @@
-package org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi.Mecanum;
+package org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcontroller.internal.Default.FtcOpModeRegister;
-import org.firstinspires.ftc.robotcontroller.internal.Default.PIDMichael;
-import org.firstinspires.ftc.robotcontroller.internal.Experiments.Michael.RangerAuto;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 //@Disabled
 @Autonomous
-public class MecanumGyro extends LinearOpMode {
+public class MecanumAuto extends LinearOpMode {
     enum Direction {FORWARD, REVERSE}
     enum Side {LEFT, RIGHT}
     enum Slope {NEGATIVE, POSITIVE}
-//    enum TurnDirection {CW, CCW}
+    //    enum TurnDirection {CW, CCW}
     protected BNO055IMU imu; //For detecting angles of rotation
 
 //    PIDMichael pid = new PIDMichael(0.001, Math.pow(10, -12), 10000); //experimentally found
