@@ -20,7 +20,7 @@ public class newbotOp extends TeleOpMode {
     Servo rs;
     Servo ls;
 
-    final double intakePwr = 0.4;
+    final double intakePwr = 0.5;
 
     @Override
     public void init() {

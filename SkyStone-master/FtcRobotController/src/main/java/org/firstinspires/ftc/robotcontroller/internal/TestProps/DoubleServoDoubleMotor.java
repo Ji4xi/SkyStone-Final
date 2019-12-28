@@ -42,7 +42,7 @@ public class DoubleServoDoubleMotor extends TeleOpMode {
 
     @Override
     public void updateData() {
-//        updateIntake();
+//        updateSlides();
         updateServo();
     }
 
