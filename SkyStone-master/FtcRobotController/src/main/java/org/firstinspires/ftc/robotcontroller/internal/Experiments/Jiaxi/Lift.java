@@ -15,7 +15,9 @@ public class Lift extends TeleOpMode {
     double drumCirc = Math.PI * (drumDiameter);
     final double brickHeight = 5;
     final double oneBlockHeight = brickHeight / (drumCirc * tpr);
-    double currentPower = 0.3;
+    double currentPower = 0.8;
+    double maxPower = 0.8;
+    double minPower = 0.75;
 
     //Define Motors
     DcMotor rightLiftMotor;
@@ -47,35 +49,63 @@ public class Lift extends TeleOpMode {
     public void telemetry() {
         telemetry.addData("RightDrumPosition", rightLiftMotor.getCurrentPosition());
         telemetry.addData("LeftDrumPosition", leftLiftMotor.getCurrentPosition());
-        telemetry.addData("Average Drum Position", (rightLiftMotor.getCurrentPosition() + leftLiftMotor.getCurrentPosition()) / 2);
+        telemetry.addData("CurrentPower", currentPower);
+        telemetry.addData("AverageDrumPosition", (rightLiftMotor.getCurrentPosition() + leftLiftMotor.getCurrentPosition()) / 2);
     }
 
     @Override
     public void updateData() {
-        if (gamepad1.y) {
-            leftLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-            rightLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-            currentPower = 0.8 ;
+        //lift one up by each block level per press
+        if (gamepad2.y) {
+            leftLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            rightLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             while ((leftLiftMotor.getCurrentPosition() + rightLiftMotor.getCurrentPosition()) / 2 < oneBlockHeight) {
-                leftLiftMotor.setPower(currentPower);
-                rightLiftMotor.setPower(currentPower);
+                double leftPower = currentPower + ((leftLiftMotor.getCurrentPosition() - rightLiftMotor.getCurrentPosition()));
+                double rightPower = currentPower + ((rightLiftMotor.getCurrentPosition() - leftLiftMotor.getCurrentPosition()));
+                if (leftPower > maxPower) {
+                    leftPower = maxPower;
+                }
+                if (leftPower < minPower) {
+                    leftPower = minPower;
+                }
+                if (rightPower > maxPower) {
+                    rightPower = maxPower;
+                }
+                if (rightPower < minPower) {
+                    rightPower = minPower;
+                }
+                leftLiftMotor.setPower(leftPower);
+                rightLiftMotor.setPower(rightPower);
             }
             leftLiftMotor.setPower(0);
             rightLiftMotor.setPower(0);
             leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
-        else if (gamepad1.a) {
-            leftLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            rightLiftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            currentPower = 0.8;
+        else if (gamepad2.a) {
+            leftLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+            rightLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
             leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             while ((leftLiftMotor.getCurrentPosition() + rightLiftMotor.getCurrentPosition()) / 2 < oneBlockHeight) {
-                leftLiftMotor.setPower(currentPower);
-                rightLiftMotor.setPower(currentPower);
+                double leftPower = 0.2 + ((leftLiftMotor.getCurrentPosition() - rightLiftMotor.getCurrentPosition()));
+                double rightPower = 0.2 + ((rightLiftMotor.getCurrentPosition() - leftLiftMotor.getCurrentPosition()) );
+                if (leftPower > 0.2) {
+                    leftPower = 0.2;
+                }
+                if (leftPower < 0.2) {
+                    leftPower = 0.2;
+                }
+                if (rightPower > 0.1) {
+                    rightPower = 0.1;
+                }
+                if (rightPower < 0.1) {
+                    rightPower = 0.1;
+                }
+                leftLiftMotor.setPower(leftPower);
+                rightLiftMotor.setPower(rightPower);
             }
             leftLiftMotor.setPower(0);
             rightLiftMotor.setPower(0);
