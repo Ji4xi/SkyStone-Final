@@ -1,19 +1,15 @@
 package org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi.Mecanum;
 
-import android.os.PowerManager;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gyroscope;
 import com.qualcomm.robotcore.util.Range;
-import com.sun.tools.javac.util.ForwardingDiagnosticFormatter;
-import com.vuforia.Renderer;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.FtcOpModeRegister;
+import org.firstinspires.ftc.robotcontroller.internal.Default.PIDMichael;
 import org.firstinspires.ftc.robotcontroller.internal.Experiments.Michael.RangerAuto;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -25,8 +21,10 @@ public class MecanumGyro extends LinearOpMode {
     enum Direction {FORWARD, REVERSE}
     enum Side {LEFT, RIGHT}
     enum Slope {NEGATIVE, POSITIVE}
-    enum TurnDirection {CW, CCW}
+//    enum TurnDirection {CW, CCW}
     protected BNO055IMU imu; //For detecting angles of rotation
+
+//    PIDMichael pid = new PIDMichael(0.001, Math.pow(10, -12), 10000); //experimentally found
 
     //drive train
     DcMotor fr, fl, br, bl;
@@ -36,6 +34,7 @@ public class MecanumGyro extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         initialize();
         waitForStart();
+//        XLinearInchesGyroPID(30, Side.RIGHT, 0.6);
         XLinearInchesGyro(30, Side.RIGHT, 0.6, 0);
         sleepSeconds(2);
         XLinearInchesGyro(30, Side.LEFT, 0.6, 0);
@@ -138,6 +137,53 @@ public class MecanumGyro extends LinearOpMode {
         motorStop();
         reinitialize();
     }
+//    public void XLinearInchesGyroPID(double inches, Side direction, double power) throws InterruptedException {
+//
+//        //math
+//        double circ = Math.PI * (3.93701);
+//        int target = (int) (inches / circ * tpr);
+//        ;
+//        //initialize
+//        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        //direction
+//        if (direction == Side.RIGHT) {
+//            fr.setDirection(DcMotorSimple.Direction.FORWARD);
+//            br.setDirection(DcMotorSimple.Direction.FORWARD);
+//            fl.setDirection(DcMotorSimple.Direction.REVERSE);
+//            bl.setDirection(DcMotorSimple.Direction.REVERSE);
+//        }
+//        else {
+//            fr.setDirection(DcMotorSimple.Direction.FORWARD);
+//            br.setDirection(DcMotorSimple.Direction.FORWARD);
+//            fl.setDirection(DcMotorSimple.Direction.REVERSE);
+//            bl.setDirection(DcMotorSimple.Direction.FORWARD);
+//        }
+//        fl.setTargetPosition(target);
+//        bl.setTargetPosition(target);
+//        fr.setTargetPosition(target);
+//        br.setTargetPosition(target);
+//        //run program
+//        fr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        br.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        fl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        bl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//        pid.initPID(target, System.nanoTime());
+//        while (fr.isBusy() && fl.isBusy() && br.isBusy() && bl.isBusy()) {
+//            double newpower = pid.actuator(fr.getCurrentPosition(), System.nanoTime()) * power;
+//             fr.setPower(newpower);
+//             fl.setPower(newpower);
+//             br.setPower(newpower);
+//             bl.setPower(newpower);
+//            //telemetry
+//            telemetry();
+//        }
+//        motorStop();
+//        reinitialize();
+//    }
 
     public void XLinearInchesGyro(double inches, Side direction, double power, double absoluteHeading) {
         //math

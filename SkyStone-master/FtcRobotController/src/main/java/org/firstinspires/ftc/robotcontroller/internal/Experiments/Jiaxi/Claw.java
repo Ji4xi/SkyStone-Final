@@ -10,11 +10,11 @@ import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 public class Claw extends TeleOpMode {
     Servo rc;
     Servo linearServo;
-    double rcPos = 0;
-    double linearServoPos = 0.5;
+    double rcPos;
+    double linearServoPos = 0;
     final double MAX = 1;
     final double MIN = 0;
-    final double rcMIN = 0.8;
+    final double rcMax = 0.4;
     @Override
     public void init() {
         rc = hardwareMap.servo.get("rc");
@@ -44,33 +44,37 @@ public class Claw extends TeleOpMode {
 
     @Override
     public void updateData() {
-        if (gamepad1.dpad_up) {
-            rcPos += 0.002;
-        } else if (gamepad1.dpad_down) {
-            rcPos -= 0.002;
+//        if (gamepad1.dpad_up) {
+//            rcPos += 0.002;
+//        } else if (gamepad1.dpad_down) {
+//            rcPos -= 0.002;
+//        }
+//
+////        else if (gamepad1.dpad_left) {
+////            linearServoPos += 0.002;
+////        } else if (gamepad1.dpad_right) {
+////            linearServoPos -= 0.002;
+////        }
+        if (gamepad1.y) {
+            rcPos = 0.1;
         }
-
-        if (gamepad1.dpad_left) {
-            linearServoPos += 0.002;
-        } else if (gamepad1.dpad_right) {
-            linearServoPos -= 0.002;
+        else if (gamepad1.a) {
+            rcPos = 0;
         }
-
-
 
         //bounds
-        if (rcPos > MAX) {
-            rcPos = MAX;
-        } else if (rcPos < rcMIN) {
-            rcPos = rcMIN;
+        if (rcPos > rcMax) {
+            rcPos = rcMax;
+        } else if (rcPos < MIN) {
+            rcPos = MIN;
         }
-        if (linearServoPos > MAX) {
-            linearServoPos = MAX;
-        } else if (linearServoPos < MIN) {
-            linearServoPos = MIN;
-        }
+//        if (linearServoPos > MAX) {
+//            linearServoPos = MAX;
+//        } else if (linearServoPos < MIN) {
+//            linearServoPos = MIN;
+//        }
 
         rc.setPosition(rcPos);
-        linearServo.setPosition(linearServoPos);
+//        linearServo.setPosition(linearServoPos);
     }
 }
