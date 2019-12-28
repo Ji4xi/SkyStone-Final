@@ -2,6 +2,7 @@ package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -10,6 +11,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
+import java.util.ArrayList;
 
 //@Disabled
 @Autonomous
@@ -28,7 +31,7 @@ public class newbot extends LinearOpMode {
     Servo ls;
 
 
-    double drivePwrMax = 0.1;
+    double drivePwrMax = 0.15;
 
     static final double COUNTS_PER_REVOLUTION = 537.6; //20:1
     static final double DRIVE_GEAR_REDUCTION = 1; //This is < 1.0 if geared up
@@ -79,6 +82,7 @@ public class newbot extends LinearOpMode {
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         fl.setTargetPosition(target);
         fr.setTargetPosition(target);
         bl.setTargetPosition(target);
@@ -89,35 +93,30 @@ public class newbot extends LinearOpMode {
         bl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         br.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        if (inches < 0) {
+            fl.setPower(-power);
+            fr.setPower(-power);
+            bl.setPower(-power);
+            br.setPower(-power);
+        } else {
+            fl.setPower(power);
+            fr.setPower(power);
+            bl.setPower(power);
+            br.setPower(power);
+        }
+
         while(opModeIsActive() &&
                 (fl.isBusy() && fr.isBusy() && bl.isBusy() && br.isBusy())) {
-
-            if (inches < 0) {
-                fl.setPower(-power);
-                fr.setPower(-power);
-                bl.setPower(-power);
-                br.setPower(-power);
-            } else {
-                fl.setPower(power);
-                fr.setPower(power);
-                bl.setPower(power);
-                br.setPower(power);
-            }
-
-            telemetry.addData("fl_pwr", fl.getPower());
-            telemetry.addData("fr_pwr", fr.getPower());
-            telemetry.addData("bl_pwr", bl.getPower());
-            telemetry.addData("br_pwr", br.getPower());
-            telemetry.addData("target_left", target - (fl.getCurrentPosition() + fr.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition())/4);
-            telemetry.update();
+            telemetry();
         }
+
         stopMotor();
         sleep(sleep, "moveForwardInches " + inches + " inches");
     }
 
-    public void moveSidewaysInches(double inches, long sleep) throws InterruptedException {
+    public void moveSidewaysInches(double inches, long sleep) throws InterruptedException{
         double power = drivePwrMax;
-        int target = (int) (inches * 57.7272771006);
+        int target = (int) (inches * COUNTS_PER_INCH);
 
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -134,31 +133,76 @@ public class newbot extends LinearOpMode {
         bl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         br.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        if (inches < 0) {
+            fl.setPower(-power);
+            fr.setPower(power);
+            bl.setPower(power);
+            br.setPower(-power);
+        }
+        else {
+            fl.setPower(power);
+            fr.setPower(-power);
+            bl.setPower(-power);
+            br.setPower(power);
+        }
+
         while(opModeIsActive() &&
                 (fl.isBusy() && fr.isBusy() && bl.isBusy() && br.isBusy())) {
-
-            if (inches < 0) {
-                fl.setPower(-power);
-                fr.setPower(power);
-                bl.setPower(power);
-                br.setPower(-power);
-            }
-            else {
-                fl.setPower(power);
-                fr.setPower(-power);
-                bl.setPower(-power);
-                br.setPower(power);
-            }
-
-            telemetry.addData("fl_pwr", fl.getPower());
-            telemetry.addData("fr_pwr", fr.getPower());
-            telemetry.addData("bl_pwr", bl.getPower());
-            telemetry.addData("br_pwr", br.getPower());
-            telemetry.addData("fl_target_left", target - fl.getCurrentPosition());
-            telemetry.update();
+        telemetry();
         }
+
         stopMotor();
         sleep(sleep, "moveSidewaysInches " + inches + " inches");
+    }
+
+//    public void moveDiagonally(double inches, double angle, long sleep) throws InterruptedException {
+//        double power = drivePwrMax;
+//        int target = (int) (inches * COUNTS_PER_INCH);
+//
+//        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
+//        fl.setPower()
+//
+//        while(opModeIsActive() &&
+//                (? fl.isBusy() : fr.isBusy()) {
+//
+//            if (inches < 0) {
+//                fl.setPower(-power);
+//                fr.setPower(power);
+//                bl.setPower(power);
+//                br.setPower(-power);
+//            }
+//            else {
+//                fl.setPower(power);
+//                fr.setPower(-power);
+//                bl.setPower(-power);
+//                br.setPower(power);
+//            }
+//
+//            telemetry.addData("fl_pwr", fl.getPower());
+//            telemetry.addData("fr_pwr", fr.getPower());
+//            telemetry.addData("bl_pwr", bl.getPower());
+//            telemetry.addData("br_pwr", br.getPower());
+//            telemetry.addData("fl_target_left", target - fl.getCurrentPosition());
+//            telemetry.update();
+//        }
+//        stopMotor();
+//        sleep(sleep, "moveDiagonally " + inches + " inches");
+//    }
+
+    public void telemetry() {
+        telemetry.addData("fl_pwr", fl.getPower());
+        telemetry.addData("fr_pwr", fr.getPower());
+        telemetry.addData("bl_pwr", bl.getPower());
+        telemetry.addData("br_pwr", br.getPower());
+        telemetry.addData("fl_target_left", fl.getTargetPosition() - fl.getCurrentPosition());
+        telemetry.addData("fr_target_left", fr.getTargetPosition() - fr.getCurrentPosition());
+        telemetry.addData("bl_target_left", bl.getTargetPosition() - bl.getCurrentPosition());
+        telemetry.addData("br_target_left", br.getTargetPosition() - br.getCurrentPosition());
+        telemetry.update();
     }
 
     public void stopMotor() {
@@ -170,6 +214,11 @@ public class newbot extends LinearOpMode {
         fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public final void sleep(long time, String input) {
