@@ -12,8 +12,8 @@ public class Lift extends TeleOpMode {
     final double drumDiameter = 2;
     double drumCirc = Math.PI * (drumDiameter);
     final double brickHeight = 5;
-    final double oneDrumRotation = 0;
-    double currentPower = 0;
+    final double oneBlockHeight = 0.75;
+    double currentPower = 0.4;
 
     //Define Motors
     DcMotor rightLiftMotor;
@@ -21,9 +21,17 @@ public class Lift extends TeleOpMode {
 
     @Override
     public void init() {
+
         rightLiftMotor = hardwareMap.dcMotor.get("rm");
         leftLiftMotor = hardwareMap.dcMotor.get("lm");
         rightLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftLiftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
     }
 
     @Override
@@ -46,17 +54,34 @@ public class Lift extends TeleOpMode {
     @Override
     public void updateData() {
         if (gamepad1.y) {
-            currentPower += 0.01;
+            leftLiftMotor.setTargetPosition((int) (leftLiftMotor.getCurrentPosition() + oneBlockHeight));
+            rightLiftMotor.setTargetPosition((int) (rightLiftMotor.getCurrentPosition() + oneBlockHeight));
+            leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            while (leftLiftMotor.isBusy() && rightLiftMotor.isBusy()) {
+                leftLiftMotor.setPower(currentPower);
+                rightLiftMotor.setPower(currentPower);
+            }
+            leftLiftMotor.setPower(0);
+            rightLiftMotor.setPower(0);
+
+            leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
         else if (gamepad1.a) {
-            currentPower -= 0.01;
-        }
+            leftLiftMotor.setTargetPosition((int) (leftLiftMotor.getCurrentPosition() - oneBlockHeight));
+            rightLiftMotor.setTargetPosition((int) (rightLiftMotor.getCurrentPosition() - oneBlockHeight));
+            leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            while (leftLiftMotor.isBusy() && rightLiftMotor.isBusy()) {
+                leftLiftMotor.setPower(currentPower);
+                rightLiftMotor.setPower(currentPower);
+            }
+            leftLiftMotor.setPower(0);
+            rightLiftMotor.setPower(0);
 
-        else {
-            currentPower = 0;
+            leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
-
-        rightLiftMotor.setPower(currentPower);
-        leftLiftMotor.setPower(currentPower);
     }
 }
