@@ -49,7 +49,8 @@ public class Lift extends TeleOpMode {
     public void telemetry() {
         telemetry.addData("RightDrumPosition", rightLiftMotor.getCurrentPosition());
         telemetry.addData("LeftDrumPosition", leftLiftMotor.getCurrentPosition());
-        telemetry.addData("CurrentPower", currentPower);
+        telemetry.addData("RightPower", rightLiftMotor.getPower());
+        telemetry.addData("LeftPower", leftLiftMotor.getPower());
         telemetry.addData("AverageDrumPosition", (rightLiftMotor.getCurrentPosition() + leftLiftMotor.getCurrentPosition()) / 2);
     }
 
