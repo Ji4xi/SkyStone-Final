@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 import org.firstinspires.ftc.robotcontroller.internal.RobotSystems.MecanumXDrive;
 
-//@Disabled
+@Disabled
 @TeleOp
 public class MecanumX extends TeleOpMode {
     MecanumXDrive mecanumXDrive = new MecanumXDrive();

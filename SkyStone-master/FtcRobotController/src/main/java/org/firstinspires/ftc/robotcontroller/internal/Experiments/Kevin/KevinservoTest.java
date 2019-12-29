@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
-//@Disabled
+@Disabled
 @TeleOp
 public class KevinservoTest extends TeleOpMode{
     Servo servo;

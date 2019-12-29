@@ -2,6 +2,7 @@ package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.internal.camera.delegating.RefCountedSwitchableCamera;
 
+@Disabled
 @Autonomous
 public class SkyScraper extends SkyStoneVuforiaAuto {
     enum Direction {
@@ -75,7 +77,7 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
         rightIntake.setDirection(DcMotorSimple.Direction.FORWARD);
         leftIntake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        lift = hardwareMap.dcMotor.get("lift");
+        lift = hardwareMap.dcMotor.get("claw");
         lm.setDirection(DcMotorSimple.Direction.FORWARD);
 
         rs = hardwareMap.servo.get("rs");
@@ -413,10 +415,10 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
         driveTrainPwr = temp;
     }
 
-//    public void lift(double power, double rev) {
-//        lift.setTargetPosition((int) (rev * COUNTS_PER_REVOLUTION));
-//        while (lift.isBusy()) {
-//            lift.setPower(power);
+//    public void claw(double power, double rev) {
+//        claw.setTargetPosition((int) (rev * COUNTS_PER_REVOLUTION));
+//        while (claw.isBusy()) {
+//            claw.setPower(power);
 //        }
 //        stopMotor();
 //    }
