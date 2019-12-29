@@ -41,7 +41,8 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
     static final double DRIVE_GEAR_REDUCTION = 1/1.5; //Thiss is < 1.0 if geared up
     static final double WHEEL_DIAMETER_INCHES = 4.25;
     static final double COUNTS_PER_INCH = (COUNTS_PER_REVOLUTION * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
-    PIDMichael pid = new PIDMichael(0.001, Math.pow(10, -12), 10000); //experimentally found
+    PIDMichael Rpid = new PIDMichael(0.001, Math.pow(10, -12), 10000); //experimentally found
+    PIDMichael Lpid = new PIDMichael(0.001, Math.pow(10, -12), 10000); //experimentally found
 
     boolean mode = true;
     double foundSkyStoneAngle;
@@ -245,7 +246,7 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
 
 
     public void moveForward(double rev) throws InterruptedException {
-        double power = 0.8;
+        double Rpower = 0.8, Lpower = 0.8;
         int target = (int) (rev * COUNTS_PER_REVOLUTION);
         rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -255,22 +256,36 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
 
         rm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        pid.initPID(target, System.nanoTime());
-        while(rm.isBusy() && lm.isBusy()) {
-            power = pid.actuator(rm.getCurrentPosition(), System.nanoTime()) * driveTrainPwr;
+        Rpid.initPID(target, System.nanoTime());
+        Lpid.initPID(target, System.nanoTime());
+        double RsnipPwr, Rintegral = 0, LsnipPwr, Lintegral = 0;
+        while(rm.isBusy() || lm.isBusy()) {
+            RsnipPwr = Rpid.actuator(rm.getCurrentPosition(), System.nanoTime());
+            LsnipPwr = Lpid.actuator(lm.getCurrentPosition(), System.nanoTime());
+            if (Rpower < 0.5) Rintegral = 0.5 - Rpower;
+            if (Lpower < 0.5) Lintegral = 0.5 - Lpower;
+            Rpower = Range.clip(RsnipPwr, -1, 1) * driveTrainPwr;
+            Lpower = Range.clip(LsnipPwr, -1, 1) * driveTrainPwr;
             if (rev < 0) {
-                rm.setPower(-power);
-                lm.setPower(-power);
+                rm.setPower(-Rpower - Rintegral);
+                lm.setPower(-Lpower - Lintegral);
             } else {
-                rm.setPower(power);
-                lm.setPower(power);
+                rm.setPower(Rpower + Rintegral);
+                lm.setPower(Lpower + Lintegral);
+                //lm.setPower(Rpower + Rintegral);
             }
 
+            telemetry.addData("Rsnippwr", RsnipPwr);
+            telemetry.addData("Rintegral", Rintegral);
+            telemetry.addData("Lsnippwr", LsnipPwr);
+            telemetry.addData("Lintegral", Lintegral);
             telemetry.addData("rm_pwr", rm.getPower());
-            telemetry.addData("target_left", target - rm.getCurrentPosition());
             telemetry.addData("lm_pwr", lm.getPower());
+            telemetry.addData("left target_left", target - lm.getCurrentPosition());
+            telemetry.addData("right target_left", target - rm.getCurrentPosition());
             telemetry.update();
         }
+        sleep(5000);
         stopMotor();
     }
 
@@ -294,7 +309,9 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
 //        return position;
 //    }
     public void moveForwardInches(double inches, long sleep) throws InterruptedException {
-        double power = 0.8;
+        double power;
+        double integral = 0;
+        double snipPwr;
         int target = (int) (inches * COUNTS_PER_INCH);
         rm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -304,9 +321,11 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
 
         rm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        pid.initPID(target, System.nanoTime());
-        while(rm.isBusy() && lm.isBusy()) {
-            power = pid.actuator(rm.getCurrentPosition(), System.nanoTime()) * driveTrainPwr;
+        Rpid.initPID(target, System.nanoTime());
+        while(rm.isBusy() || lm.isBusy()) {
+            snipPwr = Rpid.actuator(rm.getCurrentPosition(), System.nanoTime());
+            if (snipPwr < 0.5) integral = 0.5 - snipPwr;
+            power = Range.clip(snipPwr + integral, -1, 1) * driveTrainPwr;
             if (inches < 0) {
                 rm.setPower(-power);
                 lm.setPower(-power);
@@ -316,8 +335,13 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
             }
 
             telemetry.addData("rm_pwr", rm.getPower());
-            telemetry.addData("target_left", target - rm.getCurrentPosition());
+            telemetry.addData("right target_left", target - rm.getCurrentPosition());
             telemetry.addData("lm_pwr", lm.getPower());
+            telemetry.addData("left target_left", target - lm.getCurrentPosition());
+//            telemetry.addData("p", pid.p * pid.error);
+//            telemetry.addData("i", pid.i * pid.integral);
+//            telemetry.addData("d", pid.d * pid.differential);
+
             telemetry.update();
         }
         stopMotor();
@@ -339,12 +363,12 @@ public class SkyScraper extends SkyStoneVuforiaAuto {
 
         rm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        pid.initPID(target, System.nanoTime());
+        Rpid.initPID(target, System.nanoTime());
         if (!mode) targetHeading *= -1;
 
         while(opModeIsActive() && rm.isBusy() && lm.isBusy()) {
 
-            power = Range.clip(pid.actuator(rm.getCurrentPosition(), System.nanoTime()) + integral, -1, 1) * driveTrainPwr;
+            power = Range.clip(Rpid.actuator(rm.getCurrentPosition(), System.nanoTime()) + integral, -1, 1) * driveTrainPwr;
             error = getAbsoluteHeading() - targetHeading;
 
 
