@@ -20,7 +20,8 @@ public class newbotOp extends TeleOpMode {
     Servo rs;
     Servo ls;
 
-    final double intakePwr = 0.5;
+    final double intakePwr = 0.85;
+    double currentPos;
 
     @Override
     public void init() {
@@ -30,15 +31,17 @@ public class newbotOp extends TeleOpMode {
 
         rightIntake = hardwareMap.dcMotor.get("rightIntake");
         leftIntake = hardwareMap.dcMotor.get("leftIntake");
-        rightIntake.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightIntake.setDirection(DcMotorSimple.Direction.REVERSE);
         leftIntake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         claw = hardwareMap.servo.get("claw");
+        claw.setDirection(Servo.Direction.FORWARD);
 
         rs = hardwareMap.servo.get("rs");
         ls = hardwareMap.servo.get("ls");
         rs.setDirection(Servo.Direction.FORWARD);
         ls.setDirection(Servo.Direction.REVERSE);
+
     }
 
     @Override
@@ -49,6 +52,7 @@ public class newbotOp extends TeleOpMode {
         telemetry.addData("lift_pos", claw.getPosition());
         telemetry.addData("rs_ pos", rs.getPosition());
         telemetry.addData("ls_pos", ls.getPosition());
+        telemetry.addData("claw_pos", claw.getPosition());
     }
 
     @Override
@@ -64,8 +68,8 @@ public class newbotOp extends TeleOpMode {
             rs.setPosition(0);
             ls.setPosition(0);
         } else if (gamepad1.y) {
-            rs.setPosition(1);
-            ls.setPosition(1);
+            rs.setPosition(0.5);
+            ls.setPosition(0.5);
         }
     }
 

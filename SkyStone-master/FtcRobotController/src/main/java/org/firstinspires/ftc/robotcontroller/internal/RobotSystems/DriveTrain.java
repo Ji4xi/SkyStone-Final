@@ -25,7 +25,7 @@ public abstract class DriveTrain extends Mechanism implements Telemetrable {
      * All constants necessary for FTC drive trains
      */
 
-    public static final int COUNTS_PER_REVOLUTION_40 = 1120; //AndyMark 40:1 Motors
+    public static final double COUNTS_PER_REVOLUTION_40 = 537.6; //AndyMark 20:1 Motors
 
     /**
      * All fields necessary for FTC drive trains
