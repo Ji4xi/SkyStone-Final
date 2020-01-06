@@ -1,9 +1,7 @@
-package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms;
+package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.SkyScraper;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-
-import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.SkyScraper;
 
 @Autonomous
 @Disabled

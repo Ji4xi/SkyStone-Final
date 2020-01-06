@@ -1,13 +1,12 @@
-package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms;
+package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.SkyScraper;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Disabled
 @Autonomous
-public class SkyScraperIntakeBlue extends SkyScraper{
+public class SkyScraperIntakeRed extends SkyScraper{
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
@@ -21,10 +20,11 @@ public class SkyScraperIntakeBlue extends SkyScraper{
         //turn toward bricks
         turnAbsolutePID(-90, Direction.CLOCKWISE, 0.3);
         sleep(sleepTime, "turn toward bricks");
-        int blockPlace = 0;
+        int blockPlace = 2;
+        moveForwardInchesGyro(1.3, -90, sleepTime);
 
-        for (int i = 0; i < 2; i++) {
-            blockPlace = i + 1;
+        for (int i = 2; i > 0; i--) {
+            blockPlace = i;
             if (FoundSkyStoneAngle(500)) {
                 telemetry.addData("found", "found");
                 telemetry.update();
@@ -62,36 +62,34 @@ public class SkyScraperIntakeBlue extends SkyScraper{
 //        sleep(sleepTime, "move to first skystone");
 
         //turn toward skystone
-        moveForwardInchesGyro(3, -90, sleepTime);
-        turnAbsolutePID(25, Direction.COUNTERCLOCKWISE, 0.45);
-        moveForwardInchesGyro(2, 25, 500);
+        moveForwardInchesGyro(-11, -90, sleepTime);
+        turnAbsolutePID(-20, Direction.COUNTERCLOCKWISE, 0.45);
+        moveForwardInchesGyro(2, -25, 500);
         sleep(sleepTime, "turn toward skystone");
 
         // intake skystone
         rightIntake.setPower(0.8);
         leftIntake.setPower(0.8);
-
-        moveForwardInchesGyro(15, 10);
+        moveForwardInchesGyro(17, -10);
         // turn toward bridge
         rightIntake.setPower(0);
         leftIntake.setPower(0);
-        turnAbsolutePID(135, Direction.COUNTERCLOCKWISE, 0.3);
+        turnAbsolutePID(-135, Direction.CLOCKWISE, 0.3);
 
         sleep(sleepTime, "turn toward bridge");
 
-        moveForwardInchesGyro(25, 135, sleepTime, 0.5);
+        moveForwardInchesGyro(30, -135, sleepTime, 0.5);
 
-        turnAbsolutePID(90, Direction.CLOCKWISE, 0.3);
+        turnAbsolutePID(-90, Direction.COUNTERCLOCKWISE, 0.3);
         sleep(sleepTime, "turn toward parking space");
 
         // move under bridge
 
-        moveForwardInchesGyro(18 + (12 * blockPlace), 90, sleepTime);
+        moveForwardInchesGyro(14 + (20 * blockPlace), -90, sleepTime);
         rightIntake.setPower(-0.3);
         leftIntake.setPower(-0.3);
         sleep(500);
-        moveForwardInchesGyro(-5, 90, sleepTime);
-
+        moveForwardInchesGyro(-17, -90, sleepTime);
 //        //drop stone
 //        rightIntake.setPower(-0.8);
 //        leftIntake.setPower(-0.8);
