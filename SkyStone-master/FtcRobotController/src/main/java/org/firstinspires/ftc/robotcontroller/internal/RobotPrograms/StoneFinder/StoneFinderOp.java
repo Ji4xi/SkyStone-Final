@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -8,7 +7,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
-import org.firstinspires.ftc.robotcontroller.internal.Experiments.Kevin.FoundationServoKevin;
 import org.firstinspires.ftc.robotcontroller.internal.RobotSystems.MecanumXDrive;
 
 //@Disabled
@@ -19,7 +17,7 @@ public class StoneFinderOp extends TeleOpMode {
     DcMotor rightIntake;
     DcMotor leftIntake;
 
-    Servo claw;
+    Servo hook;
 
     Servo rs;
     Servo ls;
@@ -27,7 +25,7 @@ public class StoneFinderOp extends TeleOpMode {
     DcMotor rightLift;
     DcMotor leftLift;
 
-    final double intakePwr = 0.5;
+    final double intakePwr = 0.85;
     final double maxLiftPwr = 0.3;
     double currentLiftPwr = 0;
 
@@ -39,11 +37,11 @@ public class StoneFinderOp extends TeleOpMode {
         rightIntake = hardwareMap.dcMotor.get("rightIntake");
         leftIntake = hardwareMap.dcMotor.get("leftIntake");
 
-        rightIntake.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightIntake.setDirection(DcMotorSimple.Direction.REVERSE);
         leftIntake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        claw = hardwareMap.servo.get("claw");
-        claw.setDirection(Servo.Direction.FORWARD);
+        hook = hardwareMap.servo.get("hook");
+        hook.setDirection(Servo.Direction.FORWARD);
 
         rs = hardwareMap.servo.get("rs");
         ls = hardwareMap.servo.get("ls");
@@ -61,7 +59,7 @@ public class StoneFinderOp extends TeleOpMode {
         mecanumXDrive.telemetry();
         telemetry.addData("rightIntake_pwr", rightIntake.getPower());
         telemetry.addData("leftIntake_pwr", leftIntake.getPower());
-        telemetry.addData("lift_pos", claw.getPosition());
+        telemetry.addData("lift_pos", hook.getPosition());
         telemetry.addData("rs_ pos", rs.getPosition());
         telemetry.addData("ls_pos", ls.getPosition());
     }
@@ -76,11 +74,11 @@ public class StoneFinderOp extends TeleOpMode {
 
     public void updateFoundation() {
         if (gamepad1.a) {
-            rs.setPosition(1);
-            ls.setPosition(1);
-        } else if (gamepad1.y) {
             rs.setPosition(0);
             ls.setPosition(0);
+        } else if (gamepad1.y) {
+            rs.setPosition(0.5);
+            ls.setPosition(0.5);
         }
     }
 
@@ -94,8 +92,8 @@ public class StoneFinderOp extends TeleOpMode {
             leftIntake.setPower(intakePwr);
         }
         else if(gamepad2.right_bumper) {
-            rightIntake.setPower(-intakePwr);
-            leftIntake.setPower(-intakePwr);
+            rightIntake.setPower(-0.3);
+            leftIntake.setPower(-0.3);
         }
         else {
             rightIntake.setPower(0);
@@ -105,12 +103,15 @@ public class StoneFinderOp extends TeleOpMode {
 
     public void updateClaw() {
         if (gamepad2.a) {
-            claw.setPosition(0.5);
+            hook.setPosition(0.8);
         } else if (gamepad2.y) {
-            claw.setPosition(0);
+            hook.setPosition(0.2);
         }
         currentLiftPwr = gamepad2.left_stick_y * maxLiftPwr;
         leftLift.setPower(Range.clip(currentLiftPwr, - maxLiftPwr, maxLiftPwr));
         rightLift.setPower(Range.clip(currentLiftPwr, - maxLiftPwr, maxLiftPwr));
     }
+
+
+
 }

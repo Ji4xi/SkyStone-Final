@@ -9,13 +9,15 @@ import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 @TeleOp
 public class Claw extends TeleOpMode {
     Servo claw;
-    double currentPosition;
+    Servo rotate;
     final double max = 1;
     final double min = 0;
     @Override
     public void init() {
-        claw = hardwareMap.servo.get("claw");
-        claw.setDirection(Servo.Direction.FORWARD);
+        claw = hardwareMap.servo.get("grip.claw");
+        claw.setDirection(Servo.Direction.REVERSE);
+        rotate = hardwareMap.servo.get("rotate");
+        rotate.setDirection(Servo.Direction.FORWARD);
     }
 
     @Override
@@ -30,18 +32,25 @@ public class Claw extends TeleOpMode {
 
     @Override
     public void telemetry() {
+        telemetry.addData("currentRotationPosition", rotate.getPosition());
         telemetry.addData("currentPosition", claw.getPosition());
     }
 
+
     @Override
     public void updateData() {
-        if (gamepad2.y) {
-            currentPosition = 0;
+        if (gamepad1.y) {
+            claw.setPosition(0.85);
         }
-        if (gamepad1.a) {
-            currentPosition = 0.5;
+        else if (gamepad1.a) {
+            claw.setPosition(0.76);
         }
 
-        claw.setPosition(currentPosition);
+        if (gamepad1.x) {
+            rotate.setPosition(0.16);
+        }
+        else if (gamepad1.b) {
+            rotate.setPosition(0.9);
+        }
     }
 }

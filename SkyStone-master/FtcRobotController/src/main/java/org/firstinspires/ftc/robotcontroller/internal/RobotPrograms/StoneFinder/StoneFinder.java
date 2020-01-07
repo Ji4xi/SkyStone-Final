@@ -2,8 +2,6 @@ package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,9 +11,6 @@ import org.firstinspires.ftc.robotcontroller.internal.Default.PIDMichael;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-
-import java.net.PortUnreachableException;
-import java.util.ArrayList;
 
 //@Disabled
 @Autonomous
@@ -32,13 +27,16 @@ public class StoneFinder extends opencvSkystoneDetector {
     DcMotor rightIntake;
     DcMotor leftIntake;
 
-    Servo claw;
+    Servo hook;
 
     Servo rs;
     Servo ls;
 
     DcMotor rightLift;
     DcMotor leftLift;
+
+    Servo topClaw;
+    Servo bottomClaw;
 
     final double intakePwr = 0.5;
     final double maxLiftPwr = 0.3;
@@ -52,56 +50,89 @@ public class StoneFinder extends opencvSkystoneDetector {
 
     enum Direction {CLOCKWISE, COUNTERCLOCKWISE}
 
+    enum SkystonePositions {LEFT, MID, RIGHT}
+
     PIDMichael PID = new PIDMichael(0.001, Math.pow(10, -12), 10000); //experimentally found
+
+    double skystoneAngle;
 
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
         waitForStart();
+
     }
 
     public void initialize() throws InterruptedException {
-        BNO055IMU.Parameters parameterz = new BNO055IMU.Parameters();
-        parameterz.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameterz.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameterz.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameterz);
+//        BNO055IMU.Parameters parameterz = new BNO055IMU.Parameters();
+//        parameterz.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+//        parameterz.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+//        parameterz.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+//        imu = hardwareMap.get(BNO055IMU.class, "imu");
+//        imu.initialize(parameterz);
+//
+//        //driveTrain
+//        fl = hardwareMap.dcMotor.get("fl");
+//        fr = hardwareMap.dcMotor.get("fr");
+//        bl = hardwareMap.dcMotor.get("bl");
+//        br = hardwareMap.dcMotor.get("br");
+//
+//        fl.setDirection(DcMotorSimple.Direction.FORWARD);
+//        fr.setDirection(DcMotorSimple.Direction.REVERSE);
+//        bl.setDirection(DcMotorSimple.Direction.FORWARD);
+//        br.setDirection(DcMotorSimple.Direction.REVERSE);
+//
+//        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//
+//        rightIntake = hardwareMap.dcMotor.get("rightIntake");
+//        leftIntake = hardwareMap.dcMotor.get("leftIntake");
+//
+//        rightIntake.setDirection(DcMotorSimple.Direction.FORWARD);
+//        leftIntake.setDirection(DcMotorSimple.Direction.REVERSE);
+//
+//        hook = hardwareMap.servo.get("hook");
+//        hook.setDirection(Servo.Direction.FORWARD);
+//
+//        rs = hardwareMap.servo.get("rs");
+//        ls = hardwareMap.servo.get("ls");
+//        rs.setDirection(Servo.Direction.FORWARD);
+//        ls.setDirection(Servo.Direction.REVERSE);
+//
+//        rightLift = hardwareMap.dcMotor.get("rightLift");
+//        leftLift = hardwareMap.dcMotor.get("leftLift");
+//        rightLift.setDirection(DcMotorSimple.Direction.FORWARD);
+//        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+//
+//        topClaw = hardwareMap.servo.get("topClaw");
+//        bottomClaw = hardwareMap.servo.get("bottomClaw");
+//        topClaw.setDirection(Servo.Direction.FORWARD);
+//        bottomClaw.setDirection(Servo.Direction.FORWARD);
 
-        //driveTrain
-        fl = hardwareMap.dcMotor.get("fl");
-        fr = hardwareMap.dcMotor.get("fr");
-        bl = hardwareMap.dcMotor.get("bl");
-        br = hardwareMap.dcMotor.get("br");
+        //find skystone pos
+        super.runOpMode(); //init camera
 
-        fl.setDirection(DcMotorSimple.Direction.FORWARD);
-        fr.setDirection(DcMotorSimple.Direction.REVERSE);
-        bl.setDirection(DcMotorSimple.Direction.FORWARD);
-        br.setDirection(DcMotorSimple.Direction.REVERSE);
+        double mid = 0;
 
-        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        while (!isStarted()) {
+            if (valLeft == 0) {
+                skystoneAngle = mid + 14;
+            }
+            else if (valMid == 0) {
+                skystoneAngle = mid;
+            }
+            else {
+                skystoneAngle = mid - 14;
+            }
 
-        rightIntake = hardwareMap.dcMotor.get("rightIntake");
-        leftIntake = hardwareMap.dcMotor.get("leftIntake");
+            telemetry.addData("angle", skystoneAngle);
+            telemetry.update();
+        }
 
-        rightIntake.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftIntake.setDirection(DcMotorSimple.Direction.REVERSE);
+        phoneCam.closeCameraDevice();
 
-        claw = hardwareMap.servo.get("claw");
-        claw.setDirection(Servo.Direction.FORWARD);
-
-        rs = hardwareMap.servo.get("rs");
-        ls = hardwareMap.servo.get("ls");
-        rs.setDirection(Servo.Direction.FORWARD);
-        ls.setDirection(Servo.Direction.REVERSE);
-
-        rightLift = hardwareMap.dcMotor.get("rightLift");
-        leftLift = hardwareMap.dcMotor.get("leftLift");
-        rightLift.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void telemetry() {
@@ -234,6 +265,12 @@ public class StoneFinder extends opencvSkystoneDetector {
         }
 
     }
+
+    public void moveClaw(double position) {
+        topClaw.setPosition(position);
+        bottomClaw.setPosition(position);
+    }
+
     public double getAbsoluteHeading() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC , AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
