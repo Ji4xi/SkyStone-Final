@@ -8,9 +8,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.PIDMichael;
+import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.SkyScraper.SkyScraper;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.opencv.core.Mat;
 
 //@Disabled
 @Autonomous
@@ -46,11 +48,14 @@ public class StoneFinder extends opencvSkystoneDetector {
     static final double COUNTS_PER_REVOLUTION = 537.6; //20:1
     static final double DRIVE_GEAR_REDUCTION = 1; //This is < 1.0 if geared up
     static final double WHEEL_DIAMETER_INCHES = 3.93701;
-    static final double COUNTS_PER_INCH = (COUNTS_PER_REVOLUTION * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
+    static final double WHEEL_PERIMETER_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
+     static final double COUNTS_PER_INCH = (COUNTS_PER_REVOLUTION * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
 
     enum Direction {CLOCKWISE, COUNTERCLOCKWISE}
 
+
     enum SkystonePositions {LEFT, MID, RIGHT}
+
 
     PIDMichael PID = new PIDMichael(0.001, Math.pow(10, -12), 10000); //experimentally found
 
@@ -151,7 +156,7 @@ public class StoneFinder extends opencvSkystoneDetector {
         double power = drivePwrMax;
         int target = (int) (inches * COUNTS_PER_INCH);
         runToPosition(target, angle);
-        transformation(Math.toRadians(angle), power, fr, fl, br, bl);
+        transformation(angle, power, fr, fl, br, bl);
         while (fr.isBusy() || fl.isBusy() || br.isBusy() || bl.isBusy()) {}
         stopAndResetMotor();
         sleep(sleep);
@@ -160,7 +165,7 @@ public class StoneFinder extends opencvSkystoneDetector {
         double power = drivePwrMax, snipPwr, integral = 0.5; //integral is the lowest power level for the robot to move
         int target = (int) (inches * COUNTS_PER_INCH);
         runToPosition(target, angle);
-        transformation(Math.toRadians(angle), power, fr, fl, br, bl);
+        transformation(angle, power, fr, fl, br, bl);
         PID.initPID(target, System.nanoTime());
         while (fr.isBusy() || fl.isBusy() || br.isBusy() || bl.isBusy()) {
             if (Math.abs(fr.getPower()) > 0) snipPwr = PID.actuator(fr.getCurrentPosition(), System.nanoTime());
@@ -185,11 +190,92 @@ public class StoneFinder extends opencvSkystoneDetector {
     }
     public void moveInchesGyro() {}
     public void moveInchesPIDandGyro() {}
-    public void turn() {
+    public void turn(double angle, Direction direction, double maxPwr) {
         runWithoutEncoders();
-
+        flipMechanic(fr, fl, br, bl);
+        double integral = 0.5;
+        double error = 5;
+        double angleLeft = Math.abs(getAbsoluteHeading() - angle);
+        double firstDiff = Math.abs(getAbsoluteHeading() - angle);
+        if (direction == Direction.CLOCKWISE) {
+            while (opModeIsActive() && angleLeft > error) {
+                angleLeft = Math.abs(getAbsoluteHeading() - angle);
+                fr.setPower(-maxPwr);
+                fl.setPower(maxPwr);
+                br.setPower(-maxPwr);
+                bl.setPower(maxPwr);
+                telemetry.addData("fr_pwr", fr.getPower());
+                telemetry.addData("fl_pwr", fl.getPower());
+                telemetry.addData("imu", getAbsoluteHeading());
+                telemetry.addData("angleLeft", angleLeft);
+                telemetry.addData("firstDiff", firstDiff);
+                telemetry.addData("clockwise", "true");
+                telemetry.update();
+            }
+        } else {
+            while (opModeIsActive() && angleLeft > error) {
+                angleLeft = Math.abs(getAbsoluteHeading() - angle);
+                fr.setPower(maxPwr);
+                fl.setPower(-maxPwr);
+                br.setPower(maxPwr);
+                bl.setPower(-maxPwr);
+                telemetry.addData("fr_pwr", fr.getPower());
+                telemetry.addData("fl_pwr", fl.getPower());
+                telemetry.addData("imu", getAbsoluteHeading());
+                telemetry.addData("angleLeft", angleLeft);
+                telemetry.addData("firstDiff", firstDiff);
+                telemetry.addData("clockwise", "true");
+                telemetry.update();
+            }
+        }
+        flipMechanic(fr, fl, br, bl);
+        stopAndResetMotor();
     }
-    public void turnPID() {}
+    public void turnPID(double angle, Direction direction, double power) {
+        runWithoutEncoders();
+        flipMechanic(fr, fl, br, bl);
+        double angleLeft = Math.abs(getAbsoluteHeading() - angle);
+        double firstDiff = Math.abs(getAbsoluteHeading() - angle);
+        double integral = 0.5;
+        double error = 5;
+        if (direction == Direction.CLOCKWISE) {
+            while (opModeIsActive() && angleLeft > error) {
+                angleLeft = Math.abs(getAbsoluteHeading() - angle);
+                if (power > integral) power = Range.clip(angleLeft / firstDiff, 0, 1) * power;
+                else power = integral;
+                fr.setPower(-power);
+                fl.setPower(power);
+                br.setPower(-power);
+                bl.setPower(power);
+                telemetry.addData("fr_pwr", fr.getPower());
+                telemetry.addData("fl_pwr", fl.getPower());
+                telemetry.addData("imu", getAbsoluteHeading());
+                telemetry.addData("angleLeft", angleLeft);
+                telemetry.addData("firstDiff", firstDiff);
+                telemetry.addData("clockwise", "true");
+                telemetry.update();
+            }
+        } else {
+            while (opModeIsActive() && angleLeft > error) {
+                angleLeft = Math.abs(getAbsoluteHeading() - angle);
+                if (power > integral) power = Range.clip(angleLeft / firstDiff, 0, 1) * power;
+                else power = integral;
+                fr.setPower(power);
+                fl.setPower(-power);
+                br.setPower(power);
+                bl.setPower(-power);
+                telemetry.addData("fr_pwr", fr.getPower());
+                telemetry.addData("fl_pwr", fl.getPower());
+                telemetry.addData("imu", getAbsoluteHeading());
+                telemetry.addData("angleLeft", angleLeft);
+                telemetry.addData("firstDiff", firstDiff);
+                telemetry.addData("clockwise", "true");
+                telemetry.update();
+            }
+        }
+        flipMechanic(fr, fl, br, bl);
+        stopAndResetMotor();
+    }
 
 
     public void stopAndResetMotor() {
@@ -222,15 +308,19 @@ public class StoneFinder extends opencvSkystoneDetector {
     }
 
     public void runToPosition(int target, double angle) {
+        angle = Math.toRadians(angle);
         double fltarget = target, frtarget = target;
+        double flProportion = (Math.sqrt(2) * Math.cos(angle - Math.PI / 4)) / (Math.sqrt(2) * Math.sin(angle - Math.PI / 4));
+        double frProportion = (Math.sqrt(2) * Math.sin(angle - Math.PI / 4)) / (Math.sqrt(2) * Math.cos(angle - Math.PI / 4));
         if (Math.sqrt(2) * Math.sin(angle - Math.PI / 4) > Math.sqrt(2) * Math.cos(angle - Math.PI / 4)) {
             frtarget = target;
-            fltarget = target * (Math.sqrt(2) * Math.cos(angle - Math.PI / 4)) / (Math.sqrt(2) * Math.sin(angle - Math.PI / 4));
+            fltarget = target * Math.abs(flProportion);
         } else {
             fltarget = target;
-            frtarget = target * (Math.sqrt(2) * Math.sin(angle - Math.PI / 4)) / (Math.sqrt(2) * Math.cos(angle - Math.PI / 4));
+            frtarget = target * Math.abs(frProportion);
         }
-
+        if (Math.sqrt(2) * Math.cos(angle - Math.PI / 4) < 0) fltarget *= -1;
+        if (Math.sqrt(2) * Math.sin(angle - Math.PI / 4) < 0) frtarget *= -1;
         fl.setTargetPosition((int) fltarget);
         fr.setTargetPosition((int) frtarget);
         bl.setTargetPosition((int) frtarget);
@@ -255,22 +345,31 @@ public class StoneFinder extends opencvSkystoneDetector {
     }
     //angle in radians
     public void transformation (double angles, double power, DcMotor... motors) {
+        //fr fl br bl
+        angles = Math.toRadians(angles);
         for (int i = 0; i < motors.length; i++) {
-            switch (motors[i].toString()) {
-                case "fr": fr.setPower(Math.sqrt(2) * Math.sin(angles - Math.PI / 4) * power); break;
-                case "bl": bl.setPower(Math.sqrt(2) * Math.sin(angles - Math.PI / 4) * power); break;
-                case "fl": fl.setPower(Math.sqrt(2) * Math.cos(angles - Math.PI / 4) * power); break;
-                case "br": br.setPower(Math.sqrt(2) * Math.cos(angles - Math.PI / 4) * power); break;
+            switch (i) {
+                case 0 : fr.setPower(Math.sqrt(2) * Math.sin(angles - Math.PI / 4) * power); break;
+                case 1 : fl.setPower(Math.sqrt(2) * Math.cos(angles - Math.PI / 4) * power); break;
+                case 2 : br.setPower(Math.sqrt(2) * Math.cos(angles - Math.PI / 4) * power); break;
+                case 3 : bl.setPower(Math.sqrt(2) * Math.sin(angles - Math.PI / 4) * power); break;
             }
         }
 
     }
+
 
     public void moveClaw(double position) {
         topClaw.setPosition(position);
         bottomClaw.setPosition(position);
     }
 
+    public void flipMechanic(DcMotor... motors) {
+        for (int i = 0; i < motors.length; i++) {
+            if (motors[i].getDirection() == DcMotorSimple.Direction.FORWARD) motors[i].setDirection(DcMotorSimple.Direction.REVERSE);
+            else motors[i].setDirection(DcMotorSimple.Direction.FORWARD);
+        }
+    }
     public double getAbsoluteHeading() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC , AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
