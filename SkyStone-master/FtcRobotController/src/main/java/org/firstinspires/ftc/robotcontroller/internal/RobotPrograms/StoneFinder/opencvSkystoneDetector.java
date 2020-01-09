@@ -37,9 +37,9 @@ public class opencvSkystoneDetector extends LinearOpMode {
 
     //0 means skystone, 1 means yellow stone
     //-1 for debug, but we can keep it like this because if it works, it should change to either 0 or 255
-    private static int valMid = -1;
-    private static int valLeft = -1;
-    private static int valRight = -1;
+    protected static int valMid = -1;
+    protected static int valLeft = -1;
+    protected static int valRight = -1;
 
     private static float rectHeight = .6f/8f;
     private static float rectWidth = 1.5f/8f;
@@ -67,21 +67,21 @@ public class opencvSkystoneDetector extends LinearOpMode {
         phoneCam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);//display on RC
         //width, height
         //width = height in this case, because camera is in portrait mode.
-
-        waitForStart();
-        runtime.reset();
-        while (opModeIsActive()) {
-            telemetry.addData("Values", valLeft+"   "+valMid+"   "+valRight);
-            telemetry.addData("Height", rows);
-            telemetry.addData("Width", cols);
-
-            telemetry.update();
-            sleep(100);
-            //call movement functions
-//            strafe(0.4, 200);
-//            moveDistance(0.4, 700);
-
-        }
+//
+//        waitForStart();
+//        runtime.reset();
+//        while (opModeIsActive()) {
+//            telemetry.addData("Values", valLeft+"   "+valMid+"   "+valRight);
+//            telemetry.addData("Height", rows);
+//            telemetry.addData("Width", cols);
+//
+//            telemetry.update();
+//            sleep(100);
+//            //call movement functions
+////            strafe(0.4, 200);
+////            moveDistance(0.4, 700);
+//
+//        }
     }
 
     //detection pipeline
