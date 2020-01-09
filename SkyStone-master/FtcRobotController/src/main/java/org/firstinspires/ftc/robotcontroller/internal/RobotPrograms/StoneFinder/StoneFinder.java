@@ -18,7 +18,9 @@ import org.opencv.core.Mat;
 @Autonomous
 public class StoneFinder extends opencvSkystoneDetector {
 
-    protected BNO055IMU imu; //For detecting angles of rotation
+    protected BNO055IMU imu;//For detecting angles of rotation
+
+    enum Mode {OPEN, CLOSE}
 
     //driveTrain
     DcMotor fl;
@@ -275,6 +277,19 @@ public class StoneFinder extends opencvSkystoneDetector {
         }
         flipMechanic(fr, fl, br, bl);
         stopAndResetMotor();
+    }
+
+    public void foundation(Mode position, int sleep) throws InterruptedException {
+        if (position == position.OPEN) {
+            ls.setPosition(0);
+            rs.setPosition(0);
+            sleep(sleep);
+        }
+        else if (position == position.CLOSE) {
+            ls.setPosition(0.5);
+            rs.setPosition(0.5);
+            sleep(sleep);
+        }
     }
 
 
