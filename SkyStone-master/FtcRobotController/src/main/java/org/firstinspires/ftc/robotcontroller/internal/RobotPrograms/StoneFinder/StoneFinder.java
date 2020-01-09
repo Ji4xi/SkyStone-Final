@@ -17,9 +17,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.opencv.core.Mat;
 
 import java.net.PortUnreachableException;
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
-//@Disabled
+@Disabled
 @Autonomous
 public class StoneFinder extends opencvSkystoneDetector {
 
@@ -87,25 +89,25 @@ public class StoneFinder extends opencvSkystoneDetector {
         fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        rightIntake = hardwareMap.dcMotor.get("rightIntake");
-        leftIntake = hardwareMap.dcMotor.get("leftIntake");
-
-        rightIntake.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftIntake.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        claw = hardwareMap.servo.get("claw");
-        claw.setDirection(Servo.Direction.FORWARD);
-
+//
+//        rightIntake = hardwareMap.dcMotor.get("rightIntake");
+//        leftIntake = hardwareMap.dcMotor.get("leftIntake");
+//
+//        rightIntake.setDirection(DcMotorSimple.Direction.FORWARD);
+//        leftIntake.setDirection(DcMotorSimple.Direction.REVERSE);
+//
+//        claw = hardwareMap.servo.get("claw");
+//        claw.setDirection(Servo.Direction.FORWARD);
+//
         rs = hardwareMap.servo.get("rs");
         ls = hardwareMap.servo.get("ls");
         rs.setDirection(Servo.Direction.FORWARD);
         ls.setDirection(Servo.Direction.REVERSE);
-
-        rightLift = hardwareMap.dcMotor.get("rightLift");
-        leftLift = hardwareMap.dcMotor.get("leftLift");
-        rightLift.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+//
+//        rightLift = hardwareMap.dcMotor.get("rightLift");
+//        leftLift = hardwareMap.dcMotor.get("leftLift");
+//        rightLift.setDirection(DcMotorSimple.Direction.FORWARD);
+//        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void telemetry() {
@@ -125,12 +127,14 @@ public class StoneFinder extends opencvSkystoneDetector {
         int target = (int) (inches * COUNTS_PER_INCH);
         runToPosition(target, angle);
         transformation(angle, power, fr, fl, br, bl);
-        while (fr.isBusy() || fl.isBusy() || br.isBusy() || bl.isBusy()) {}
+        while (fr.isBusy() || fl.isBusy() || br.isBusy() || bl.isBusy()) {
+            telemetry();
+        }
         stopAndResetMotor();
         sleep(sleep);
     }
     public void moveInchesPID(double inches, double angle, long sleep) {
-        double power = drivePwrMax, snipPwr, integral = 0.5; //integral is the lowest power level for the robot to move
+        double power = drivePwrMax, snipPwr, integral = 0.65; //integral is the lowest power level for the robot to move
         int target = (int) (inches * COUNTS_PER_INCH);
         runToPosition(target, angle);
         transformation(angle, power, fr, fl, br, bl);
@@ -143,18 +147,15 @@ public class StoneFinder extends opencvSkystoneDetector {
             power = Range.clip(snipPwr + integral, 0, 1) * drivePwrMax;
             transformation(Math.toRadians(angle), power, fr, fl, br, bl);
 
-            telemetry.addData("fr_pwr", fr.getPower());
-            telemetry.addData("right target_left", target - fr.getCurrentPosition());
-            telemetry.addData("fl_pwr", fl.getPower());
-            telemetry.addData("left target_left", target - fl.getCurrentPosition());
-//            telemetry.addData("p", pid.p * pid.error);
-//            telemetry.addData("i", pid.i * pid.integral);
-//            telemetry.addData("d", pid.d * pid.differential);
-
-            telemetry.update();
+            telemetry();
         }
         stopAndResetMotor();
+        long timeT = System.currentTimeMillis();
         sleep(sleep);
+        timeT = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - timeT);
+        telemetry.addData("time total", timeT);
+        telemetry.update();
+        sleep(3000);
     }
     public void moveInchesGyro() {}
     public void moveInchesPIDandGyro() {}
@@ -204,8 +205,8 @@ public class StoneFinder extends opencvSkystoneDetector {
         flipMechanic(fr, fl, br, bl);
         double angleLeft = Math.abs(getAbsoluteHeading() - angle);
         double firstDiff = Math.abs(getAbsoluteHeading() - angle);
-        double integral = 0.5;
-        double error = 5;
+        double integral = 0.15;
+        double error = 3;
         if (direction == Direction.CLOCKWISE) {
             while (opModeIsActive() && angleLeft > error) {
                 angleLeft = Math.abs(getAbsoluteHeading() - angle);

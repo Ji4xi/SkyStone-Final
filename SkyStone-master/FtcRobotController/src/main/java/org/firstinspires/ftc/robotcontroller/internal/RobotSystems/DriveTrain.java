@@ -92,8 +92,8 @@ public abstract class DriveTrain extends Mechanism implements Telemetrable {
         for (int i = 0; i < numOfMotors; i++) {
             motors.add(hardwareMap.dcMotor.get(motorNames[i]));
             // set the direction of the motors
-            if (i % 2 == 0) motors.get(i).setDirection(DcMotorSimple.Direction.REVERSE);
-            else motors.get(i).setDirection(DcMotorSimple.Direction.FORWARD);
+            if (i % 2 == 0) motors.get(i).setDirection(DcMotorSimple.Direction.FORWARD);
+            else motors.get(i).setDirection(DcMotorSimple.Direction.REVERSE);
         }
         telemetry.addData(">", "DriveTrain.init() Successful");
     }
