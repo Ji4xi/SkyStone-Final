@@ -78,29 +78,29 @@ public class StoneFinder extends opencvSkystoneDetector {
     }
 
     public void initialize() throws InterruptedException {
-//        BNO055IMU.Parameters parameterz = new BNO055IMU.Parameters();
-//        parameterz.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-//        parameterz.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-//        parameterz.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-//        imu = hardwareMap.get(BNO055IMU.class, "imu");
-//        imu.initialize(parameterz);
-//
-//        //driveTrain
-//        fl = hardwareMap.dcMotor.get("fl");
-//        fr = hardwareMap.dcMotor.get("fr");
-//        bl = hardwareMap.dcMotor.get("bl");
-//        br = hardwareMap.dcMotor.get("br");
-//
-//        fl.setDirection(DcMotorSimple.Direction.FORWARD);
-//        fr.setDirection(DcMotorSimple.Direction.REVERSE);
-//        bl.setDirection(DcMotorSimple.Direction.FORWARD);
-//        br.setDirection(DcMotorSimple.Direction.REVERSE);
-//
-//        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//
+        BNO055IMU.Parameters parameterz = new BNO055IMU.Parameters();
+        parameterz.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameterz.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameterz.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameterz);
+
+        //driveTrain
+        fl = hardwareMap.dcMotor.get("fl");
+        fr = hardwareMap.dcMotor.get("fr");
+        bl = hardwareMap.dcMotor.get("bl");
+        br = hardwareMap.dcMotor.get("br");
+
+        fl.setDirection(DcMotorSimple.Direction.FORWARD);
+        fr.setDirection(DcMotorSimple.Direction.REVERSE);
+        bl.setDirection(DcMotorSimple.Direction.FORWARD);
+        br.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 //        rightIntake = hardwareMap.dcMotor.get("rightIntake");
 //        leftIntake = hardwareMap.dcMotor.get("leftIntake");
 //
@@ -110,11 +110,11 @@ public class StoneFinder extends opencvSkystoneDetector {
 //        hook = hardwareMap.servo.get("hook");
 //        hook.setDirection(Servo.Direction.FORWARD);
 //
-//        rs = hardwareMap.servo.get("rs");
-//        ls = hardwareMap.servo.get("ls");
-//        rs.setDirection(Servo.Direction.FORWARD);
-//        ls.setDirection(Servo.Direction.REVERSE);
-//
+        rs = hardwareMap.servo.get("rs");
+        ls = hardwareMap.servo.get("ls");
+        rs.setDirection(Servo.Direction.FORWARD);
+        ls.setDirection(Servo.Direction.REVERSE);
+
 //        rightLift = hardwareMap.dcMotor.get("rightLift");
 //        leftLift = hardwareMap.dcMotor.get("leftLift");
 //        rightLift.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -217,10 +217,6 @@ public class StoneFinder extends opencvSkystoneDetector {
         stopAndResetMotor();
         long timeT = System.currentTimeMillis();
         sleep(sleep);
-        timeT = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - timeT);
-        telemetry.addData("time total", timeT);
-        telemetry.update();
-        sleep(3000);
     }
     public void moveInchesGyro() {}
     public void moveInchesPIDandGyro() {}
