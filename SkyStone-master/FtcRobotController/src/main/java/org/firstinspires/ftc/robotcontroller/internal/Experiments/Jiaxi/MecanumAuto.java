@@ -42,9 +42,11 @@ public class MecanumAuto extends LinearOpMode {
         sleepSeconds(2);
         foundation(Mode.CLOSE);
         sleepSeconds(1);
-        YLinearInchesGyro(27.5, Direction.FORWARD, 0.4, 0);
+        YLinearInchesGyro(28, Direction.FORWARD, 0.4, 0);
+        sleepSeconds(1);
+        foundation(Mode.OPEN);
         sleepSeconds(2);
-        XLinearInchesGyro(40, Side.RIGHT, 0.6, 0);
+        XLinearInchesGyro(43, Side.RIGHT, 0.6, 0);
     }
 
     public void initialize() throws InterruptedException {

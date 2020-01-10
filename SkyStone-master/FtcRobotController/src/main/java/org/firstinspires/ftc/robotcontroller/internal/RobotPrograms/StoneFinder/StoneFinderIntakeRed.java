@@ -2,11 +2,8 @@ package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.SkyScraper.SkyScraper;
-
 @Autonomous
-public class StoneFinderIntakeBlue extends StoneFinder {
-
+public class StoneFinderIntakeRed extends StoneFinder {
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();

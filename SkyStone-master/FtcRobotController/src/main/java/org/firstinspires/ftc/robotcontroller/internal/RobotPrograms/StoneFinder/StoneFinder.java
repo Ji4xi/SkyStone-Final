@@ -21,7 +21,7 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-@Disabled
+//@Disabled
 @Autonomous
 public class StoneFinder extends opencvSkystoneDetector {
 
@@ -52,7 +52,7 @@ public class StoneFinder extends opencvSkystoneDetector {
     final double intakePwr = 0.5;
     final double maxLiftPwr = 0.3;
     double currentLiftPwr = 0;
-    double drivePwrMax = 0.8;
+    final double drivePwrMax = 0.45;
 
     static final double COUNTS_PER_REVOLUTION = 537.6; //20:1
     static final double DRIVE_GEAR_REDUCTION = 1; //This is < 1.0 if geared up
@@ -120,10 +120,10 @@ public class StoneFinder extends opencvSkystoneDetector {
 //        rightLift.setDirection(DcMotorSimple.Direction.FORWARD);
 //        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
 //
-//        topClaw = hardwareMap.servo.get("topClaw");
-//        bottomClaw = hardwareMap.servo.get("bottomClaw");
-//        topClaw.setDirection(Servo.Direction.FORWARD);
-//        bottomClaw.setDirection(Servo.Direction.FORWARD);
+        topClaw = hardwareMap.servo.get("top");
+        bottomClaw = hardwareMap.servo.get("bot");
+        topClaw.setDirection(Servo.Direction.FORWARD);
+        bottomClaw.setDirection(Servo.Direction.FORWARD);
 
 
         fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -140,10 +140,7 @@ public class StoneFinder extends opencvSkystoneDetector {
 //        claw = hardwareMap.servo.get("claw");
 //        claw.setDirection(Servo.Direction.FORWARD);
 //
-        rs = hardwareMap.servo.get("rs");
-        ls = hardwareMap.servo.get("ls");
-        rs.setDirection(Servo.Direction.FORWARD);
-        ls.setDirection(Servo.Direction.REVERSE);
+
 //
 //        rightLift = hardwareMap.dcMotor.get("rightLift");
 //        leftLift = hardwareMap.dcMotor.get("leftLift");
@@ -153,7 +150,7 @@ public class StoneFinder extends opencvSkystoneDetector {
         //find skystone pos
         super.runOpMode(); //init camera
 
-        double mid = 0;
+        double mid = 180;
 
         while (!isStarted()) {
             if (valLeft == 0) {
@@ -218,8 +215,81 @@ public class StoneFinder extends opencvSkystoneDetector {
         long timeT = System.currentTimeMillis();
         sleep(sleep);
     }
-    public void moveInchesGyro() {}
-    public void moveInchesPIDandGyro() {}
+    public void moveInchesGyro(double inches, double angle, long sleep) {
+        double initialAngle = getAbsoluteHeading(), currentAngle, adjust = 0, dialation = 100;
+        double power = drivePwrMax, snipPwr, integral = 0.40; //integral is the lowest power level for the robot to move
+        int target = (int) (inches * COUNTS_PER_INCH);
+        runToPosition(target, angle);
+        //PID.initPID(target, System.nanoTime());
+        angle = Math.toRadians(angle);
+        while (fr.isBusy() && fl.isBusy() && br.isBusy() && bl.isBusy()) {
+            double average = Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4;
+            currentAngle = getAbsoluteHeading();
+//            if (Math.abs(fr.getPower()) > 0) snipPwr = average / target;
+            snipPwr = average / target;
+
+            if (snipPwr < integral) integral = integral - snipPwr;
+            power = Range.clip(snipPwr + integral, 0, 1) * drivePwrMax;
+            adjust = initialAngle - currentAngle;
+
+            if ((adjust < 0 && !(initialAngle > 0 && currentAngle < 0)) || adjust > 0 && (initialAngle > 0 && currentAngle < 0)) { //need clockwise
+                fr.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+                fl.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+                br.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+                bl.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+            } else if ((adjust > 0 && !(initialAngle > 0 && currentAngle < 0)) || adjust < 0 && (initialAngle > 0 && currentAngle < 0)) {
+                fr.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+                fl.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+                br.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+                bl.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+            } else {
+                fr.setPower(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power);
+                fl.setPower(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power);
+                br.setPower(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power);
+                bl.setPower(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power);
+            }
+            telemetry();
+        }
+        stopAndResetMotor();
+        sleep(sleep);
+    }
+    public void moveInchesPIDandGyro(double inches, double angle, long sleep) {
+        double initialAngle = getAbsoluteHeading(), currentAngle, adjust = 0, dialation = 75;
+        double power = drivePwrMax, snipPwr, integral = 0.30; //integral is the lowest power level for the robot to move
+        int target = (int) (inches * COUNTS_PER_INCH);
+        runToPosition(target, angle);
+        PID.initPID(target, System.nanoTime());
+        angle = Math.toRadians(angle);
+        while (fr.isBusy() && fl.isBusy() && br.isBusy() && bl.isBusy()) {
+            currentAngle = getAbsoluteHeading();
+            if (Math.abs(fr.getPower()) > 0) snipPwr = PID.actuator(fr.getCurrentPosition(), System.nanoTime());
+            else snipPwr = PID.actuator(fl.getCurrentPosition(), System.nanoTime());
+
+            if (snipPwr < integral) integral = integral - snipPwr;
+            power = Range.clip(snipPwr + integral, 0, 1) * drivePwrMax;
+            adjust = initialAngle - currentAngle;
+
+            if ((adjust < 0 && !(initialAngle > 0 && currentAngle < 0)) || adjust > 0 && (initialAngle > 0 && currentAngle < 0)) { //need clockwise
+                fr.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+                fl.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+                br.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+                bl.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+            } else if ((adjust > 0 && !(initialAngle > 0 && currentAngle < 0)) || adjust < 0 && (initialAngle > 0 && currentAngle < 0)) {
+                fr.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+                fl.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+                br.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+                bl.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+            } else {
+                fr.setPower(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power);
+                fl.setPower(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power);
+                br.setPower(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power);
+                bl.setPower(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power);
+            }
+            telemetry();
+        }
+        stopAndResetMotor();
+        sleep(sleep);
+    }
     public void turn(double angle, Direction direction, double maxPwr) {
         runWithoutEncoders();
         flipMechanic(fr, fl, br, bl);
@@ -355,7 +425,7 @@ public class StoneFinder extends opencvSkystoneDetector {
         double fltarget = target, frtarget = target;
         double flProportion = (Math.sqrt(2) * Math.cos(angle - Math.PI / 4)) / (Math.sqrt(2) * Math.sin(angle - Math.PI / 4));
         double frProportion = (Math.sqrt(2) * Math.sin(angle - Math.PI / 4)) / (Math.sqrt(2) * Math.cos(angle - Math.PI / 4));
-        if (Math.sqrt(2) * Math.sin(angle - Math.PI / 4) > Math.sqrt(2) * Math.cos(angle - Math.PI / 4)) {
+        if (frProportion > flProportion) {
             frtarget = target;
             fltarget = target * Math.abs(flProportion);
         } else {
