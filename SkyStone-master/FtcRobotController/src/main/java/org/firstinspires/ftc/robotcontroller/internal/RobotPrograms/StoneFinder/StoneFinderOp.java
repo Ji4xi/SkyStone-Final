@@ -76,7 +76,8 @@ public class StoneFinderOp extends TeleOpMode {
         rightLift = hardwareMap.dcMotor.get("rightLift");
         leftLift = hardwareMap.dcMotor.get("leftLift");
         rightLift.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftLift.setDirection(DcMotorSimple.Direction.FORWARD);
+
 
 
         topClaw = hardwareMap.servo.get("top" +
@@ -161,7 +162,7 @@ public class StoneFinderOp extends TeleOpMode {
         if (gamepad2.a) {
             hook.setPosition(0.8);
         } else if (gamepad2.y) {
-            hook.setPosition(0.2);
+            hook.setPosition(0.3);
         }
         currentLiftPwr = gamepad2.left_stick_y * maxLiftPwr;
         leftLift.setPower(Range.clip(currentLiftPwr, - maxLiftPwr, maxLiftPwr));
@@ -194,12 +195,20 @@ public class StoneFinderOp extends TeleOpMode {
     }
 
     public void updateExtender() {
-
-        if (gamepad2.dpad_up) {
+        double mode;
+        mode = gamepad2.right_stick_y;
+        if (mode < 0) {
             extenderPos += 0.001;
-        } else if (gamepad2.dpad_down) {
+        }
+        else if (mode > 0) {
             extenderPos -= 0.001;
         }
+
+//        if (gamepad2.dpad_up) {
+//            extenderPos += 0.001;
+//        } else if (gamepad2.dpad_down) {
+//            extenderPos -= 0.001;
+//        }
 
         //bounds
         if (extenderPos > EXTENDER_MAX_POS) {
@@ -208,11 +217,11 @@ public class StoneFinderOp extends TeleOpMode {
             extenderPos = EXTENDER_MIN_POS;
         }
 
-        if (gamepad2.b && extenderPos == EXTENDER_MIN_POS) {
-            extenderPos = EXTENDER_MAX_POS;
-        } else if (gamepad2.b && extenderPos == EXTENDER_MAX_POS) {
-            extenderPos = EXTENDER_MIN_POS;
-        }
+//        if (gamepad2.b && extenderPos == EXTENDER_MIN_POS) {
+//            extenderPos = EXTENDER_MAX_POS;
+//        } else if (gamepad2.b && extenderPos == EXTENDER_MAX_POS) {
+//            extenderPos = EXTENDER_MIN_POS;
+//        }
 
         extender.setPosition(Range.clip(extenderPos, EXTENDER_MIN_POS, EXTENDER_MAX_POS));
     }
