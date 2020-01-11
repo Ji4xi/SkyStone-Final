@@ -49,8 +49,8 @@ public class StoneFinderOp extends TeleOpMode {
 
     final double SERVO_TICK_PER_REV = 1 / 7.5;
     double extenderPos = 0;
-    final double EXTENDER_MAX_POS = 0.4;
-    final double EXTENDER_MIN_POS = 0.2;
+    final double EXTENDER_MAX_POS = 0.7;
+    final double EXTENDER_MIN_POS = 0.5;
 
 
 
