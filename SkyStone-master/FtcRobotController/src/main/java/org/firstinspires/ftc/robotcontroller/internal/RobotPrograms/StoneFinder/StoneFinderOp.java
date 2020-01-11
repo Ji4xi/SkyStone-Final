@@ -79,6 +79,7 @@ public class StoneFinderOp extends TeleOpMode {
         leftLift.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
+
         topClaw = hardwareMap.servo.get("top" +
                 "");
         botClaw = hardwareMap.servo.get("bot");
@@ -196,10 +197,10 @@ public class StoneFinderOp extends TeleOpMode {
     public void updateExtender() {
         double mode;
         mode = gamepad2.right_stick_y;
-        if (mode > 0) {
+        if (mode < 0) {
             extenderPos += 0.001;
         }
-        else if (mode < 0) {
+        else if (mode > 0) {
             extenderPos -= 0.001;
         }
 
