@@ -2,7 +2,7 @@ package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous
+//@Autonomous
 public class RedFoundationTurn extends StoneFinder {
     @Override
     public void runOpMode() throws InterruptedException {

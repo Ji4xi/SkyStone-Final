@@ -80,11 +80,14 @@ public class StoneFinderOp extends TeleOpMode {
 
 
 
-        topClaw = hardwareMap.servo.get("top" +
-                "");
+        topClaw = hardwareMap.servo.get("top");
         botClaw = hardwareMap.servo.get("bot");
-        topClaw.setDirection(Servo.Direction.FORWARD);
-        botClaw.setDirection(Servo.Direction.FORWARD);
+        topClaw.setDirection(Servo.Direction.REVERSE);
+        botClaw.setDirection(Servo.Direction.REVERSE);
+
+
+        topClaw.setPosition(1);
+        botClaw.setPosition(0.15);
 
         extender = hardwareMap.servo.get("extender");
         extender.setDirection(Servo.Direction.REVERSE);
@@ -217,21 +220,25 @@ public class StoneFinderOp extends TeleOpMode {
             extenderPos = EXTENDER_MIN_POS;
         }
 
-//        if (gamepad2.b && extenderPos == EXTENDER_MIN_POS) {
-//            extenderPos = EXTENDER_MAX_POS;
-//        } else if (gamepad2.b && extenderPos == EXTENDER_MAX_POS) {
-//            extenderPos = EXTENDER_MIN_POS;
-//        }
+        double diff1 = Math.abs(extenderPos - EXTENDER_MAX_POS);
+        double diff2 = Math.abs(extenderPos - EXTENDER_MIN_POS);
+        if (gamepad2.b && diff1 < diff2) {
+            extenderPos = EXTENDER_MAX_POS;
+        } else if (gamepad2.b && diff1 > diff2) {
+            extenderPos = EXTENDER_MIN_POS;
+        }
 
+        if (gamepad2.dpad_up) extenderPos = EXTENDER_MAX_POS;
+        else if (gamepad2.dpad_down) extenderPos = EXTENDER_MIN_POS;
         extender.setPosition(Range.clip(extenderPos, EXTENDER_MIN_POS, EXTENDER_MAX_POS));
     }
 
     public void updateGrip() {
         if (gamepad1.y) {
-            grip.setPosition(0.6);
+            grip.setPosition(0.7);
         }
         else if (gamepad1.a) {
-            grip.setPosition(0.4); //0.76
+            grip.setPosition(0.38); //0.76
         }
 
         if (gamepad1.x) {

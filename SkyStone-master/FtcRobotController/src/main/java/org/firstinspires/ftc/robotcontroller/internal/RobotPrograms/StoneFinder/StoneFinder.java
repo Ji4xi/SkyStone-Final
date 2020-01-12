@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.PIDMichael;
+import org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi.MecanumAuto;
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.SkyScraper.SkyScraper;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -22,12 +23,14 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 //@Disabled
-@Autonomous
+//@Autonomous
 public class StoneFinder extends opencvSkystoneDetector {
 
     protected BNO055IMU imu;//For detecting angles of rotation
 
     enum Mode {OPEN, CLOSE}
+    enum Side {LEFT, RIGHT}
+    enum GAGE {FORWARD, REVERSE}
 
     //driveTrain
     DcMotor fl;
@@ -122,10 +125,11 @@ public class StoneFinder extends opencvSkystoneDetector {
 //
         topClaw = hardwareMap.servo.get("top");
         bottomClaw = hardwareMap.servo.get("bot");
-        topClaw.setDirection(Servo.Direction.FORWARD);
-        bottomClaw.setDirection(Servo.Direction.FORWARD);
+        topClaw.setDirection(Servo.Direction.REVERSE);
+        bottomClaw.setDirection(Servo.Direction.REVERSE);
 
-
+        topClaw.setPosition(0.5);
+        bottomClaw.setPosition(0.3);
         fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -150,7 +154,7 @@ public class StoneFinder extends opencvSkystoneDetector {
         //find skystone pos
         super.runOpMode(); //init camera
 
-        double mid = 180;
+        double mid = 0;
 
         while (!isStarted()) {
             if (valLeft == 0) {
@@ -165,6 +169,7 @@ public class StoneFinder extends opencvSkystoneDetector {
 
             telemetry.addData("angle", skystoneAngle);
             telemetry.update();
+            sleep(5000);
         }
 
         phoneCam.closeCameraDevice();
@@ -215,9 +220,9 @@ public class StoneFinder extends opencvSkystoneDetector {
         long timeT = System.currentTimeMillis();
         sleep(sleep);
     }
-    public void moveInchesGyro(double inches, double angle, long sleep) {
-        double initialAngle = getAbsoluteHeading(), currentAngle, adjust = 0, dialation = 100;
-        double power = drivePwrMax, snipPwr, integral = 0.40; //integral is the lowest power level for the robot to move
+    public void moveInchesGyro(double inches, double angle, long sleep, int dialation) {
+        double initialAngle = getAbsoluteHeading(), currentAngle, adjust = 0; // 80, 0.3   80,0.35 0.44 67
+        double power = drivePwrMax, snipPwr, integral = 0.30; //integral is the lowest power level for the robot to move
         int target = (int) (inches * COUNTS_PER_INCH);
         runToPosition(target, angle);
         //PID.initPID(target, System.nanoTime());
@@ -229,7 +234,45 @@ public class StoneFinder extends opencvSkystoneDetector {
             snipPwr = average / target;
 
             if (snipPwr < integral) integral = integral - snipPwr;
-            power = Range.clip(snipPwr + integral, 0, 1) * drivePwrMax;
+            power = Range.clip(snipPwr + integral, 0, 1);
+            adjust = initialAngle - currentAngle;
+
+            if ((adjust < 0 && !(initialAngle > 0 && currentAngle < 0)) || adjust > 0 && (initialAngle > 0 && currentAngle < 0)) { //need clockwise
+                fr.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+                fl.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+                br.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+                bl.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+            } else if ((adjust > 0 && !(initialAngle > 0 && currentAngle < 0)) || adjust < 0 && (initialAngle > 0 && currentAngle < 0)) {
+                fr.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+                fl.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+                br.setPower(Math.abs(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power) + Math.abs(adjust / dialation));
+                bl.setPower(Math.abs(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power) - Math.abs(adjust / dialation));
+            } else {
+                fr.setPower(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power);
+                fl.setPower(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power);
+                br.setPower(Math.sqrt(2) * Math.cos(angle - Math.PI / 4) * power);
+                bl.setPower(Math.sqrt(2) * Math.sin(angle - Math.PI / 4) * power);
+            }
+            telemetry();
+        }
+        stopAndResetMotor();
+        sleep(sleep, dialation + "");
+    }
+    public void moveInchesGyro(double inches, double angle, long sleep) {
+        double initialAngle = getAbsoluteHeading(), currentAngle, adjust = 0, dialation = 80; // 80, 0.3   80,0.35 0.44 67
+        double power = drivePwrMax, snipPwr, integral = 0.3; //integral is the lowest power level for the robot to move
+        int target = (int) (inches * COUNTS_PER_INCH);
+        runToPosition(target, angle);
+        //PID.initPID(target, System.nanoTime());
+        angle = Math.toRadians(angle);
+        while (fr.isBusy() && fl.isBusy() && br.isBusy() && bl.isBusy()) {
+            double average = Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4;
+            currentAngle = getAbsoluteHeading();
+//            if (Math.abs(fr.getPower()) > 0) snipPwr = average / target;
+            snipPwr = average / target;
+
+            if (snipPwr < integral) integral = integral - snipPwr;
+            power = Range.clip(snipPwr + integral, 0, 1);
             adjust = initialAngle - currentAngle;
 
             if ((adjust < 0 && !(initialAngle > 0 && currentAngle < 0)) || adjust > 0 && (initialAngle > 0 && currentAngle < 0)) { //need clockwise
@@ -333,7 +376,7 @@ public class StoneFinder extends opencvSkystoneDetector {
     }
     public void turnPID(double angle, Direction direction, double power) {
         runWithoutEncoders();
-        flipMechanic(fr, fl, br, bl);
+        //flipMechanic(fr, fl, br, bl);
         double angleLeft = Math.abs(getAbsoluteHeading() - angle);
         double firstDiff = Math.abs(getAbsoluteHeading() - angle);
         double integral = 0.15;
@@ -373,7 +416,7 @@ public class StoneFinder extends opencvSkystoneDetector {
                 telemetry.update();
             }
         }
-        flipMechanic(fr, fl, br, bl);
+        //flipMechanic(fr, fl, br, bl);
         stopAndResetMotor();
     }
 
@@ -420,6 +463,136 @@ public class StoneFinder extends opencvSkystoneDetector {
         super.sleep(time);
     }
 
+
+    public void YLinearInchesGyro(double inches, GAGE direction, double power, double absoluteHeading) {
+        //math
+        double circ = Math.PI * (3.93701);
+        int target = (int) (inches / circ * COUNTS_PER_REVOLUTION);
+        //initialize
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        double leftPower;
+        double rightPower;
+        double change;
+        //direction
+        if(direction == GAGE.FORWARD) {
+            fr.setDirection(DcMotorSimple.Direction.REVERSE);
+            br.setDirection(DcMotorSimple.Direction.REVERSE);
+            fl.setDirection(DcMotorSimple.Direction.FORWARD);
+            bl.setDirection(DcMotorSimple.Direction.FORWARD);
+        }
+        else {
+            fr.setDirection(DcMotorSimple.Direction.FORWARD);
+            br.setDirection(DcMotorSimple.Direction.FORWARD);
+            fl.setDirection(DcMotorSimple.Direction.REVERSE);
+            bl.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
+        //run program
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        while (Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4 <= target) {
+            //checks for direction
+            change = direction == GAGE.FORWARD ? getAbsoluteHeading() : -getAbsoluteHeading();
+            double average = Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4;
+            //reset power
+            leftPower = power + (change - absoluteHeading)/100;
+            rightPower = power - (change - absoluteHeading)/100;
+            //bounds
+            leftPower = Range.clip(leftPower, -1, 1);
+            rightPower = Range.clip(rightPower, -1, 1);
+            if (average < target / 2) {
+                fr.setPower((rightPower * (average / target)) + .2);
+                fl.setPower((leftPower * (average / target)) + .2);
+                br.setPower((rightPower * (average / target)) + .2);
+                bl.setPower((leftPower * (average / target)) + .2);
+            }
+            else if (average > target / 2) {
+                double justSomeMath = target - average;
+                //set power
+                fr.setPower((rightPower * (justSomeMath / target)) + .2);
+                fl.setPower((leftPower * (justSomeMath / target)) + .2);
+                br.setPower((rightPower * (justSomeMath / target)) + .2);
+                bl.setPower((leftPower * (justSomeMath / target)) + .2);
+            }
+
+            //telemetry
+            telemetry();
+        }
+        stopAndResetMotor();
+        reinitialize();
+    }
+
+    public void XLinearInchesGyro(double inches, Side direction, double power, double absoluteHeading) {
+        //math
+        double circ = Math.PI * (3.93701);
+        int target = (int) (inches / circ * COUNTS_PER_REVOLUTION);
+        double change;
+        //initialize
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        double forwardPower;
+        double backwardPower;
+        //direction
+        if (direction == Side.RIGHT) {
+            fr.setDirection(DcMotorSimple.Direction.FORWARD);
+            br.setDirection(DcMotorSimple.Direction.REVERSE);
+            fl.setDirection(DcMotorSimple.Direction.FORWARD);
+            bl.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
+        else {
+            fr.setDirection(DcMotorSimple.Direction.REVERSE);
+            br.setDirection(DcMotorSimple.Direction.FORWARD);
+            fl.setDirection(DcMotorSimple.Direction.REVERSE);
+            bl.setDirection(DcMotorSimple.Direction.FORWARD);
+        }
+        //run program
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        while (Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4 <= target) {
+            double average = Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4;
+            //reset power
+            forwardPower = power + (getAbsoluteHeading() - absoluteHeading)/100;
+            backwardPower = power - (getAbsoluteHeading() - absoluteHeading)/100;
+            //bounds
+            forwardPower= Range.clip(forwardPower, -1, 1);
+            backwardPower = Range.clip(backwardPower, -1, 1);
+
+            if (average < target / 2) {
+                fr.setPower((backwardPower * (average / target)) + .2);
+                fl.setPower((forwardPower * (average / target)) + .2);
+                br.setPower((forwardPower * (average / target)) + .2);
+                bl.setPower((backwardPower * (average / target)) + .2);
+            }
+
+            else if (average > target / 2) {
+                double justSomeMath = target - average;
+                //set power
+                fr.setPower((backwardPower * (justSomeMath / target)) + .2);
+                fl.setPower((forwardPower * (justSomeMath / target)) + .2);
+                br.setPower((forwardPower * (justSomeMath / target)) + .2);
+                bl.setPower((backwardPower * (justSomeMath / target)) + .2);
+            }
+
+            //telemetry
+            telemetry();
+        }
+        stopAndResetMotor();
+        reinitialize();
+    }
+    public void reinitialize() {
+        fr.setDirection(DcMotorSimple.Direction.REVERSE);
+        fl.setDirection(DcMotorSimple.Direction.FORWARD);
+        br.setDirection(DcMotorSimple.Direction.REVERSE);
+        bl.setDirection(DcMotorSimple.Direction.FORWARD);
+    }
     public void runToPosition(int target, double angle) {
         angle = Math.toRadians(angle);
         double fltarget = target, frtarget = target;
@@ -472,9 +645,9 @@ public class StoneFinder extends opencvSkystoneDetector {
     }
 
 
-    public void moveClaw(double position) {
-        topClaw.setPosition(position);
-        bottomClaw.setPosition(position);
+    public void moveClaw(double position1, double position2) {
+        topClaw.setPosition(position1);
+        bottomClaw.setPosition(position2);
     }
 
     public void flipMechanic(DcMotor... motors) {
