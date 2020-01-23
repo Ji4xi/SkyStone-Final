@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 
+@TeleOp
+@Disabled
 public class KevinClaw extends TeleOpMode {
     Servo servo1;
     Servo servo2;
