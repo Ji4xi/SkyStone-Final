@@ -16,8 +16,8 @@ public class JackBlack extends TeleOpMode {
         top = hardwareMap.servo.get("top");
         bot = hardwareMap.servo.get("bot");
 
-        top.setDirection(Servo.Direction.FORWARD);
-        bot.setDirection(Servo.Direction.FORWARD);
+        top.setDirection(Servo.Direction.REVERSE);
+        bot.setDirection(Servo.Direction.REVERSE);
     }
 
     @Override
@@ -28,12 +28,18 @@ public class JackBlack extends TeleOpMode {
 
     @Override
     public void updateData() {
-        if (gamepad1.y) {
+        if (gamepad1.x) {
             top.setPosition(0);
+        }
+        else if (gamepad1.y) {
+            top.setPosition(0.5);
         }
 
         if (gamepad1.a) {
-            bot.setPosition(0);
+            bot.setPosition(0.05);
+        }
+        else if (gamepad1.b) {
+            bot.setPosition(0.30);
         }
     }
 

@@ -7,13 +7,13 @@ public class RedFoundation extends StoneFinder {
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-        foundation(Mode.OPEN,2000);
-        moveInchesPID(28, 0, 2000);
-        moveInchesPID(30.25, 90, 2000);
-        foundation(Mode.CLOSE, 2000);
-        moveInchesPID(30.25, 270, 2000);
-        foundation(Mode.OPEN,2000);
-        moveInchesPID(63.25, 180, 2000);
+        foundation(Mode.OPEN,250); //set claw to open position (just in case)
+        XLinearInchesGyro(8, Side.LEFT, 0.45, 0); //move slightly to the right to line the robot with the foundation
+        YLinearInchesGyro(28, GAGE.REVERSE, 0.45, 0); //move towards the foundation
+        foundation(Mode.CLOSE, 500); //close the claws to grip onto the foundation
+        YLinearInchesGyro(30.5, GAGE.FORWARD, 0.35, 0); //pull the foundation to the build site by moving backwards
+        foundation(Mode.OPEN,1000); //open the claw to release the foundation from the robot
+        XLinearInchesGyro(43, Side.RIGHT, 0.30, 18);
 
     }
 }

@@ -6,18 +6,21 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcontroller.internal.Default.FtcOpModeRegister;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
-@Disabled
+
 @Autonomous
 public class MecanumAuto extends LinearOpMode {
     enum Direction {FORWARD, REVERSE}
     enum Side {LEFT, RIGHT}
     enum Slope {NEGATIVE, POSITIVE}
+    enum Mode {OPEN, CLOSE}
     //    enum TurnDirection {CW, CCW}
     protected BNO055IMU imu; //For detecting angles of rotation
 
@@ -26,27 +29,24 @@ public class MecanumAuto extends LinearOpMode {
     //drive train
     DcMotor fr, fl, br, bl;
     final double tpr = 537.6;
+    Servo ls, rs;
 
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
         waitForStart();
-//        XLinearInchesGyroPID(30, Side.RIGHT, 0.6);
-        XLinearInchesGyro(30, Side.RIGHT, 0.6, 0);
+        foundation(Mode.OPEN);
+        XLinearInchesGyro(8, Side.LEFT, 0.6, 0);
         sleepSeconds(2);
-        XLinearInchesGyro(30, Side.LEFT, 0.6, 0);
+        YLinearInchesGyro(28,Direction.REVERSE, 0.8, 0);
         sleepSeconds(2);
-        YLinearInchesGyro(30, Direction.FORWARD, 0.6, 0);
+        foundation(Mode.CLOSE);
+        sleepSeconds(1);
+        YLinearInchesGyro(28, Direction.FORWARD, 0.4, 0);
+        sleepSeconds(1);
+        foundation(Mode.OPEN);
         sleepSeconds(2);
-        YLinearInchesGyro(30, Direction.REVERSE, 0.6, 0);
-        sleepSeconds(2);
-        DiagonalInchesGyro(30, Slope.POSITIVE, Direction.FORWARD, 0.6, 0);
-        sleepSeconds(2);
-        DiagonalInchesGyro(30, Slope.NEGATIVE, Direction.FORWARD, 0.6, 0);
-        sleepSeconds(2);
-        DiagonalInchesGyro(30, Slope.NEGATIVE, Direction.REVERSE, 0.6, 0);
-        sleepSeconds(2);
-        DiagonalInchesGyro(30, Slope.POSITIVE, Direction.REVERSE, 0.6, 0);
+        XLinearInchesGyro(43, Side.RIGHT, 0.6, 0);
     }
 
     public void initialize() throws InterruptedException {
@@ -71,6 +71,12 @@ public class MecanumAuto extends LinearOpMode {
         bl = hardwareMap.dcMotor.get("bl");
         bl.setDirection(DcMotorSimple.Direction.FORWARD);
         bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        //foundation servo
+        rs = hardwareMap.servo.get("rs");
+        rs.setDirection(Servo.Direction.REVERSE);
+        ls = hardwareMap.servo.get("ls");
+        ls.setDirection(Servo.Direction.FORWARD);
     }
 
     public void YLinearInchesGyro(double inches, Direction direction, double power, double absoluteHeading) {
@@ -322,6 +328,16 @@ public class MecanumAuto extends LinearOpMode {
         }
         motorStop();
         reinitialize();
+    }
+    public void foundation(Mode mode) {
+        if (mode == Mode.OPEN) {
+            ls.setPosition(0);
+            rs.setPosition(0);
+        }
+        else if (mode == Mode.CLOSE) {
+            ls.setPosition(0.5);
+            rs.setPosition(0.5);
+        }
     }
 
     public void motorStop() {
