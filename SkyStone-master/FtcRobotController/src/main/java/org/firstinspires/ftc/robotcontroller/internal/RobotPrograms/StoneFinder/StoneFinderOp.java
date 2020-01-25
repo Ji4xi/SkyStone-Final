@@ -37,7 +37,7 @@ public class StoneFinderOp extends TeleOpMode {
     DcMotor leftLift;
 
 
-    final double intakePwr = 0.4;
+    final double intakePwr = 0.7;
     final double maxLiftPwr = 0.3;
     double currentLiftPwr = 0;
 
@@ -86,11 +86,11 @@ public class StoneFinderOp extends TeleOpMode {
         botClaw.setDirection(Servo.Direction.REVERSE);
 
 
-        topClaw.setPosition(1);
-        botClaw.setPosition(0.15);
+        topClaw.setPosition(0);
+        botClaw.setPosition(0.157);
 
         extender = hardwareMap.servo.get("extender");
-        extender.setDirection(Servo.Direction.REVERSE);
+        extender.setDirection(Servo.Direction.FORWARD);
         extender.setPosition(EXTENDER_MIN_POS);
 
         grip = hardwareMap.servo.get("grip");
@@ -152,8 +152,8 @@ public class StoneFinderOp extends TeleOpMode {
             leftIntake.setPower(intakePwr);
         }
         else if(gamepad2.right_bumper) {
-            rightIntake.setPower(-0.3);
-            leftIntake.setPower(-0.3);
+            rightIntake.setPower(-0.45);
+            leftIntake.setPower(-0.45);
         }
         else {
             rightIntake.setPower(0);
@@ -176,8 +176,8 @@ public class StoneFinderOp extends TeleOpMode {
         double leftSlidePwr = gamepad2.left_stick_y * slidePwr;
         double rightSlidePwr = gamepad2.left_stick_y * slidePwr;
 
-        leftSlidePwr = gamepad2.left_stick_y > 0 ? 0.2 : leftSlidePwr;
-        rightSlidePwr = gamepad2.left_stick_y > 0 ? 0.2 : rightSlidePwr;
+        leftSlidePwr = gamepad2.left_stick_y > 0 ? 0.35 : leftSlidePwr;
+        rightSlidePwr = gamepad2.left_stick_y > 0 ? 0.35 : rightSlidePwr;
 
 
         if (gamepad2.x) {

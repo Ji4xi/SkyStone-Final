@@ -10,6 +10,7 @@ public class JackBlack extends TeleOpMode {
 
     Servo top;
     Servo bot;
+    double topPos = 0, botPos = 0;
 
     @Override
     public void init() {
@@ -28,19 +29,34 @@ public class JackBlack extends TeleOpMode {
 
     @Override
     public void updateData() {
+
         if (gamepad1.x) {
-            top.setPosition(0);
+            topPos = 0.035;
         }
         else if (gamepad1.y) {
-            top.setPosition(0.5);
+            topPos = 0.4;
         }
 
         if (gamepad1.a) {
-            bot.setPosition(0.05);
+            botPos = 0;
         }
         else if (gamepad1.b) {
-            bot.setPosition(0.30);
+            botPos = 0.3;
         }
+
+        if (gamepad1.dpad_up) botPos += 0.001;
+        else if (gamepad1.dpad_down) botPos -= 0.001;
+        else if (gamepad1.dpad_left) topPos += 0.001;
+        else if (gamepad1.dpad_right) topPos -= 0.001;
+
+        if (topPos > 1) topPos = 1;
+        else if (topPos < 0) topPos = 0;
+
+        if (botPos > 1) botPos = 1;
+        else if (botPos < 0) botPos = 0;
+
+        top.setPosition(topPos);
+        bot.setPosition(botPos);
     }
 
 
