@@ -238,7 +238,7 @@ public class StoneFinderOp extends TeleOpMode {
             grip.setPosition(0.7);
         }
         else if (gamepad1.a) {
-            grip.setPosition(0.09); //0.76
+            grip.setPosition(0.11); //0.76
         }
 
         if (gamepad1.x) {
