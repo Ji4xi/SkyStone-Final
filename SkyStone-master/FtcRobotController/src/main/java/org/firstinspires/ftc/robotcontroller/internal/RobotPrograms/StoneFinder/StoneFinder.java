@@ -55,7 +55,7 @@ public class StoneFinder extends opencvSkystoneDetector {
     final double intakePwr = 0.5;
     final double maxLiftPwr = 0.3;
     double currentLiftPwr = 0;
-    final double drivePwrMax = 0.45;
+    final double drivePwrMax = 0.7;
 
     static final double COUNTS_PER_REVOLUTION = 537.6; //20:1
     static final double DRIVE_GEAR_REDUCTION = 1; //This is < 1.0 if geared up
@@ -128,7 +128,7 @@ public class StoneFinder extends opencvSkystoneDetector {
         topClaw.setDirection(Servo.Direction.REVERSE);
         bottomClaw.setDirection(Servo.Direction.REVERSE);
 
-        topClaw.setPosition(0.5);
+        topClaw.setPosition(0.4);
         bottomClaw.setPosition(0.3);
         fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -169,7 +169,6 @@ public class StoneFinder extends opencvSkystoneDetector {
 
             telemetry.addData("angle", skystoneAngle);
             telemetry.update();
-            sleep(5000);
         }
 
         phoneCam.closeCameraDevice();
@@ -263,12 +262,10 @@ public class StoneFinder extends opencvSkystoneDetector {
         double power = drivePwrMax, snipPwr, integral = 0.3; //integral is the lowest power level for the robot to move
         int target = (int) (inches * COUNTS_PER_INCH);
         runToPosition(target, angle);
-        //PID.initPID(target, System.nanoTime());
         angle = Math.toRadians(angle);
         while (fr.isBusy() && fl.isBusy() && br.isBusy() && bl.isBusy()) {
             double average = Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4;
             currentAngle = getAbsoluteHeading();
-//            if (Math.abs(fr.getPower()) > 0) snipPwr = average / target;
             snipPwr = average / target;
 
             if (snipPwr < integral) integral = integral - snipPwr;
@@ -494,6 +491,7 @@ public class StoneFinder extends opencvSkystoneDetector {
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         while (Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4 <= target) {
             //checks for direction
             change = direction == GAGE.FORWARD ? getAbsoluteHeading() : -getAbsoluteHeading();
