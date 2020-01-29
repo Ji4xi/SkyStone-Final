@@ -39,7 +39,7 @@ public class ClawClawCooCoo extends TeleOpMode {
     @Override
     public void updateData() {
         if (gamepad1.y) {
-            currentPosition = 0.7;
+            currentPosition = 0;
             clawServo.setPosition(currentPosition);
         }
         if (gamepad1.x) {
