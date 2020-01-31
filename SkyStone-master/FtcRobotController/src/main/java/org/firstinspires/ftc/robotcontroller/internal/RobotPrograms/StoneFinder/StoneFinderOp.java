@@ -49,8 +49,8 @@ public class StoneFinderOp extends TeleOpMode {
 
     final double SERVO_TICK_PER_REV = 1 / 7.5;
     double extenderPos = 0;
-    final double EXTENDER_MAX_POS = 0.7;
-    final double EXTENDER_MIN_POS = 0.5;
+    final double EXTENDER_MAX_POS = 0.8;
+    final double EXTENDER_MIN_POS = 0.3;
 
 
 
@@ -87,7 +87,7 @@ public class StoneFinderOp extends TeleOpMode {
 
 
         topClaw.setPosition(0);
-        botClaw.setPosition(0.157);
+        botClaw.setPosition(0.5);
 
         extender = hardwareMap.servo.get("extender");
         extender.setDirection(Servo.Direction.FORWARD);
@@ -96,7 +96,7 @@ public class StoneFinderOp extends TeleOpMode {
         grip = hardwareMap.servo.get("grip");
         rotate = hardwareMap.servo.get("rotate");
         grip.setDirection(Servo.Direction.FORWARD);
-        rotate.setDirection(Servo.Direction.FORWARD);
+        rotate.setDirection(Servo.Direction.REVERSE);
 
     }
 
@@ -163,9 +163,9 @@ public class StoneFinderOp extends TeleOpMode {
 
     public void updateHook() {
         if (gamepad2.a) {
-            hook.setPosition(0.8);
+            hook.setPosition(0.9);
         } else if (gamepad2.y) {
-            hook.setPosition(0.3);
+            hook.setPosition(0.2);
         }
         currentLiftPwr = gamepad2.left_stick_y * maxLiftPwr;
         leftLift.setPower(Range.clip(currentLiftPwr, - maxLiftPwr, maxLiftPwr));
@@ -201,10 +201,10 @@ public class StoneFinderOp extends TeleOpMode {
         double mode;
         mode = gamepad2.right_stick_y;
         if (mode < 0) {
-            extenderPos += 0.001;
+            extenderPos += 0.002;
         }
         else if (mode > 0) {
-            extenderPos -= 0.001;
+            extenderPos -= 0.002;
         }
 
 //        if (gamepad2.dpad_up) {
@@ -238,7 +238,7 @@ public class StoneFinderOp extends TeleOpMode {
             grip.setPosition(0.7);
         }
         else if (gamepad1.a) {
-            grip.setPosition(0.38); //0.76
+            grip.setPosition(0.11); //0.76
         }
 
         if (gamepad1.x) {
