@@ -129,19 +129,11 @@ public class StoneFinderOp extends TeleOpMode {
         //updateClaw();
         updateExtender();
         updateGrip();
-        updateDrive();
     }
 
     //public void updateClaw() {
     //
     //}
-    public void updateDrive() {
-        if(gamepad1.right_trigger != 0) {
-            mecanumXDrive.moveRight(0.6);
-        } else if (gamepad1.left_trigger != 0) {
-            mecanumXDrive.moveLeft(0.6);
-        }
-    }
 
     public void updateFoundation() {
         if (gamepad1.left_bumper) {
@@ -157,6 +149,8 @@ public class StoneFinderOp extends TeleOpMode {
         mecanumXDrive.update();
         if (gamepad1.x) mecanumXDrive.flipMechanic(true);
         else if (gamepad1.b) mecanumXDrive.flipMechanic(false);
+        if (gamepad1.right_trigger != 0) mecanumXDrive.setSpeed(0.8);
+        if (gamepad1.left_trigger != 0) mecanumXDrive.setSpeed(0.5);
     }
 
     public void updateIntake() {
