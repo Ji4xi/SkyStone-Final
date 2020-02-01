@@ -159,8 +159,8 @@ public class StoneFinderOp extends TeleOpMode {
             leftIntake.setPower(intakePwr);
         }
         else if(gamepad2.right_bumper) {
-            rightIntake.setPower(-0.45);
-            leftIntake.setPower(-0.45);
+            rightIntake.setPower(-0.6);
+            leftIntake.setPower(-0.6);
         }
         else {
             rightIntake.setPower(0);
@@ -255,7 +255,7 @@ public class StoneFinderOp extends TeleOpMode {
             rotate.setPosition(0.465);
         }
         else if (gamepad1.dpad_up) {
-            rotate.setPosition(0.85);
+            rotate.setPosition(0.82);
         }
     }
 

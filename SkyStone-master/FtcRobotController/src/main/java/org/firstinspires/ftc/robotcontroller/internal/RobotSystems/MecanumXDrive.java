@@ -53,6 +53,7 @@ public class MecanumXDrive extends DriveTrain {
                 if (i % 2 == 0) motors.get(i).setDirection(DcMotorSimple.Direction.REVERSE);
                 else motors.get(i).setDirection(DcMotorSimple.Direction.FORWARD);
             }
+            dir = true;
         } else {
             for (int i = 0; i < numOfMotors; i++) {
                 // set the direction of the motors
