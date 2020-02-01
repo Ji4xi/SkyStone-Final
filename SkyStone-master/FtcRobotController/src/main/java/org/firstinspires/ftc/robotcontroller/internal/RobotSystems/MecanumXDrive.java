@@ -33,4 +33,18 @@ public class MecanumXDrive extends DriveTrain {
     public void turnClockwise(double angularVelocity) {
 
     }
+
+    public void moveLeft(double max) {
+        motors.get(0).setPower(gamepad1.right_trigger * max);
+        motors.get(1).setPower(-gamepad1.right_trigger * max);
+        motors.get(2).setPower(-gamepad1.right_trigger * max);
+        motors.get(3).setPower(gamepad1.right_trigger * max);
+    }
+
+    public void moveRight(double max) {
+        motors.get(0).setPower(-gamepad1.left_trigger * max);
+        motors.get(1).setPower(gamepad1.left_trigger * max);
+        motors.get(2).setPower(gamepad1.left_trigger * max);
+        motors.get(3).setPower(-gamepad1.left_trigger * max);
+    }
 }
