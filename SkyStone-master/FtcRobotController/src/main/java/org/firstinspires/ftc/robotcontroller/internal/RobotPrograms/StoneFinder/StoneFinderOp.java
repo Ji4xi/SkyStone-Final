@@ -151,6 +151,8 @@ public class StoneFinderOp extends TeleOpMode {
 
     public void updateDriveTrain() {
         mecanumXDrive.update();
+        if (gamepad1.x) mecanumXDrive.flipMechanic(true);
+        else if (gamepad1.b) mecanumXDrive.flipMechanic(false);
     }
 
     public void updateIntake() {

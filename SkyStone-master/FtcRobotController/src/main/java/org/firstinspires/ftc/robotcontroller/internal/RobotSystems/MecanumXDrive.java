@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotSystems;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
 import org.firstinspires.ftc.robotcontroller.internal.TestProps.MecanumX;
 
 public class MecanumXDrive extends DriveTrain {
@@ -32,5 +34,21 @@ public class MecanumXDrive extends DriveTrain {
     @Override
     public void turnClockwise(double angularVelocity) {
 
+    }
+
+    public void flipMechanic(boolean bool) {
+        if (bool) {
+            for (int i = 0; i < numOfMotors; i++) {
+                // set the direction of the motors
+                if (i % 2 == 0) motors.get(i).setDirection(DcMotorSimple.Direction.REVERSE);
+                else motors.get(i).setDirection(DcMotorSimple.Direction.FORWARD);
+            }
+        } else {
+            for (int i = 0; i < numOfMotors; i++) {
+                // set the direction of the motors
+                if (i % 2 == 0) motors.get(i).setDirection(DcMotorSimple.Direction.FORWARD);
+                else motors.get(i).setDirection(DcMotorSimple.Direction.REVERSE);
+            }
+        }
     }
 }
