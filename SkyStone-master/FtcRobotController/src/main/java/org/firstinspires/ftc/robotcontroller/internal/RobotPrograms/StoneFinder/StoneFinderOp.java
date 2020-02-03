@@ -87,7 +87,7 @@ public class StoneFinderOp extends TeleOpMode {
 
 
         topClaw.setPosition(0);
-        botClaw.setPosition(0.5);
+        botClaw.setPosition(0.35);
 
         extender = hardwareMap.servo.get("extender");
         extender.setDirection(Servo.Direction.FORWARD);
@@ -115,6 +115,8 @@ public class StoneFinderOp extends TeleOpMode {
         telemetry.addData("gripper pos", grip.getPosition());
         telemetry.addData("rotator pos", rotate.getPosition());
         telemetry.addData("extender pwr", extender.getPosition());
+        telemetry.addData("claw top", topClaw.getPosition());
+        telemetry.addData("claw bottom", botClaw.getPosition());
     }
 
     @Override
@@ -132,6 +134,7 @@ public class StoneFinderOp extends TeleOpMode {
     //public void updateClaw() {
     //
     //}
+
     public void updateFoundation() {
         if (gamepad1.left_bumper) {
             rs.setPosition(0);
@@ -144,6 +147,10 @@ public class StoneFinderOp extends TeleOpMode {
 
     public void updateDriveTrain() {
         mecanumXDrive.update();
+        if (gamepad1.x) mecanumXDrive.flipMechanic(true);
+        else if (gamepad1.b) mecanumXDrive.flipMechanic(false);
+        if (gamepad1.right_trigger != 0) mecanumXDrive.setSpeed(0.8);
+        if (gamepad1.left_trigger != 0) mecanumXDrive.setSpeed(0.5);
     }
 
     public void updateIntake() {
@@ -152,8 +159,8 @@ public class StoneFinderOp extends TeleOpMode {
             leftIntake.setPower(intakePwr);
         }
         else if(gamepad2.right_bumper) {
-            rightIntake.setPower(-0.45);
-            leftIntake.setPower(-0.45);
+            rightIntake.setPower(-0.6);
+            leftIntake.setPower(-0.6);
         }
         else {
             rightIntake.setPower(0);
@@ -163,9 +170,9 @@ public class StoneFinderOp extends TeleOpMode {
 
     public void updateHook() {
         if (gamepad2.a) {
-            hook.setPosition(0.9);
+            hook.setPosition(0.8);
         } else if (gamepad2.y) {
-            hook.setPosition(0.2);
+            hook.setPosition(0.3);
         }
         currentLiftPwr = gamepad2.left_stick_y * maxLiftPwr;
         leftLift.setPower(Range.clip(currentLiftPwr, - maxLiftPwr, maxLiftPwr));
@@ -235,20 +242,21 @@ public class StoneFinderOp extends TeleOpMode {
 
     public void updateGrip() {
         if (gamepad1.y) {
-            grip.setPosition(0.7);
+            grip.setPosition(0.55);
         }
         else if (gamepad1.a) {
             grip.setPosition(0.11); //0.76
         }
 
-        if (gamepad1.x) {
-            rotate.setPosition(0.16);
+        if (gamepad1.dpad_down) {
+            rotate.setPosition(0.08);
         }
-        else if (gamepad1.b) {
-            rotate.setPosition(0.9);
+        else if (gamepad1.dpad_left) {
+            rotate.setPosition(0.465);
+        }
+        else if (gamepad1.dpad_up) {
+            rotate.setPosition(0.82);
         }
     }
-
-
 
 }

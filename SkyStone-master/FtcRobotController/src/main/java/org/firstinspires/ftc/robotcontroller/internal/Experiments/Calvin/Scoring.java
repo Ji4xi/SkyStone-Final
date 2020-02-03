@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.robotcontroller.internal.Experiments.Calvin;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 
+@Disabled
 @TeleOp
 public class Scoring extends TeleOpMode {
 
