@@ -227,4 +227,8 @@ public abstract class DriveTrain extends Mechanism implements Telemetrable {
         }
 
     }
+
+    public void setSpeed(double speed) {
+        drivePwrMax = speed;
+    }
 }

@@ -46,20 +46,6 @@ public class MecanumXDrive extends DriveTrain {
 
     }
 
-    public void moveLeft(double max) {
-        motors.get(0).setPower(gamepad1.right_trigger * max);
-        motors.get(1).setPower(-gamepad1.right_trigger * max);
-        motors.get(2).setPower(-gamepad1.right_trigger * max);
-        motors.get(3).setPower(gamepad1.right_trigger * max);
-    }
-
-    public void moveRight(double max) {
-        motors.get(0).setPower(-gamepad1.left_trigger * max);
-        motors.get(1).setPower(gamepad1.left_trigger * max);
-        motors.get(2).setPower(gamepad1.left_trigger * max);
-        motors.get(3).setPower(-gamepad1.left_trigger * max);
-    }
-
     public void flipMechanic(boolean bool) {
         if (bool) {
             for (int i = 0; i < numOfMotors; i++) {
@@ -67,6 +53,7 @@ public class MecanumXDrive extends DriveTrain {
                 if (i % 2 == 0) motors.get(i).setDirection(DcMotorSimple.Direction.REVERSE);
                 else motors.get(i).setDirection(DcMotorSimple.Direction.FORWARD);
             }
+            dir = true;
         } else {
             for (int i = 0; i < numOfMotors; i++) {
                 // set the direction of the motors
