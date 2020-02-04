@@ -1,12 +1,6 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
-import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.SkyScraper.SkyScraper;
-
-@Autonomous
-public class NewSkyStoneIntakeBlue extends StoneFinder {
-
+public class NewSkyStoneIntakeRed extends StoneFinder{
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
@@ -18,14 +12,14 @@ public class NewSkyStoneIntakeBlue extends StoneFinder {
         topClaw.setPosition(0.257);
         bottomClaw.setPosition(0);
         if (skystoneAngle > 0) {
-            xAddOn = 7.35;
-            YLinearInchesGyro(xAddOn, GAGE.FORWARD, drivePwrMax - 0.3, -90);
+            xAddOn = 0;
+            YLinearInchesGyro(xAddOn, GAGE.REVERSE, drivePwrMax - 0.3, 90);
         } else if (skystoneAngle == 0) {
-            xAddOn = 7.35 + SKYSTONE_INCH;
-            YLinearInchesGyro(xAddOn, GAGE.FORWARD, drivePwrMax - 0.3, -90);
+            xAddOn = 0;
+            YLinearInchesGyro(xAddOn, GAGE.REVERSE, drivePwrMax - 0.3, 90);
         } else {
-            xAddOn = 7.35 + 2 * SKYSTONE_INCH;
-            YLinearInchesGyro(xAddOn, GAGE.FORWARD, drivePwrMax - 0.3, -90);
+            xAddOn = SKYSTONE_INCH;
+            YLinearInchesGyro(xAddOn, GAGE.REVERSE, drivePwrMax - 0.3, 90);
         }
 
         double drift = 2;
@@ -36,11 +30,12 @@ public class NewSkyStoneIntakeBlue extends StoneFinder {
         moveClaw(0, 0.33);
         XLinearInchesGyro(drift + 1.8, Side.RIGHT, drivePwrMax - 0.3, -90);
 
+        //need fix in distance travelled
         if (skystoneAngle > 0)
-            YLinearInchesGyro(17.85 + 3 * TILE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
-        else if (skystoneAngle == 0) YLinearInchesGyro(17.85 + 3 * TILE_INCH + SKYSTONE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
+            YLinearInchesGyro(17.85 + 3 * TILE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
+        else if (skystoneAngle == 0) YLinearInchesGyro(17.85 + 3 * TILE_INCH + SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
         else {
-            YLinearInchesGyro(17.85 + 3 * TILE_INCH + 2 * SKYSTONE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
+            YLinearInchesGyro(17.85 + 3 * TILE_INCH + 2 * SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
         }
 
         XLinearInchesGyro(drift + 1.9, Side.LEFT, drivePwrMax - 0.3, -90);
@@ -52,11 +47,12 @@ public class NewSkyStoneIntakeBlue extends StoneFinder {
         //RAISE
         moveClaw(0, 0.33);
 
+        //need fix in distance travelled
         if (skystoneAngle > 0)
-            YLinearInchesGyro(-7.1 + 3 * TILE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
-        else if (skystoneAngle == 0) YLinearInchesGyro(-7.1 + 3 * TILE_INCH + SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
+            YLinearInchesGyro(-7.1 + 3 * TILE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
+        else if (skystoneAngle == 0) YLinearInchesGyro(-7.1 + 3 * TILE_INCH + SKYSTONE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
         else {
-            YLinearInchesGyro(-7.1 + 3 * TILE_INCH + 2 * SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
+            YLinearInchesGyro(-7.1 + 3 * TILE_INCH + 2 * SKYSTONE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
         }
 
         //SECOND BLOCK
@@ -69,6 +65,7 @@ public class NewSkyStoneIntakeBlue extends StoneFinder {
         moveClaw(0, 0.33);
         XLinearInchesGyro(drift + 2.8, Side.RIGHT, drivePwrMax - 0.3, -90);
 
+        //need fix in distance travelled
         if (skystoneAngle > 0)
             YLinearInchesGyro(0.9 + 3 * TILE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
         else if (skystoneAngle == 0) YLinearInchesGyro(0.9 + 3 * TILE_INCH + SKYSTONE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
@@ -81,18 +78,15 @@ public class NewSkyStoneIntakeBlue extends StoneFinder {
         bottomClaw.setPosition(0);
         topClaw.setPosition(0.4);
 
-        //extend servo
-
         //Foundation
-        YLinearInchesGyro(.5, GAGE.FORWARD,drivePwrMax - 0.3, 180);
+        YLinearInchesGyro(.5, GAGE.REVERSE,drivePwrMax - 0.3, -180);
         turnPID(-175, Direction.CLOCKWISE, 0.6);//12
-        YLinearInchesGyro(2, GAGE.REVERSE,drivePwrMax - 0.3, -180);
+        YLinearInchesGyro(2, GAGE.FORWARD,drivePwrMax - 0.3, 180);
         foundation(Mode.OPEN, 100);
+        //extend servo
         //tape.setPower(0.4);
-        YLinearInchesGyro(TILE_INCH + 4.5, GAGE.FORWARD,drivePwrMax - 0.3, 180);
+        YLinearInchesGyro(TILE_INCH + 4.5, GAGE.REVERSE,drivePwrMax - 0.3, -180);
         foundation(Mode.CLOSE, 0);
         //tape.setPower(0);
-
     }
-
 }
