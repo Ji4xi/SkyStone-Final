@@ -8,7 +8,7 @@ public class ParkLeftBridge extends MichaelBot {
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
         sleep(22000);
-        YLinearInchesGyro(28,GAGE.FORWARD, 0.7, 0);
+        YLinearInchesGyro(25,GAGE.FORWARD, 0.7, 0);
         sleep(500);
         XLinearInchesGyro(9, Side.LEFT, 0.7, 0);
     }
