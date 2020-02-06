@@ -17,7 +17,7 @@ public class NewSkyStoneIntakeRed extends StoneFinder {
         topClaw.setPosition(0.257);
         bottomClaw.setPosition(0);
         if (skystoneAngle > 0) {
-            xAddOn = SKYSTONE_INCH;
+            xAddOn = SKYSTONE_INCH - 3;
             YLinearInchesGyro(xAddOn, GAGE.REVERSE, drivePwrMax - 0.3, 90);
         } else if (skystoneAngle == 0) {
             xAddOn = 3 * SKYSTONE_INCH - 3;
@@ -28,22 +28,36 @@ public class NewSkyStoneIntakeRed extends StoneFinder {
         }
 
         double drift = 2;
-        XLinearInchesGyro(drift + 0.4, Side.LEFT, drivePwrMax - 0.3, -90);
+        if (skystoneAngle == 0) {
+            XLinearInchesGyro(drift + 0.4, Side.LEFT, drivePwrMax - 0.3, -90);
+        } else {
+            XLinearInchesGyro(drift + 0.4, Side.LEFT, drivePwrMax - 0.3, -90);
+        }
+
         topClaw.setPosition(0);
         sleep(400);
         //RAISE
         moveClaw(0, 0.33);
-        XLinearInchesGyro(drift + 2.2, Side.RIGHT, drivePwrMax - 0.3, -90);
+        if (skystoneAngle == 0) {
+            XLinearInchesGyro(drift + 2.2, Side.RIGHT, drivePwrMax - 0.3, -90);
+        } else {
+            XLinearInchesGyro(drift + 2.2, Side.RIGHT, drivePwrMax - 0.3, -90);
+        }
 
         //need fix in distance travelled
         if (skystoneAngle > 0)
-            YLinearInchesGyro(10.85 + 3 * TILE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
-        else if (skystoneAngle == 0) YLinearInchesGyro(19.85 + 3 * TILE_INCH + SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
+            YLinearInchesGyro(10.85 + 3 * TILE_INCH + SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
+        else if (skystoneAngle == 0) YLinearInchesGyro(10.85 + 3 * TILE_INCH + 3 * SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
         else {
             YLinearInchesGyro(10.85 + 3 * TILE_INCH + 2 * SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
         }
 
-        XLinearInchesGyro(drift + 2.1, Side.LEFT, drivePwrMax - 0.3, -90);
+        if (skystoneAngle == 0) {
+            XLinearInchesGyro(drift + 2.1, Side.LEFT, drivePwrMax - 0.3, -90);
+        } else {
+            XLinearInchesGyro(drift + 2.1, Side.LEFT, drivePwrMax - 0.3, -90);
+        }
+
         //DROP
         bottomClaw.setPosition(0);
         topClaw.setPosition(0.4);
@@ -54,8 +68,8 @@ public class NewSkyStoneIntakeRed extends StoneFinder {
 
         //need fix in distance travelled
         if (skystoneAngle > 0)
-            YLinearInchesGyro(-16.1 + 3 * TILE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
-        else if (skystoneAngle == 0) YLinearInchesGyro(-7.1 + 3 * TILE_INCH + SKYSTONE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
+            YLinearInchesGyro(-16.1 + 3 * TILE_INCH + 2 * SKYSTONE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
+        else if (skystoneAngle == 0) YLinearInchesGyro(-16.1 + 3 * TILE_INCH + 3 * SKYSTONE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
         else {
             YLinearInchesGyro(-16.1 + 3 * TILE_INCH + 2 * SKYSTONE_INCH, GAGE.REVERSE, drivePwrMax + 0.3, 90); //DANGEROUS
         }
@@ -72,8 +86,8 @@ public class NewSkyStoneIntakeRed extends StoneFinder {
 
         //need fix in distance travelled
         if (skystoneAngle > 0)
-            YLinearInchesGyro(0.9 + 3 * TILE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
-        else if (skystoneAngle == 0) YLinearInchesGyro(7.9 + 3 * TILE_INCH + SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
+            YLinearInchesGyro(0.9 + 3 * TILE_INCH + 2 * SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
+        else if (skystoneAngle == 0) YLinearInchesGyro(0.9 + 3 * TILE_INCH + 3 * SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
         else {
             YLinearInchesGyro(0.9 + 3 * TILE_INCH + 2 * SKYSTONE_INCH, GAGE.FORWARD, drivePwrMax + 0.3, -90); //DANGEROUS
         }

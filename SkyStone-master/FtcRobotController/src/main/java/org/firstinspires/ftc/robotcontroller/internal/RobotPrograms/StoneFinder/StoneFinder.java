@@ -183,10 +183,7 @@ public class StoneFinder extends opencvSkystoneDetector {
             telemetry.addData("angle", skystoneAngle);
             telemetry.update();
         }
-
         phoneCam.closeCameraDevice();
-
-
     }
 
     public void telemetry() {
