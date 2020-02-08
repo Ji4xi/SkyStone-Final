@@ -28,9 +28,9 @@ public class StoneFinder extends opencvSkystoneDetector {
 
     protected BNO055IMU imu;//For detecting angles of rotation
 
-    enum Mode {OPEN, CLOSE}
-    enum Side {LEFT, RIGHT}
-    enum GAGE {FORWARD, REVERSE}
+    public enum Mode {OPEN, CLOSE}
+    public enum Side {LEFT, RIGHT}
+    public enum GAGE {FORWARD, REVERSE}
 
     //driveTrain
     DcMotor fl;
