@@ -72,6 +72,8 @@ public class StoneFinderOp extends TeleOpMode {
         ls = hardwareMap.servo.get("ls");
         rs.setDirection(Servo.Direction.FORWARD);
         ls.setDirection(Servo.Direction.REVERSE);
+        rs.setPosition(0);
+        ls.setPosition(0);
 
         rightLift = hardwareMap.dcMotor.get("rightLift");
         leftLift = hardwareMap.dcMotor.get("leftLift");
@@ -186,19 +188,20 @@ public class StoneFinderOp extends TeleOpMode {
         leftSlidePwr = gamepad2.left_stick_y > 0 ? 0.35 : leftSlidePwr;
         rightSlidePwr = gamepad2.left_stick_y > 0 ? 0.35 : rightSlidePwr;
 
-
         if (gamepad2.x) {
             double nearest = COUNTS_PER_BRICK * Math.round((leftLift.getCurrentPosition() + rightLift.getCurrentPosition()) / 2 / COUNTS_PER_BRICK);
-
             leftSlidePwr =  slidePwr * (nearest - leftLift.getCurrentPosition())/COUNTS_PER_BRICK;
             rightSlidePwr = slidePwr * (nearest - rightLift.getCurrentPosition())/COUNTS_PER_BRICK;
-
         }
 
         if (gamepad2.left_stick_y == 0) {
             leftSlidePwr = -0.1565;
             rightSlidePwr = -0.1565;
         }
+
+//        //prevent crashing
+//        if (leftLift.getCurrentPosition() < 100 && leftLift.getPower() < 0) leftSlidePwr = 0;
+//        if (rightLift.getCurrentPosition() < 100 && rightLift.getPower() < 0) rightSlidePwr = 0;
 
         leftLift.setPower(leftSlidePwr);
         rightLift.setPower(rightSlidePwr);
@@ -213,13 +216,6 @@ public class StoneFinderOp extends TeleOpMode {
         else if (mode > 0) {
             extenderPos -= 0.002;
         }
-
-//        if (gamepad2.dpad_up) {
-//            extenderPos += 0.001;
-//        } else if (gamepad2.dpad_down) {
-//            extenderPos -= 0.001;
-//        }
-
         //bounds
         if (extenderPos > EXTENDER_MAX_POS) {
             extenderPos = EXTENDER_MAX_POS;
@@ -249,7 +245,7 @@ public class StoneFinderOp extends TeleOpMode {
         }
 
         if (gamepad1.dpad_down) {
-            rotate.setPosition(0.08);
+            rotate.setPosition(0.10);
         }
         else if (gamepad1.dpad_left) {
             rotate.setPosition(0.465);
