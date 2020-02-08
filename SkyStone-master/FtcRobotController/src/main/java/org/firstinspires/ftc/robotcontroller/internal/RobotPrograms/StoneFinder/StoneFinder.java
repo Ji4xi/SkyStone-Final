@@ -3,6 +3,7 @@ package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -46,7 +47,7 @@ public class StoneFinder extends opencvSkystoneDetector {
     Servo rs;
     Servo ls;
 
-    Servo tape;
+    CRServo tape;
 
     DcMotor rightLift;
     DcMotor leftLift;
@@ -136,9 +137,8 @@ public class StoneFinder extends opencvSkystoneDetector {
         topClaw.setDirection(Servo.Direction.REVERSE);
         bottomClaw.setDirection(Servo.Direction.REVERSE);
 
-        tape = hardwareMap.servo.get("tape");
-        tape.setDirection(Servo.Direction.REVERSE);
-        tape.setPosition(0.5);
+        tape = hardwareMap.crservo.get("tape");
+        tape.setDirection(CRServo.Direction.REVERSE);
 
         topClaw.setPosition(0.4);
         bottomClaw.setPosition(0.3);
@@ -146,6 +146,7 @@ public class StoneFinder extends opencvSkystoneDetector {
         fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        foundation(Mode.CLOSE, 0);
 //
 //        rightIntake = hardwareMap.dcMotor.get("rightIntake");
 //        leftIntake = hardwareMap.dcMotor.get("leftIntake");
@@ -182,10 +183,7 @@ public class StoneFinder extends opencvSkystoneDetector {
             telemetry.addData("angle", skystoneAngle);
             telemetry.update();
         }
-
         phoneCam.closeCameraDevice();
-
-
     }
 
     public void telemetry() {
@@ -469,12 +467,12 @@ public class StoneFinder extends opencvSkystoneDetector {
     }
 
     public void foundation(Mode position, int sleep) throws InterruptedException {
-        if (position == position.OPEN) {
+        if (position == position.CLOSE) {
             ls.setPosition(0);
             rs.setPosition(0);
             sleep(sleep);
         }
-        else if (position == position.CLOSE) {
+        else if (position == position.OPEN) {
             ls.setPosition(0.5);
             rs.setPosition(0.5);
             sleep(sleep);
@@ -543,6 +541,7 @@ public class StoneFinder extends opencvSkystoneDetector {
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        double minPwr = 0.2;
         while (Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4 <= target) {
             //checks for direction
             change = direction == GAGE.FORWARD ? getAbsoluteHeading() : -getAbsoluteHeading();
@@ -554,18 +553,18 @@ public class StoneFinder extends opencvSkystoneDetector {
             leftPower = Range.clip(leftPower, -1, 1);
             rightPower = Range.clip(rightPower, -1, 1);
             if (average < target / 2) {
-                fr.setPower((rightPower * (average / target)) + .2);
-                fl.setPower((leftPower * (average / target)) + .2);
-                br.setPower((rightPower * (average / target)) + .2);
-                bl.setPower((leftPower * (average / target)) + .2);
+                fr.setPower((rightPower * (average / target)) + minPwr);
+                fl.setPower((leftPower * (average / target)) + minPwr);
+                br.setPower((rightPower * (average / target)) + minPwr);
+                bl.setPower((leftPower * (average / target)) + minPwr);
             }
             else if (average > target / 2) {
                 double justSomeMath = target - average;
                 //set power
-                fr.setPower((rightPower * (justSomeMath / target)) + .2);
-                fl.setPower((leftPower * (justSomeMath / target)) + .2);
-                br.setPower((rightPower * (justSomeMath / target)) + .2);
-                bl.setPower((leftPower * (justSomeMath / target)) + .2);
+                fr.setPower((rightPower * (justSomeMath / target)) + minPwr);
+                fl.setPower((leftPower * (justSomeMath / target)) + minPwr);
+                br.setPower((rightPower * (justSomeMath / target)) + minPwr);
+                bl.setPower((leftPower * (justSomeMath / target)) + minPwr);
             }
 
             //telemetry
@@ -605,6 +604,8 @@ public class StoneFinder extends opencvSkystoneDetector {
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        double minPwr = 0.2;
         while (Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4 <= target) {
             double average = Math.abs(fr.getCurrentPosition() + fl.getCurrentPosition() + bl.getCurrentPosition() + br.getCurrentPosition()) / 4;
             //reset power
@@ -615,19 +616,19 @@ public class StoneFinder extends opencvSkystoneDetector {
             backwardPower = Range.clip(backwardPower, -1, 1);
 
             if (average < target / 2) {
-                fr.setPower((backwardPower * (average / target)) + .2);
-                fl.setPower((forwardPower * (average / target)) + .2);
-                br.setPower((forwardPower * (average / target)) + .2);
-                bl.setPower((backwardPower * (average / target)) + .2);
+                fr.setPower((backwardPower * (average / target)) + minPwr);
+                fl.setPower((forwardPower * (average / target)) + minPwr);
+                br.setPower((forwardPower * (average / target)) + minPwr);
+                bl.setPower((backwardPower * (average / target)) + minPwr);
             }
 
             else if (average > target / 2) {
                 double justSomeMath = target - average;
                 //set power
-                fr.setPower((backwardPower * (justSomeMath / target)) + .2);
-                fl.setPower((forwardPower * (justSomeMath / target)) + .2);
-                br.setPower((forwardPower * (justSomeMath / target)) + .2);
-                bl.setPower((backwardPower * (justSomeMath / target)) + .2);
+                fr.setPower((backwardPower * (justSomeMath / target)) + minPwr);
+                fl.setPower((forwardPower * (justSomeMath / target)) + minPwr);
+                br.setPower((forwardPower * (justSomeMath / target)) + minPwr);
+                bl.setPower((backwardPower * (justSomeMath / target)) + minPwr);
             }
 
             //telemetry

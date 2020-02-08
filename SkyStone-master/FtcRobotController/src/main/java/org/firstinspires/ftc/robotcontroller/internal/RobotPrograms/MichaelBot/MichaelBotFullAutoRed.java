@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.MichaelBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.MichaelBot.MichaelBot;
-
+@Disabled
 @Autonomous
 public class MichaelBotFullAutoRed extends MichaelBot {
     @Override

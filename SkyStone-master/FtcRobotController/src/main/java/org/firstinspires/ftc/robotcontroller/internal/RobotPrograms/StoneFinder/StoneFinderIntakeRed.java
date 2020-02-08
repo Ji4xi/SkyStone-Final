@@ -28,7 +28,7 @@ public class StoneFinderIntakeRed extends StoneFinder {
         sleep(300);
         moveClaw(0.5, 0.8);//0.3
         if (skystoneAngle == 0)
-        YLinearInchesGyro(76.5, GAGE.REVERSE, drivePwrMax, 90); //DANGEROUS
+        YLinearInchesGyro(74.5, GAGE.REVERSE, drivePwrMax, 90); //DANGEROUS
         else if (skystoneAngle < 0) YLinearInchesGyro(75.5, GAGE.REVERSE, drivePwrMax, 90); //DANGEROUS
         else {
             YLinearInchesGyro(63.5, GAGE.REVERSE, drivePwrMax, 90); //DANGEROUS
