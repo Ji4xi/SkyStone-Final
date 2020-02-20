@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcontroller.internal.Default.PID;
+import org.firstinspires.ftc.robotcontroller.internal.Default.PD;
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 import org.firstinspires.ftc.robotcontroller.internal.RobotSystems.ArcadeDrive;
 import org.firstinspires.ftc.robotcontroller.internal.RobotSystems.DriveTrain;

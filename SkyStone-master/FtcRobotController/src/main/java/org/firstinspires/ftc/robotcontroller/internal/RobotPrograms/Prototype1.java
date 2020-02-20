@@ -14,6 +14,6 @@ import org.firstinspires.ftc.robotcontroller.internal.TestProps.Arcade;
 
 //@Disabled
 @TeleOp
-public class Prototype1 extends continuousServo {
+public class Prototype1 extends JackBlack {
 
 }

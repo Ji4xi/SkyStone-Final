@@ -89,7 +89,7 @@ public class StoneFinderOp extends TeleOpMode {
 
 
         topClaw.setPosition(0);
-        botClaw.setPosition(0.35);
+        botClaw.setPosition(0.707);
 
         extender = hardwareMap.servo.get("extender");
         extender.setDirection(Servo.Direction.FORWARD);

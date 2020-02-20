@@ -21,11 +21,12 @@ public class StoneFinderIntakeBlue extends StoneFinder {
             YLinearInchesGyro(1.5, GAGE.REVERSE, drivePwrMax - 0.3, 90);
         }
         //moveInchesPID(10, skystoneAngle, 1000);
-        bottomClaw.setPosition(0);
+        topClaw.setPosition(0.388);
+        bottomClaw.setPosition(0.332);
         XLinearInchesGyro(3.4, Side.LEFT, drivePwrMax - 0.3, -90);
-        topClaw.setPosition(0.035);
+        topClaw.setPosition(0);
         sleep(400);
-        moveClaw(0, 0.13);
+        moveClaw(0, 0.707);
         if (skystoneAngle > 0) {
             XLinearInchesGyro(8.5, Side.RIGHT, drivePwrMax - 0.3, -90);
         } else {
@@ -34,9 +35,9 @@ public class StoneFinderIntakeBlue extends StoneFinder {
 
         YLinearInchesGyro(32.6, GAGE.REVERSE, drivePwrMax, 90);
 
-        moveClaw(0, 0.05);
+        moveClaw(0, 0.355);
         sleep(300);
-        moveClaw(0.5, 0.08); //0.13
+        moveClaw(0.48, 0.707); //0.13
         if (skystoneAngle == 0)
             YLinearInchesGyro(54.5 + 1, GAGE.FORWARD, drivePwrMax, -90); //DANGEROUS
         else if (skystoneAngle < 0) YLinearInchesGyro(53.5 + 0.6, GAGE.FORWARD, drivePwrMax, -90); //DANGEROUS
@@ -44,16 +45,17 @@ public class StoneFinderIntakeBlue extends StoneFinder {
             YLinearInchesGyro(51 - 3 + 1.1, GAGE.FORWARD, drivePwrMax, -90); //DANGEROUS
         }
         //second brick
-        bottomClaw.setPosition(0);
+        topClaw.setPosition(0.388);
+        bottomClaw.setPosition(0.332);
         if (skystoneAngle < 0)  XLinearInchesGyro(6.0 + 0.2, Side.LEFT, drivePwrMax - 0.3, -90);
         else if (skystoneAngle > 0) XLinearInchesGyro(6.5 + 0.6, Side.LEFT, drivePwrMax - 0.3, -90);
         else {
             XLinearInchesGyro(5.4, Side.LEFT, drivePwrMax - 0.3, -90);
         }
 
-        topClaw.setPosition(0.035);
+        topClaw.setPosition(0);
         sleep(400);
-        moveClaw(0, 0.13);
+        moveClaw(0, 0.707);
         if (skystoneAngle < 0)  XLinearInchesGyro(10.95 + 0.2, Side.RIGHT, drivePwrMax - 0.3, -90);
         else {
             XLinearInchesGyro(10.35, Side.RIGHT, drivePwrMax - 0.3, -90);
@@ -68,10 +70,10 @@ public class StoneFinderIntakeBlue extends StoneFinder {
             YLinearInchesGyro(59.5, GAGE.REVERSE, drivePwrMax, 90);
         }
 
-
-        moveClaw(0, 0.05);
+        moveClaw(0, 0.355);
         sleep(300);
-        moveClaw(0.5, 0.08); //0.13
+        moveClaw(0.48, 0.707); //0.13
+
         if (skystoneAngle == 0) {
             YLinearInchesGyro(21.5, GAGE.FORWARD, drivePwrMax, -90);
         } else if (skystoneAngle > 0) {

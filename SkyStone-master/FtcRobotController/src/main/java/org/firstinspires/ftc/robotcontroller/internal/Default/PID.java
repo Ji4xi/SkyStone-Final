@@ -2,7 +2,6 @@ package org.firstinspires.ftc.robotcontroller.internal.Default;
 
 import java.util.ArrayList;
 
-//x-axis is time and y-axis is error
 public class PID {
     public PID(double targetValue, double kp, double ki, double kd) {
         this.targetValue = targetValue;
@@ -55,8 +54,8 @@ public class PID {
         double sum = 0; //uses trapezoidal sum approximation method
         if (e_list.size() >= 2) {
             for (int i = 0; i <= e_list.size() - 2; i++) {
-                double dt = t_list.get(i + 1) - t_list.get(i);
-                sum += (e_list.get(i + 1) + e_list.get(i)) * dt / 2.0;
+                double dt = t_list.get(i+1) - t_list.get(i);
+                sum += (e_list.get(i+1) + e_list.get(i))*dt / 2.0;
             }
         }
         return sum;
@@ -79,3 +78,4 @@ public class PID {
         return error;
     }
 }
+

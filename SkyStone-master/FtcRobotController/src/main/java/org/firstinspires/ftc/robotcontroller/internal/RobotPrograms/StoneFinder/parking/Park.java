@@ -11,6 +11,6 @@ public class Park extends StoneFinder {
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
         sleep(27000);
-        XLinearInchesGyro(9, Side.LEFT, 0.7, 0);
+        //XLinearInchesGyro(9, Side.LEFT, 0.7, 0);
     }
 }

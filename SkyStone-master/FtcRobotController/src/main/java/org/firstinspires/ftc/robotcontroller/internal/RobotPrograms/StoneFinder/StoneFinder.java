@@ -29,9 +29,9 @@ public class StoneFinder extends opencvSkystoneDetector {
 
     protected BNO055IMU imu;//For detecting angles of rotation
 
-    public enum Mode {OPEN, CLOSE}
-    public enum Side {LEFT, RIGHT}
-    public enum GAGE {FORWARD, REVERSE}
+    enum Mode {OPEN, CLOSE}
+    enum Side {LEFT, RIGHT}
+    enum GAGE {FORWARD, REVERSE}
 
     //driveTrain
     DcMotor fl;
@@ -83,7 +83,8 @@ public class StoneFinder extends opencvSkystoneDetector {
     double skystoneAngle;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void
+    runOpMode() throws InterruptedException {
         initialize();
         waitForStart();
 
@@ -127,11 +128,6 @@ public class StoneFinder extends opencvSkystoneDetector {
         rs.setDirection(Servo.Direction.FORWARD);
         ls.setDirection(Servo.Direction.REVERSE);
 
-//        rightLift = hardwareMap.dcMotor.get("rightLift");
-//        leftLift = hardwareMap.dcMotor.get("leftLift");
-//        rightLift.setDirection(DcMotorSimple.Direction.FORWARD);
-//        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
-//
         topClaw = hardwareMap.servo.get("top");
         bottomClaw = hardwareMap.servo.get("bot");
         topClaw.setDirection(Servo.Direction.REVERSE);
@@ -140,29 +136,13 @@ public class StoneFinder extends opencvSkystoneDetector {
         tape = hardwareMap.crservo.get("tape");
         tape.setDirection(CRServo.Direction.REVERSE);
 
-        topClaw.setPosition(0.4);
-        bottomClaw.setPosition(0.3);
+        topClaw.setPosition(0);
+        bottomClaw.setPosition(0.707);
         fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         foundation(Mode.CLOSE, 0);
-//
-//        rightIntake = hardwareMap.dcMotor.get("rightIntake");
-//        leftIntake = hardwareMap.dcMotor.get("leftIntake");
-//
-//        rightIntake.setDirection(DcMotorSimple.Direction.FORWARD);
-//        leftIntake.setDirection(DcMotorSimple.Direction.REVERSE);
-//
-//        claw = hardwareMap.servo.get("claw");
-//        claw.setDirection(Servo.Direction.FORWARD);
-//
-
-//
-//        rightLift = hardwareMap.dcMotor.get("rightLift");
-//        leftLift = hardwareMap.dcMotor.get("leftLift");
-//        rightLift.setDirection(DcMotorSimple.Direction.FORWARD);
-//        leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //find skystone pos
         super.runOpMode(); //init camera
