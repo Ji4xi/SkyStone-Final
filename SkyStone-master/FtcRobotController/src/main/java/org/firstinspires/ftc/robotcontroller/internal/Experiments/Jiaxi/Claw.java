@@ -14,7 +14,7 @@ public class Claw extends TeleOpMode {
     @Override
     public void init() {
         claw = hardwareMap.servo.get("grip.claw");
-        claw.setDirection(Servo.Direction.REVERSE);
+        claw.setDirection(Servo.Direction.FORWARD);
     }
 
     @Override
@@ -36,10 +36,12 @@ public class Claw extends TeleOpMode {
     @Override
     public void updateData() {
         if (gamepad1.y) {
-            claw.setPosition(0);
+            claw.setDirection(Servo.Direction.FORWARD);
+            claw.setPosition(0.3);
         }
         else if (gamepad1.a) {
-            claw.setPosition(0.0278);
+            claw.setDirection(Servo.Direction.REVERSE);
+            claw.setPosition(0.9);
         }
     }
 }
