@@ -13,7 +13,10 @@ public class RandomAuto extends NewStoneFinder {
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-        moveInches(48, 90, 90);
-        sleep(3000);
+        moveInches(40, 90, 90);
+        sleep(4000);
+        telemetry();
+        telemetry.update();
+        sleep(4000);
     }
 }
