@@ -107,7 +107,7 @@ public class StoneFinderOp extends TeleOpMode {
         mecanumXDrive.telemetry();
         telemetry.addData("rightIntake_pwr", rightIntake.getPower());
         telemetry.addData("leftIntake_pwr", leftIntake.getPower());
-        telemetry.addData("lift_pos", hook.getPosition());
+        telemetry.addData("hook_pos", hook.getPosition());
         telemetry.addData("rs_ pos", rs.getPosition());
         telemetry.addData("ls_pos", ls.getPosition());
         telemetry.addData("leftSlide_pwr", leftLift.getPower());
@@ -119,6 +119,9 @@ public class StoneFinderOp extends TeleOpMode {
         telemetry.addData("extender pwr", extender.getPosition());
         telemetry.addData("claw top", topClaw.getPosition());
         telemetry.addData("claw bottom", botClaw.getPosition());
+        telemetry.addData("leftSlide_pos", leftLift.getCurrentPosition());
+        telemetry.addData("rightSlide_pos", rightLift.getCurrentPosition());
+
     }
 
     @Override
@@ -198,6 +201,12 @@ public class StoneFinderOp extends TeleOpMode {
             leftSlidePwr = -0.0765;
             rightSlidePwr = -0.0765;
         }
+
+//        leftSlidePwr = (leftLift.getCurrentPosition() <= -3200 || rightLift.getCurrentPosition() <= -3200) && leftSlidePwr >= 0 ? 0 : leftSlidePwr;
+//        rightSlidePwr = (leftLift.getCurrentPosition() <= -3200 || rightLift.getCurrentPosition() <= -3200) && rightSlidePwr >= 0 ? 0 : rightSlidePwr;
+//        leftSlidePwr = (leftLift.getCurrentPosition() >= 500 || rightLift.getCurrentPosition() >= 500) && leftSlidePwr <= 0 ? 0 : leftSlidePwr;
+//        rightSlidePwr = (leftLift.getCurrentPosition() >= 500 || rightLift.getCurrentPosition() >= 500) && rightSlidePwr <= 0 ? 0 : rightSlidePwr;
+
 
 //        //prevent crashing
 //        if (leftLift.getCurrentPosition() < 100 && leftLift.getPower() < 0) leftSlidePwr = 0;
