@@ -15,35 +15,35 @@ import org.firstinspires.ftc.robotcontroller.internal.RobotSystems.MecanumXDrive
 public class StoneFinderOp extends TeleOpMode {
     MecanumXDrive mecanumXDrive = new MecanumXDrive();
 
-    DcMotor rightIntake;
-    DcMotor leftIntake;
+    protected DcMotor rightIntake;
+    protected DcMotor leftIntake;
 
-    Servo hook;
+    protected Servo hook;
 
-    Servo rs;
-    Servo ls;
+    protected Servo rs;
+    protected  Servo ls;
 
-    Servo topClaw;
-    Servo botClaw;
+    protected Servo topClaw;
+    protected Servo botClaw;
 
-    Servo grip;
-    Servo rotate;
+    protected Servo grip;
+    protected Servo rotate;
 
-    Servo extender;
-
-
-
-    DcMotor rightLift;
-    DcMotor leftLift;
+    protected Servo extender;
 
 
-    final double intakePwr = 0.7;
-    final double maxLiftPwr = 0.3;
-    double currentLiftPwr = 0;
 
-    final double slidePwr = 0.8;
+    protected DcMotor rightLift;
+    protected DcMotor leftLift;
 
-    final double COUNTS_PER_REVOLUTION = 288;
+
+    protected final double intakePwr = 0.7;
+    protected final double maxLiftPwr = 0.3;
+    protected double currentLiftPwr = 0;
+
+    protected final double slidePwr = 0.8;
+
+    protected final double COUNTS_PER_REVOLUTION = 288;
     final double COUNTS_PER_INCH = COUNTS_PER_REVOLUTION / 6.69291;
     final double COUNTS_PER_BRICK = COUNTS_PER_INCH * 5;
 
