@@ -8,12 +8,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 public class GlobalCoordinate implements Runnable {
+    private int sleepTime;
     private double globalX;
     private double globalY;
     private boolean isRunning;
     private DcMotor encoderLeft, encoderRight;
     private double deltas1, deltas2, deltax1, deltax2, deltay1, deltay2, changeHorizontal, changeVertical, theta;
-    private double lastEncoderCountLeft, lastEncoderCountRight;
+    private double lastEncoderCountLeft, lastEncoderCountRight, currentEncoderCountLeft, currentEncoderCountRight;
     private BNO055IMU imu;
     /**
      * Constructor for GlobalCoordinate
@@ -30,6 +31,7 @@ public class GlobalCoordinate implements Runnable {
         this.encoderLeft = encoderLeft;
         this.encoderRight = encoderRight;
         this.imu = imu;
+        sleepTime = 50; //50-75 is recommended
     }
 
     public double getGlobalX() {
@@ -64,10 +66,12 @@ public class GlobalCoordinate implements Runnable {
 
     private void updateGlobalCoordinate() {
         theta = getNormalizedHeading();
-        deltas1 = encoderLeft.getCurrentPosition() - lastEncoderCountLeft;
-        lastEncoderCountLeft = deltas1;
-        deltas2 = encoderRight.getCurrentPosition() - lastEncoderCountRight;
-        lastEncoderCountRight = deltas2;
+        currentEncoderCountLeft = encoderLeft.getCurrentPosition();
+        currentEncoderCountRight = encoderRight.getCurrentPosition();
+        deltas1 = currentEncoderCountLeft - lastEncoderCountLeft;
+        lastEncoderCountLeft = currentEncoderCountLeft;
+        deltas2 = currentEncoderCountRight - lastEncoderCountRight;
+        lastEncoderCountRight = currentEncoderCountRight;
         deltax1 = deltas1 * Math.cos(1 / Math.sqrt(2)) * deltas1;
         deltax2 = deltas2 * Math.cos(1 / Math.sqrt(2)) * deltas2;
         deltay1 = deltas1 * Math.sin(1 / Math.sqrt(2)) * deltas1;
@@ -89,6 +93,11 @@ public class GlobalCoordinate implements Runnable {
     public void run() {
         while (isRunning) {
             updateGlobalCoordinate();
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
         }
     }
 }
