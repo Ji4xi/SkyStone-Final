@@ -58,7 +58,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
     protected static final double COUNTS_PER_INCH = (COUNTS_PER_REVOLUTION * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
 
     protected enum Direction {CLOCKWISE, COUNTERCLOCKWISE}
-
+    protected double gyroPwr = 0;
 
     protected enum SkystonePositions {LEFT, MID, RIGHT}
     //Field Variables
@@ -179,7 +179,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         int target = (int) (inches / circ * COUNTS_PER_REVOLUTION);
         double snipPwr, currentPos;
         String section;
-        double maxPwr = 0.1;
+        double maxPwr = 0.4;
 
         fr.setTargetPosition((int) (transformation(angle, "fr") * target));
         fl.setTargetPosition((int) (transformation(angle, "fl") * target));
@@ -198,7 +198,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         while ((Math.abs(fr.getCurrentPosition()) + Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition()) + Math.abs(br.getCurrentPosition())) < target - 15) {
-            snipPwr = 0.1;
+            snipPwr = 0.4;
             fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr"));
             fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl"));
             br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "br"));
@@ -248,17 +248,15 @@ public class NewStoneFinder extends opencvSkystoneDetector {
 
             switch (section) {
                 case "front": snipPwr = currentPos / front * (maxPwr - 0.25) + 0.25; break;
-                case "end": snipPwr = 0; break; //snipPwr = (1 - (currentPos -  end) / (target - end)) * (maxPwr - 0.1) + 0.1;
+                case "end": snipPwr = 0; gyroPwr = 0.1; break; //snipPwr = (1 - (currentPos -  end) / (target - end)) * (maxPwr - 0.1) + 0.1;
                 case "mid": snipPwr = trueVelocity < 2490 ? snipPwr + 0.01 : snipPwr - 0.01; break; //0.8 for transition
                 default: snipPwr = 0; //safety
             }
 
-            if (section == "end")
-
-            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr")* (snipPwr + 0.1));
-            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl")* (snipPwr + 0.1));
-            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "fr")* (snipPwr + 0.1));
-            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl")* (snipPwr + 0.1));
+            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr")* (snipPwr + gyroPwr));
+            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl")* (snipPwr + gyroPwr));
+            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "fr")* (snipPwr + gyroPwr));
+            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl")* (snipPwr + gyroPwr));
             telemetry();
 
             waitOneFullHardwareCycle();
@@ -268,6 +266,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         fr.setPower(0);
         bl.setPower(0);
         br.setPower(0);
+        gyroPwr = 0;
     }
     public void updateVelocity() {
         double lastCount = fr.getCurrentPosition();

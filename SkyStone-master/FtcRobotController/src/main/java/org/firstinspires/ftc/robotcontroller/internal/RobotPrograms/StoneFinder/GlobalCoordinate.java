@@ -31,7 +31,7 @@ public class GlobalCoordinate implements Runnable {
         this.encoderLeft = encoderLeft;
         this.encoderRight = encoderRight;
         this.imu = imu;
-        sleepTime = 50; //50-75 is recommended
+        sleepTime = 12; //50-75 is recommended
     }
 
     public double getGlobalX() {
@@ -72,10 +72,10 @@ public class GlobalCoordinate implements Runnable {
         lastEncoderCountLeft = currentEncoderCountLeft;
         deltas2 = currentEncoderCountRight - lastEncoderCountRight;
         lastEncoderCountRight = currentEncoderCountRight;
-        deltax1 = deltas1 * Math.cos(1 / Math.sqrt(2)) * deltas1;
-        deltax2 = deltas2 * Math.cos(1 / Math.sqrt(2)) * deltas2;
-        deltay1 = deltas1 * Math.sin(1 / Math.sqrt(2)) * deltas1;
-        deltay2 = deltas2 * Math.sin(1 / Math.sqrt(2)) * deltas2;
+        deltax1 = deltas1 * 1 / Math.sqrt(2);
+        deltax2 = deltas2 * 1 / Math.sqrt(2);
+        deltay1 = deltas1 * 1 / Math.sqrt(2);
+        deltay2 = deltas2 * 1 / Math.sqrt(2);
 
         changeHorizontal = deltax1 - deltax2;
         changeVertical = (deltay1 + deltay2) / 2;
