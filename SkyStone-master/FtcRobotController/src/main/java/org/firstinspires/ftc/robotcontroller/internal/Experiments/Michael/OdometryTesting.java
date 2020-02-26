@@ -78,7 +78,7 @@ public class OdometryTesting extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         initialize();
         waitForStart();
-        globalCoordinate = new GlobalCoordinate(fl, fr, imu);
+        globalCoordinate = new GlobalCoordinate(fl, fr, bl, br, imu);
         Thread globalCoordinateThread = new Thread(globalCoordinate);
         globalCoordinateThread.start();
         while (opModeIsActive()) {
@@ -91,8 +91,10 @@ public class OdometryTesting extends LinearOpMode {
             telemetry.addData("fl_encoder_count", fl.getCurrentPosition());
             telemetry.addData("br_encoder_count", br.getCurrentPosition());
             telemetry.addData("bl_encoder_count", bl.getCurrentPosition());
+            telemetry.addData("normalized_heading", globalCoordinate.getTheta());
 
             telemetry.update();
+            updateDriveTrain();
 
         }
         globalCoordinateThread.stop();

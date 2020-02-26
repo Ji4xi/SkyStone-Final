@@ -79,8 +79,10 @@ public class StoneFinderOp extends TeleOpMode {
         leftLift = hardwareMap.dcMotor.get("leftLift");
         rightLift.setDirection(DcMotorSimple.Direction.REVERSE);
         leftLift.setDirection(DcMotorSimple.Direction.FORWARD);
-
-
+        rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         topClaw = hardwareMap.servo.get("top");
         botClaw = hardwareMap.servo.get("bot");
@@ -125,7 +127,7 @@ public class StoneFinderOp extends TeleOpMode {
     }
 
     @Override
-    public void updateData() {
+    public void updateData(){
         updateDriveTrain();
         updateIntake();
         updateHook();
@@ -184,33 +186,40 @@ public class StoneFinderOp extends TeleOpMode {
         rightLift.setPower(Range.clip(currentLiftPwr, - maxLiftPwr, maxLiftPwr));
     }
 
-    public void updateLift() {
+    public void updateLift(){
         double leftSlidePwr = gamepad2.left_stick_y * slidePwr;
         double rightSlidePwr = gamepad2.left_stick_y * slidePwr;
 
-        leftSlidePwr = gamepad2.left_stick_y > 0 ? 0.25 : leftSlidePwr;
-        rightSlidePwr = gamepad2.left_stick_y > 0 ? 0.25 : rightSlidePwr;
+        leftSlidePwr = gamepad2.left_stick_y > 0 ? 0.2 : leftSlidePwr;
+        rightSlidePwr = gamepad2.left_stick_y > 0 ? 0.2 : rightSlidePwr;
 
-        if (gamepad2.x) {
-            double nearest = COUNTS_PER_BRICK * Math.round((leftLift.getCurrentPosition() + rightLift.getCurrentPosition()) / 2 / COUNTS_PER_BRICK);
-            leftSlidePwr =  slidePwr * (nearest - leftLift.getCurrentPosition())/COUNTS_PER_BRICK;
-            rightSlidePwr = slidePwr * (nearest - rightLift.getCurrentPosition())/COUNTS_PER_BRICK;
-        }
+//        if (gamepad2.x) {
+//            double nearest = COUNTS_PER_BRICK * Math.round((leftLift.getCurrentPosition() + rightLift.getCurrentPosition()) / 2 / COUNTS_PER_BRICK);
+//            leftSlidePwr =  slidePwr * (nearest - leftLift.getCurrentPosition())/COUNTS_PER_BRICK;
+//            rightSlidePwr = slidePwr * (nearest - rightLift.getCurrentPosition())/COUNTS_PER_BRICK;
+//        }
 
         if (gamepad2.left_stick_y == 0) {
             leftSlidePwr = -0.0765;
             rightSlidePwr = -0.0765;
         }
 
-//        leftSlidePwr = (leftLift.getCurrentPosition() <= -3200 || rightLift.getCurrentPosition() <= -3200) && leftSlidePwr >= 0 ? 0 : leftSlidePwr;
-//        rightSlidePwr = (leftLift.getCurrentPosition() <= -3200 || rightLift.getCurrentPosition() <= -3200) && rightSlidePwr >= 0 ? 0 : rightSlidePwr;
-//        leftSlidePwr = (leftLift.getCurrentPosition() >= 500 || rightLift.getCurrentPosition() >= 500) && leftSlidePwr <= 0 ? 0 : leftSlidePwr;
-//        rightSlidePwr = (leftLift.getCurrentPosition() >= 500 || rightLift.getCurrentPosition() >= 500) && rightSlidePwr <= 0 ? 0 : rightSlidePwr;
-
 
 //        //prevent crashing
-//        if (leftLift.getCurrentPosition() < 100 && leftLift.getPower() < 0) leftSlidePwr = 0;
-//        if (rightLift.getCurrentPosition() < 100 && rightLift.getPower() < 0) rightSlidePwr = 0;
+
+        if (leftLift.getCurrentPosition() >= 0 && leftSlidePwr == -0.0765 || rightLift.getCurrentPosition() >= 0 && rightLift.getPower() == -0.0765) {
+            leftSlidePwr = gamepad2.left_stick_y * slidePwr;
+            rightSlidePwr = gamepad2.left_stick_y * slidePwr;
+//            if (leftLift.getCurrentPosition() >= 0 && leftSlidePwr > 0 || rightLift.getCurrentPosition() >= 0 && leftSlidePwr > 0) {
+//                leftSlidePwr = 0;
+//                rightSlidePwr = 0;
+//            }
+        }
+        if (leftLift.getCurrentPosition() >= -10 || rightLift.getCurrentPosition() >= -10) {
+            leftSlidePwr = - Math.abs(leftSlidePwr);
+            rightSlidePwr = - Math.abs(leftSlidePwr);
+        }
+
 
         leftLift.setPower(leftSlidePwr);
         rightLift.setPower(rightSlidePwr);

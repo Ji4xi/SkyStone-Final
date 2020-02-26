@@ -123,7 +123,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         foundation(Mode.CLOSE, 0);
 
-        GlobalCoordinate globalCoordinate = new GlobalCoordinate(fl, fr, imu);
+        GlobalCoordinate globalCoordinate = new GlobalCoordinate(fl, fr, bl, br, imu);
         Thread globalCoordinateThread = new Thread(globalCoordinate);
         globalCoordinateThread.start();
 

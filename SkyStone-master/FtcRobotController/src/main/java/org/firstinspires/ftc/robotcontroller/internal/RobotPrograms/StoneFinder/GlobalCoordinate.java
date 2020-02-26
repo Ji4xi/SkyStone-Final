@@ -12,9 +12,11 @@ public class GlobalCoordinate implements Runnable {
     private double globalX;
     private double globalY;
     private boolean isRunning;
-    private DcMotor encoderLeft, encoderRight;
+    private DcMotor encoderLeft, encoderRight, encoderLeftBack, encoderRightBack;
     private double deltas1, deltas2, deltax1, deltax2, deltay1, deltay2, changeHorizontal, changeVertical, theta;
+    private double deltas3, deltas4, deltax3, deltax4, deltay3, deltay4, changeHorizontalBack, changeVerticalBack;
     private double lastEncoderCountLeft, lastEncoderCountRight, currentEncoderCountLeft, currentEncoderCountRight;
+    private double lastEncoderCountLeftBack, lastEncoderCountRightBack, currentEncoderCountLeftBack, currentEncoderCountRightBack;
     private BNO055IMU imu;
     /**
      * Constructor for GlobalCoordinate
@@ -22,14 +24,18 @@ public class GlobalCoordinate implements Runnable {
      * @param encoderRight
      * @param imu
      */
-    public GlobalCoordinate(DcMotor encoderLeft, DcMotor encoderRight, BNO055IMU imu) {
+    public GlobalCoordinate(DcMotor encoderLeft, DcMotor encoderRight, DcMotor encoderLeftBack, DcMotor encoderRightBack, BNO055IMU imu) {
         globalX = 0;
         globalY = 0;
         isRunning = true;
         lastEncoderCountLeft = 0;
         lastEncoderCountRight = 0;
+        lastEncoderCountLeftBack = 0;
+        lastEncoderCountRightBack = 0;
         this.encoderLeft = encoderLeft;
         this.encoderRight = encoderRight;
+        this.encoderLeftBack = encoderLeftBack;
+        this.encoderRightBack = encoderRightBack;
         this.imu = imu;
         sleepTime = 50; //50-75 is recommended
     }
@@ -63,24 +69,40 @@ public class GlobalCoordinate implements Runnable {
     public void stop() {
         isRunning = false;
     }
+    public double getTheta() {
+        return theta;
+    }
 
     private void updateGlobalCoordinate() {
-        theta = getNormalizedHeading();
+        theta = Math.toRadians(getNormalizedHeading());
         currentEncoderCountLeft = encoderLeft.getCurrentPosition();
         currentEncoderCountRight = encoderRight.getCurrentPosition();
         deltas1 = currentEncoderCountLeft - lastEncoderCountLeft;
         lastEncoderCountLeft = currentEncoderCountLeft;
         deltas2 = currentEncoderCountRight - lastEncoderCountRight;
         lastEncoderCountRight = currentEncoderCountRight;
-        deltax1 = deltas1 * Math.cos(1 / Math.sqrt(2)) * deltas1;
-        deltax2 = deltas2 * Math.cos(1 / Math.sqrt(2)) * deltas2;
-        deltay1 = deltas1 * Math.sin(1 / Math.sqrt(2)) * deltas1;
-        deltay2 = deltas2 * Math.sin(1 / Math.sqrt(2)) * deltas2;
+        deltax1 = deltas1 * 1 / Math.sqrt(2);
+        deltax2 = deltas2 * 1 / Math.sqrt(2);
+        deltay1 = deltas1 * 1 / Math.sqrt(2);
+        deltay2 = deltas2 * 1 / Math.sqrt(2);
 
-        changeHorizontal = deltax1 - deltax2;
-        changeVertical = (deltay1 + deltay2) / 2;
+        currentEncoderCountLeftBack = encoderLeftBack.getCurrentPosition();
+        currentEncoderCountRightBack = encoderRightBack.getCurrentPosition();
+        deltas3 = currentEncoderCountLeftBack - lastEncoderCountLeftBack;
+        lastEncoderCountLeftBack = currentEncoderCountLeftBack;
+        deltas4 = currentEncoderCountRightBack - lastEncoderCountRightBack;
+        lastEncoderCountRightBack = currentEncoderCountRightBack;
+        deltax3 = deltas3 * 1 / Math.sqrt(2);
+        deltax4 = deltas4 * 1 / Math.sqrt(2);
+        deltay3 = deltas3 * 1 / Math.sqrt(2);
+        deltay4 = deltas4 * 1 / Math.sqrt(2);
+
+        changeHorizontal = deltax1 - deltax2 - deltax3 + deltax4;
+        changeVertical = (deltay1 + deltay2 + deltay3 + deltay4) / 4;
         double tempChangeHorizontal = changeHorizontal;
         double tempChangeVertical = changeVertical;
+
+
 
         changeHorizontal = Math.cos(theta) * tempChangeVertical + Math.sin(theta) * tempChangeHorizontal;
         changeVertical = Math.sin(theta) * tempChangeVertical + Math.cos(theta) * tempChangeHorizontal;
