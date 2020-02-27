@@ -22,8 +22,11 @@ public class MyOdometryOpmode extends LinearOpMode {
 
     protected BNO055IMU imu;//For detecting angles of rotation
     protected String section;
+
     protected enum Mode {OPEN, CLOSE}
+
     protected enum Side {LEFT, RIGHT}
+
     protected enum GAGE {FORWARD, REVERSE}
 
     //driveTrain
@@ -67,6 +70,7 @@ public class MyOdometryOpmode extends LinearOpMode {
 
 
     protected enum SkystonePositions {LEFT, MID, RIGHT}
+
     //Field Variables
     protected final double TILE_INCH = 22.75;
     protected final double CONNECTION_INCH = 1.125;
@@ -78,59 +82,277 @@ public class MyOdometryOpmode extends LinearOpMode {
     GlobalCoordinate globalCoordinate;
 
     double skystoneAngle;
+
     public void runOpMode() throws InterruptedException {
         initialize();
-        waitForStart();
-        globalCoordinate = new GlobalCoordinate(fl, fr, imu);
+        globalCoordinate = new GlobalCoordinate(fl, fr, bl, br, imu);
         Thread globalCoordinateThread = new Thread(globalCoordinate);
         globalCoordinateThread.start();
-
-        goToPosition(0*COUNTS_PER_INCH, 24*COUNTS_PER_INCH, 0.5, 0, 1*COUNTS_PER_INCH);
-
-        while (opModeIsActive()) {
-            telemetry.addData("globalX", globalCoordinate.getGlobalX() / COUNTS_PER_INCH);
-            telemetry.addData("globalY", globalCoordinate.getGlobalY() / COUNTS_PER_INCH);
-            telemetry.addData("changeHorizonal", globalCoordinate.getChangeHorizontal());
-            telemetry.addData("changeVertical", globalCoordinate.getChangeVertical());
-
-            telemetry.addData("fr_encoder_count", fr.getCurrentPosition());
-            telemetry.addData("fl_encoder_count", fl.getCurrentPosition());
-            telemetry.addData("br_encoder_count", br.getCurrentPosition());
-            telemetry.addData("bl_encoder_count", bl.getCurrentPosition());
-
-            telemetry.update();
-
-        }
+        waitForStart();
+        moveInchesShortY(10.0 * COUNTS_PER_INCH, 1 * COUNTS_PER_INCH, 90, 90);
+        sleep(2000);
+        moveInchesShortY(-10.0 * COUNTS_PER_INCH, 1 * COUNTS_PER_INCH, 90, 90);
+        ;
         globalCoordinateThread.stop();
     }
 
-    public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double desiredRobotOrientation, double allowableDistanceError) {
+    public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double gyroAngle) {
+        double allowableDistanceError = 2 * COUNTS_PER_INCH;
+        double angle, gyroPwr = 0;
         double distanceToXTarget = targetXPosition - globalCoordinate.getGlobalX();
         double distanceToYTarget = targetYPosition - globalCoordinate.getGlobalY();
-
+        double snipPwr = robotPower;
         double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
 
         while (opModeIsActive() && distance > allowableDistanceError) {
 
-
             distanceToXTarget = targetXPosition - globalCoordinate.getGlobalX();
             distanceToYTarget = targetYPosition - globalCoordinate.getGlobalY();
+            angle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
+            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr") * (snipPwr + gyroPwr));
+            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl") * (snipPwr + gyroPwr));
+            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "fr") * (snipPwr + gyroPwr));
+            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl") * (snipPwr + gyroPwr));
             distance = Math.hypot(distanceToXTarget, distanceToYTarget);
 
-
-            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
-
-            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
-            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-            double pivot_correction = desiredRobotOrientation - globalCoordinate.getNormalizedHeading();
-
+//            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
+//            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
+//            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
+//            double pivot_correction = desiredRobotOrientation - globalCoordinate.getNormalizedHeading();
 
         }
 
     }
-    public double getAbsoluteHeading() {
-        return imu.getAngularOrientation(AxesReference.INTRINSIC , AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+
+    public void telemetry() {
+        telemetry.addData("globalX", globalCoordinate.getGlobalX() / COUNTS_PER_INCH);
+        telemetry.addData("globalY", globalCoordinate.getGlobalY() / COUNTS_PER_INCH);
+        telemetry.addData("changeHorizonal", globalCoordinate.getChangeHorizontal());
+        telemetry.addData("changeVertical", globalCoordinate.getChangeVertical());
+
+        telemetry.addData("fr_encoder_count", fr.getCurrentPosition());
+        telemetry.addData("fl_encoder_count", fl.getCurrentPosition());
+        telemetry.addData("br_encoder_count", br.getCurrentPosition());
+        telemetry.addData("bl_encoder_count", bl.getCurrentPosition());
+
+        telemetry.update();
+
     }
+
+    public void moveInchesX(double targetXPosition, double allowableError, double angle, double gyroAngle) {
+        double currentX = globalCoordinate.getGlobalX();
+        double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - currentX;
+        double snipPwr = 0, gyroPwr = 0, maxPwr = 1;
+
+        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        while (Math.abs(distanceToXTarget) > allowableError) {
+            updateVelocity();
+            if (distanceToXTarget > (targetXPosition - (0.5 * TILE_INCH) * COUNTS_PER_INCH))
+                section = "front";
+            else if (distanceToXTarget < (TILE_INCH) * COUNTS_PER_INCH) section = "end";
+            else section = "mid";
+
+            switch (section) {
+                case "front":
+                    snipPwr = distanceToXTarget / targetXPosition * (maxPwr - 0.25) + 0.25;
+                    break;
+                case "mid":
+                    snipPwr = trueVelocity < 2490 ? snipPwr + 0.01 : snipPwr - 0.01;
+                    break; //0.8 for transition
+                case "end":
+                    snipPwr = 0;
+                    gyroPwr = 0.1;
+                    break; //snipPwr = (1 - (currentPos -  end) / (target - end)) * (maxPwr - 0.1) + 0.1;
+                default:
+                    snipPwr = 0; //safety
+            }
+
+            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr") * (snipPwr + gyroPwr));
+            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl") * (snipPwr + gyroPwr));
+            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "fr") * (snipPwr + gyroPwr));
+            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl") * (snipPwr + gyroPwr));
+            telemetry();
+
+        }
+        fl.setPower(0);
+        fr.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
+    }
+
+    public void moveInchesY(double targetYPosition, double allowableError, double angle, double gyroAngle) {
+        double currentY = globalCoordinate.getGlobalY();
+        double distanceToXTarget = targetYPosition * COUNTS_PER_INCH - currentY;
+        double snipPwr = 0, gyroPwr = 0, maxPwr = 1;
+
+        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        while (Math.abs(distanceToXTarget) > allowableError) {
+            updateVelocity();
+            if (distanceToXTarget > (targetYPosition - (0.5 * TILE_INCH) * COUNTS_PER_INCH))
+                section = "front";
+            else if (distanceToXTarget < (TILE_INCH) * COUNTS_PER_INCH) section = "end";
+            else section = "mid";
+
+            switch (section) {
+                case "front":
+                    snipPwr = distanceToXTarget / targetYPosition * (maxPwr - 0.25) + 0.25;
+                    break;
+                case "mid":
+                    snipPwr = trueVelocity < 2490 ? snipPwr + 0.01 : snipPwr - 0.01;
+                    break; //0.8 for transition
+                case "end":
+                    snipPwr = 0;
+                    gyroPwr = 0.1;
+                    break; //snipPwr = (1 - (currentPos -  end) / (target - end)) * (maxPwr - 0.1) + 0.1;
+                default:
+                    snipPwr = 0; //safety
+            }
+
+            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr") * (snipPwr + gyroPwr));
+            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl") * (snipPwr + gyroPwr));
+            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "fr") * (snipPwr + gyroPwr));
+            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl") * (snipPwr + gyroPwr));
+            telemetry();
+
+        }
+        fl.setPower(0);
+        fr.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
+    }
+
+
+    public void moveInchesShortX(double targetXPosition, double allowableError, double angle, double gyroAngle) {
+        double snipPwr;
+        double distanceToXTarget = targetXPosition - globalCoordinate.getGlobalX();
+
+        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        while (Math.abs(distanceToXTarget) > allowableError) {
+            snipPwr = 0.4;
+            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr"));
+            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl"));
+            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "br"));
+            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl"));
+            telemetry();
+        }
+        fl.setPower(0);
+        fr.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
+    }
+
+    public void moveInchesShortY(double targetYPosition, double allowableError, double angle, double gyroAngle) {
+        double snipPwr;
+        double distanceToYTarget = targetYPosition - globalCoordinate.getGlobalY();
+        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        while (distanceToYTarget > allowableError) {
+            snipPwr = 0.4;
+            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr"));
+            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl"));
+            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "br"));
+            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl"));
+            telemetry();
+        }
+        fl.setPower(0);
+        fr.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
+    }
+
+    public double gyro(double angles, String motor) {
+        //fr fl br bl
+        double a = 70; //adjusting rate
+        double dif = angles - getNormalizedHeading();
+        if (dif > 0) { //need counterclockwise
+            switch (motor) {
+                case "fr":
+                    return dif / a;
+                case "fl":
+                    return -dif / a;
+                case "br":
+                    return dif / a;
+                case "bl":
+                    return -dif / a;
+                default:
+                    return 0;
+            }
+        } else if (dif < 0) {
+            switch (motor) {
+                case "fr":
+                    return dif / a;
+                case "fl":
+                    return -dif / a;
+                case "br":
+                    return dif / a;
+                case "bl":
+                    return -dif / a;
+                default:
+                    return 0;
+            }
+        } else {
+            return 0;
+        }
+
+    }
+
+    //angle in radians
+    public double transformation(double angles, String motor) {
+        //fr fl br bl
+        angles = Math.toRadians(angles);
+        switch (motor) {
+            case "fr":
+                return Math.sin(angles - Math.PI / 4);
+            case "fl":
+                return Math.cos(angles - Math.PI / 4);
+            case "br":
+                return Math.cos(angles - Math.PI / 4);
+            case "bl":
+                return Math.sin(angles - Math.PI / 4);
+            default:
+                return 0;
+        }
+    }
+
+    public double getAbsoluteHeading() {
+        return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+    }
+
     public void initialize() throws InterruptedException {
         BNO055IMU.Parameters parameterz = new BNO055IMU.Parameters();
         parameterz.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -176,13 +398,10 @@ public class MyOdometryOpmode extends LinearOpMode {
         bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
 
 
     }
@@ -199,22 +418,55 @@ public class MyOdometryOpmode extends LinearOpMode {
 
     /**
      * Calculate the power in the x direction
+     *
      * @param desiredAngle angle on the x axis
-     * @param speed robot's speed
+     * @param speed        robot's speed
      * @return the x vector
      */
     private double calculateX(double desiredAngle, double speed) {
         return Math.cos(Math.toRadians(desiredAngle)) * speed;
     }
 
+    public double getNormalizedHeading() {
+        return (getAbsoluteHeading() + 450) % 360;
+    }
+
     /**
      * Calculate the power in the y direction
+     *
      * @param desiredAngle angle on the y axis
-     * @param speed robot's speed
+     * @param speed        robot's speed
      * @return the y vector
      */
     private double calculateY(double desiredAngle, double speed) {
         return Math.sin(Math.toRadians(desiredAngle)) * speed;
     }
 
+    public void updateVelocity() {
+        double lastCount = fr.getCurrentPosition();
+        if (fr.getTargetPosition() > fl.getTargetPosition()) {
+            lastCount = fr.getCurrentPosition();
+            time = System.nanoTime();
+            double velocity = (fr.getCurrentPosition() - lastCount) / ((System.nanoTime() - time) * Math.pow(10, -9));
+            double sum = 0;
+            for (int i = 0; i < list.length - 1; i++) {
+                list[i] = list[i + 1];
+                sum += list[i];
+            }
+            list[list.length - 1] = velocity;
+            trueVelocity = (sum + velocity) / list.length;
+        } else {
+            lastCount = fl.getCurrentPosition();
+            time = System.nanoTime();
+            double velocity = (fl.getCurrentPosition() - lastCount) / ((System.nanoTime() - time) * Math.pow(10, -9));
+            double sum = 0;
+            for (int i = 0; i < list.length - 1; i++) {
+                list[i] = list[i + 1];
+                sum += list[i];
+            }
+            list[list.length - 1] = velocity;
+            trueVelocity = (sum + velocity) / list.length;
+        }
+
+    }
 }

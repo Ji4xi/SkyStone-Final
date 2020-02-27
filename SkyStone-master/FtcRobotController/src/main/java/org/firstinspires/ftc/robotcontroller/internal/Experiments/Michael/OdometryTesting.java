@@ -78,6 +78,7 @@ public class OdometryTesting extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         initialize();
         waitForStart();
+
         globalCoordinate = new GlobalCoordinate(fl, fr, bl, br, imu);
         Thread globalCoordinateThread = new Thread(globalCoordinate);
         globalCoordinateThread.start();
@@ -157,12 +158,9 @@ public class OdometryTesting extends LinearOpMode {
     }
 
     public void updateDriveTrain() {
-
                 fl.setPower((-gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.right_stick_x * turnPwrMax) * drivePwrMax); //-
                 fr.setPower((-gamepad1.left_stick_y + gamepad1.left_stick_x + gamepad1.right_stick_x * turnPwrMax) * drivePwrMax); //+
                 bl.setPower((-gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.right_stick_x * turnPwrMax) * drivePwrMax); //+
                 br.setPower((-gamepad1.left_stick_y - gamepad1.left_stick_x + gamepad1.right_stick_x * turnPwrMax) * drivePwrMax); //-
-
-
     }
 }

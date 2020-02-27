@@ -17,6 +17,7 @@ public class GlobalCoordinate implements Runnable {
     private double deltas3, deltas4, deltax3, deltax4, deltay3, deltay4, changeHorizontalBack, changeVerticalBack;
     private double lastEncoderCountLeft, lastEncoderCountRight, currentEncoderCountLeft, currentEncoderCountRight;
     private double lastEncoderCountLeftBack, lastEncoderCountRightBack, currentEncoderCountLeftBack, currentEncoderCountRightBack;
+    private double xMultiplier, yMultiplier;
     private BNO055IMU imu;
     /**
      * Constructor for GlobalCoordinate
@@ -38,6 +39,8 @@ public class GlobalCoordinate implements Runnable {
         this.encoderRightBack = encoderRightBack;
         this.imu = imu;
         sleepTime = 12; //50-75 is recommended
+        xMultiplier = 0.8;
+        yMultiplier = 0.66;
     }
 
     public double getGlobalX() {
@@ -99,19 +102,17 @@ public class GlobalCoordinate implements Runnable {
         deltay3 = deltas3 * 1 / Math.sqrt(2);
         deltay4 = deltas4 * 1 / Math.sqrt(2);
 
-        changeHorizontal = deltax1 - deltax2 - deltax3 + deltax4;
+        changeHorizontal = (deltax1 - deltax2 - deltax3 + deltax4) / 2;
         changeVertical = (deltay1 + deltay2 + deltay3 + deltay4) / 4;
 
         double tempChangeHorizontal = changeHorizontal;
         double tempChangeVertical = changeVertical;
 
-
-
         changeHorizontal = Math.cos(theta) * tempChangeVertical + Math.sin(theta) * tempChangeHorizontal;
         changeVertical = Math.sin(theta) * tempChangeVertical + Math.cos(theta) * tempChangeHorizontal;
 
-        globalX += changeHorizontal;
-        globalY += changeVertical;
+        globalX += changeHorizontal * xMultiplier;
+        globalY += changeVertical * yMultiplier;
     }
 
     @Override
@@ -124,5 +125,13 @@ public class GlobalCoordinate implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void setGlobalX(double globalX) {
+        this.globalX = globalX;
+    }
+
+    public void setGlobalY(double globalY) {
+        this.globalY = globalY;
     }
 }
