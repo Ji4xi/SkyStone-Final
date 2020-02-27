@@ -89,10 +89,8 @@ public class MyOdometryOpmode extends LinearOpMode {
         Thread globalCoordinateThread = new Thread(globalCoordinate);
         globalCoordinateThread.start();
         waitForStart();
-        moveInchesShortY(10.0 * COUNTS_PER_INCH, 1 * COUNTS_PER_INCH, 90, 90);
-        sleep(2000);
-        moveInchesShortY(-10.0 * COUNTS_PER_INCH, 1 * COUNTS_PER_INCH, 90, 90);
-        ;
+        goToPosition(0,20,0.3,90);
+        sleep(3000);
         globalCoordinateThread.stop();
     }
 

@@ -213,8 +213,11 @@ public class StoneFinderOp extends TeleOpMode {
 
         }
         if (leftLift.getCurrentPosition() >= -50 || rightLift.getCurrentPosition() >= -50) {
-            leftSlidePwr = - Math.abs(leftSlidePwr);
-            rightSlidePwr = - Math.abs(leftSlidePwr);
+                leftSlidePwr = - Math.abs(leftSlidePwr);
+                rightSlidePwr = - Math.abs(rightSlidePwr);
+
+
+
         }
 
 
