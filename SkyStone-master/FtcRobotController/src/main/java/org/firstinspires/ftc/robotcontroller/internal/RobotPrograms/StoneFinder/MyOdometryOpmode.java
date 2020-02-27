@@ -115,6 +115,9 @@ public class MyOdometryOpmode extends LinearOpMode {
             bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl") * (snipPwr + gyroPwr));
             distance = Math.hypot(distanceToXTarget, distanceToYTarget);
 
+            Object[] names = {"distance", "distance to X", "distance to Y"};
+            Object[] numbers = {distance, distanceToXTarget, distanceToYTarget};
+            telemetry(names, numbers);
 //            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
 //            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
 //            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
@@ -124,7 +127,7 @@ public class MyOdometryOpmode extends LinearOpMode {
 
     }
 
-    public void telemetry() {
+    public void telemetry(Object[]... maps) {
         telemetry.addData("globalX", globalCoordinate.getGlobalX() / COUNTS_PER_INCH);
         telemetry.addData("globalY", globalCoordinate.getGlobalY() / COUNTS_PER_INCH);
         telemetry.addData("changeHorizonal", globalCoordinate.getChangeHorizontal());
@@ -134,6 +137,10 @@ public class MyOdometryOpmode extends LinearOpMode {
         telemetry.addData("fl_encoder_count", fl.getCurrentPosition());
         telemetry.addData("br_encoder_count", br.getCurrentPosition());
         telemetry.addData("bl_encoder_count", bl.getCurrentPosition());
+
+        for (int number = 0; number < maps[0].length; number++) {
+            telemetry.addData(maps[0][number].toString(), maps[1][number].toString());
+        }
 
         telemetry.update();
 
