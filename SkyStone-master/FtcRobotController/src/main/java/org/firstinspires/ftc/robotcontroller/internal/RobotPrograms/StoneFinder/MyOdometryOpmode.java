@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.PD;
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.GlobalCoordinate;
@@ -15,6 +16,8 @@ import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
+import java.awt.font.NumericShaper;
 
 @Autonomous
 public class MyOdometryOpmode extends LinearOpMode {
@@ -94,12 +97,13 @@ public class MyOdometryOpmode extends LinearOpMode {
         goToPosition(0,40,0.3,90);
         sleep(3000);
         goToPosition(10,40,0.3,90);
+        sleep(5000);
         //globalCoordinateThread.stop();
     }
 
     public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double gyroAngle) {
         double allowableDistanceError = 1 * COUNTS_PER_INCH;
-        double angle, gyroPwr = 0;
+        double angle, gyroPwr = 1;
         double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
         double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
         double snipPwr = robotPower;
@@ -111,20 +115,18 @@ public class MyOdometryOpmode extends LinearOpMode {
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         while (opModeIsActive() && distance > allowableDistanceError) {
-
+            double normalHeading = getNormalizedHeading();
             distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
             distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
             angle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
-            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr") * (snipPwr + gyroPwr));
-            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl") * (snipPwr + gyroPwr));
-            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "br") * (snipPwr + gyroPwr));
-            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl") * (snipPwr + gyroPwr));
+            fr.setPower(transformation(2 * angle - normalHeading, "fr") * snipPwr + gyro(gyroAngle, "fr") * (gyroPwr));
+            fl.setPower(transformation(2 * angle - normalHeading, "fl") * snipPwr + gyro(gyroAngle, "fl") * (gyroPwr));
+            br.setPower(transformation(2 * angle - normalHeading, "br") * snipPwr + gyro(gyroAngle, "br") * (gyroPwr));
+            bl.setPower(transformation(2 * angle - normalHeading, "bl") * snipPwr + gyro(gyroAngle, "bl") * (gyroPwr));
             distance = Math.hypot(distanceToXTarget, distanceToYTarget);
-            Object[] names = {"distance", "distance to X", "distance to Y"};
-            Object[] numbers = {distance, distanceToXTarget, distanceToYTarget};
-            Object[] names2 = {"theta"};
-            Object[] numbers2 = {angle};
-            telemetry(names,numbers,names2, numbers2);
+            Object[] names = {"distance", "distance to X", "distance to Y","theta"};
+            Object[] numbers = {distance, distanceToXTarget, distanceToYTarget,angle};
+            telemetry(names,numbers);
 //            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
 //            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
 //            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
@@ -167,7 +169,7 @@ public class MyOdometryOpmode extends LinearOpMode {
     public void moveInchesX(double targetXPosition, double allowableError, double angle, double gyroAngle) {
         double currentX = globalCoordinate.getGlobalX();
         double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - currentX;
-        double snipPwr = 0, gyroPwr = 0, maxPwr = 1;
+        double snipPwr = 0, gyroPwr = 0.2, maxPwr = 1;
 
         fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -202,10 +204,10 @@ public class MyOdometryOpmode extends LinearOpMode {
                     snipPwr = 0; //safety
             }
 
-            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr") * (snipPwr + gyroPwr));
-            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl") * (snipPwr + gyroPwr));
-            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "fr") * (snipPwr + gyroPwr));
-            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl") * (snipPwr + gyroPwr));
+            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr") * (gyroPwr));
+            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl") * (gyroPwr));
+            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "fr") * (gyroPwr));
+            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl") * (gyroPwr));
             telemetry();
 
         }
@@ -281,11 +283,12 @@ public class MyOdometryOpmode extends LinearOpMode {
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         while (Math.abs(distanceToXTarget) > allowableError) {
+            double normalHeading = getNormalizedHeading();
             snipPwr = 0.4;
-            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr"));
-            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl"));
-            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "br"));
-            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl"));
+            fr.setPower(transformation(2 * angle - normalHeading, "fr") * snipPwr + gyro(gyroAngle, "fr"));
+            fl.setPower(transformation(2 * angle - normalHeading, "fl") * snipPwr + gyro(gyroAngle, "fl"));
+            br.setPower(transformation(2 * angle - normalHeading, "br") * snipPwr + gyro(gyroAngle, "br"));
+            bl.setPower(transformation(2 * angle - normalHeading, "bl") * snipPwr + gyro(gyroAngle, "bl"));
             telemetry();
         }
         fl.setPower(0);
@@ -322,7 +325,7 @@ public class MyOdometryOpmode extends LinearOpMode {
 
     public double gyro(double angles, String motor) {
         //fr fl br bl
-        double a = 70; //adjusting rate
+        double a = 100; //adjusting rate
         double dif = angles - getNormalizedHeading();
         if (dif > 0) { //need counterclockwise
             switch (motor) {
