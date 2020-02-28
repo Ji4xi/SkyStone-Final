@@ -15,66 +15,65 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 public class NewStoneFinder extends opencvSkystoneDetector {
     protected BNO055IMU imu;//For detecting angles of rotation
-    String section;
-    enum Mode {OPEN, CLOSE}
-    enum Side {LEFT, RIGHT}
-    enum GAGE {FORWARD, REVERSE}
+    protected String section;
+    protected enum Mode {OPEN, CLOSE}
+    protected enum Side {LEFT, RIGHT}
+    protected enum GAGE {FORWARD, REVERSE}
 
     //driveTrain
-    DcMotor fl;
-    DcMotor fr;
-    DcMotor bl;
-    DcMotor br;
+    protected DcMotor fl;
+    protected DcMotor fr;
+    protected DcMotor bl;
+    protected DcMotor br;
 
-    double[] list = new double[100];
-    double trueVelocity;
-    double time = System.nanoTime();
-    double lastCount = fr.getCurrentPosition();
-
-    DcMotor rightIntake;
-    DcMotor leftIntake;
-
-    Servo hook;
-
-    Servo rs;
-    Servo ls;
-
-    CRServo tape;
-
-    DcMotor rightLift;
-    DcMotor leftLift;
-
-    Servo topClaw;
-    Servo bottomClaw;
-
-    double drivePwrMax = 0.3;
-    final double intakePwr = 0.5;
-    final double maxLiftPwr = 0.6;
-    double currentLiftPwr = 0;
-    static final double COUNTS_PER_REVOLUTION = 537.6; //20:1
-    static final double DRIVE_GEAR_REDUCTION = 1; //This is < 1.0 if geared up
-    static final double WHEEL_DIAMETER_INCHES = 3.93701;
-    static final double WHEEL_PERIMETER_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
-    static final double COUNTS_PER_INCH = (COUNTS_PER_REVOLUTION * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
-
-    enum Direction {CLOCKWISE, COUNTERCLOCKWISE}
+    protected double[] list = new double[100];
+    protected double trueVelocity;
+    protected double time = System.nanoTime();
 
 
-    enum SkystonePositions {LEFT, MID, RIGHT}
+    protected DcMotor rightIntake;
+    protected DcMotor leftIntake;
+
+    protected Servo hook;
+
+    protected Servo rs;
+    protected Servo ls;
+
+    protected CRServo tape;
+
+    protected DcMotor rightLift;
+    protected DcMotor leftLift;
+
+    protected Servo topClaw;
+    protected Servo bottomClaw;
+
+    protected double drivePwrMax = 0.3;
+    protected final double intakePwr = 0.5;
+    protected final double maxLiftPwr = 0.6;
+    protected double currentLiftPwr = 0;
+    protected static final double COUNTS_PER_REVOLUTION = 537.6; //20:1
+    protected static final double DRIVE_GEAR_REDUCTION = 1; //This is < 1.0 if geared up
+    protected static final double WHEEL_DIAMETER_INCHES = 3.93701;
+    protected static final double WHEEL_PERIMETER_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
+    protected static final double COUNTS_PER_INCH = (COUNTS_PER_REVOLUTION * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
+
+    protected enum Direction {CLOCKWISE, COUNTERCLOCKWISE}
+    protected double gyroPwr = 0;
+
+    protected enum SkystonePositions {LEFT, MID, RIGHT}
     //Field Variables
-    public final double TILE_INCH = 22.75;
-    final double CONNECTION_INCH = 1.125;
-    final double SKYSTONE_INCH = 8;
-    final double ROBOT_LENGTH_INCH = 17.85;
-    final double ROBOT_WIDTH_INCH = 17.7;
+    protected final double TILE_INCH = 22.75;
+    protected final double CONNECTION_INCH = 1.125;
+    protected final double SKYSTONE_INCH = 8;
+    protected final double ROBOT_LENGTH_INCH = 17.85;
+    protected final double ROBOT_WIDTH_INCH = 17.7;
 
     PD pd = new PD(1, 1250);
 
     double skystoneAngle;
 
     @Override
-    public void
-    runOpMode() throws InterruptedException {
+    public void runOpMode() throws InterruptedException {
         initialize();
         waitForStart();
     }
@@ -122,7 +121,11 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        foundation(StoneFinder.Mode.CLOSE, 0);
+        foundation(Mode.CLOSE, 0);
+
+        GlobalCoordinate globalCoordinate = new GlobalCoordinate(fl, fr, bl, br, imu);
+        Thread globalCoordinateThread = new Thread(globalCoordinate);
+        globalCoordinateThread.start();
 
         //find skystone pos
         super.runOpMode(); //init camera
@@ -145,6 +148,9 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         }
         phoneCam.closeCameraDevice();
     }
+
+
+
 
     public void telemetry() {
         telemetry.addData("target", Math.abs(fr.getTargetPosition()) + Math.abs(fl.getTargetPosition()) + Math.abs(br.getTargetPosition()) + Math.abs(bl.getTargetPosition()));
@@ -173,7 +179,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         int target = (int) (inches / circ * COUNTS_PER_REVOLUTION);
         double snipPwr, currentPos;
         String section;
-        double maxPwr = 0.1;
+        double maxPwr = 0.4;
 
         fr.setTargetPosition((int) (transformation(angle, "fr") * target));
         fl.setTargetPosition((int) (transformation(angle, "fl") * target));
@@ -192,7 +198,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         while ((Math.abs(fr.getCurrentPosition()) + Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition()) + Math.abs(br.getCurrentPosition())) < target - 15) {
-            snipPwr = 0.1;
+            snipPwr = 0.4;
             fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr"));
             fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl"));
             br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "br"));
@@ -205,12 +211,13 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         br.setPower(0);
     }
 
-    public void moveInches (double inches, double angle, double gyroAngle) {
+    public void moveInches (double inches, double angle, double gyroAngle) throws InterruptedException{
         double circ = Math.PI * (3.93701);
         int target = (int) (inches / circ * COUNTS_PER_REVOLUTION);
         double snipPwr = 0, currentPos;
         double maxPwr = 1;
 
+        waitOneFullHardwareCycle();
         fr.setTargetPosition((int) (transformation(angle, "fr") * target));
         fl.setTargetPosition((int) (transformation(angle, "fl") * target));
         br.setTargetPosition((int) (transformation(angle, "br") * target));
@@ -218,7 +225,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
 
         target = Math.abs(fr.getTargetPosition()) + Math.abs(fl.getTargetPosition()) + Math.abs(br.getTargetPosition()) + Math.abs(bl.getTargetPosition()); //*2 for 2 motors
         double front = (TILE_INCH / 2) * 4 / circ * COUNTS_PER_REVOLUTION;
-        double end = target - (2 * TILE_INCH + 5) * 4 / circ * COUNTS_PER_REVOLUTION;
+        double end = target - (TILE_INCH) * 4 / circ * COUNTS_PER_REVOLUTION;
         double mid = (target - end) * 4;
 
         fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -231,6 +238,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+
         while ((Math.abs(fr.getCurrentPosition()) + Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition()) + Math.abs(br.getCurrentPosition())) < target - 15) {
             updateVelocity();
             currentPos = Math.abs(fr.getCurrentPosition()) + Math.abs(fl.getCurrentPosition()) + Math.abs(br.getCurrentPosition()) + Math.abs(bl.getCurrentPosition());
@@ -239,27 +247,29 @@ public class NewStoneFinder extends opencvSkystoneDetector {
             else section = "mid";
 
             switch (section) {
-                case "front": snipPwr = currentPos / front * (maxPwr - 0.1) + 0.1; break;
-                case "end": snipPwr = 0; break; //snipPwr = (1 - (currentPos -  end) / (target - end)) * (maxPwr - 0.1) + 0.1;
+                case "front": snipPwr = currentPos / front * (maxPwr - 0.25) + 0.25; break;
+                case "end": snipPwr = 0; gyroPwr = 0.1; break; //snipPwr = (1 - (currentPos -  end) / (target - end)) * (maxPwr - 0.1) + 0.1;
                 case "mid": snipPwr = trueVelocity < 2490 ? snipPwr + 0.01 : snipPwr - 0.01; break; //0.8 for transition
                 default: snipPwr = 0; //safety
             }
 
-            if (section == "end")
-
-            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr")* (snipPwr + 0.1));
-            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl")* (snipPwr + 0.1));
-            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "fr")* (snipPwr + 0.1));
-            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl")* (snipPwr + 0.1));
+            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr")* (snipPwr + gyroPwr));
+            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl")* (snipPwr + gyroPwr));
+            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "fr")* (snipPwr + gyroPwr));
+            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl")* (snipPwr + gyroPwr));
             telemetry();
+
+            waitOneFullHardwareCycle();
         }
 
         fl.setPower(0);
         fr.setPower(0);
         bl.setPower(0);
         br.setPower(0);
+        gyroPwr = 0;
     }
     public void updateVelocity() {
+        double lastCount = fr.getCurrentPosition();
         if (fr.getTargetPosition() > fl.getTargetPosition()) {
             lastCount = fr.getCurrentPosition();
             time = System.nanoTime();
@@ -372,7 +382,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
     public double getNormalizedHeading() {
         return (getAbsoluteHeading() + 450) % 360;
     }
-    public void foundation(StoneFinder.Mode position, int sleep) throws InterruptedException {
+    public void foundation(Mode position, int sleep) throws InterruptedException {
         if (position == position.CLOSE) {
             ls.setPosition(0);
             rs.setPosition(0);

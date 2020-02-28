@@ -15,35 +15,35 @@ import org.firstinspires.ftc.robotcontroller.internal.RobotSystems.MecanumXDrive
 public class StoneFinderOp extends TeleOpMode {
     MecanumXDrive mecanumXDrive = new MecanumXDrive();
 
-    DcMotor rightIntake;
-    DcMotor leftIntake;
+    protected DcMotor rightIntake;
+    protected DcMotor leftIntake;
 
-    Servo hook;
+    protected Servo hook;
 
-    Servo rs;
-    Servo ls;
+    protected Servo rs;
+    protected  Servo ls;
 
-    Servo topClaw;
-    Servo botClaw;
+    protected Servo topClaw;
+    protected Servo botClaw;
 
-    Servo grip;
-    Servo rotate;
+    protected Servo grip;
+    protected Servo rotate;
 
-    Servo extender;
+    protected Servo extender;
 
     Servo capstoneServo;
 
-    DcMotor rightLift;
-    DcMotor leftLift;
+    protected DcMotor rightLift;
+    protected DcMotor leftLift;
 
 
-    final double intakePwr = 0.7;
-    final double maxLiftPwr = 0.3;
-    double currentLiftPwr = 0;
+    protected final double intakePwr = 0.7;
+    protected final double maxLiftPwr = 0.3;
+    protected double currentLiftPwr = 0;
 
-    final double slidePwr = 0.8;
+    protected final double slidePwr = 0.8;
 
-    final double COUNTS_PER_REVOLUTION = 288;
+    protected final double COUNTS_PER_REVOLUTION = 288;
     final double COUNTS_PER_INCH = COUNTS_PER_REVOLUTION / 6.69291;
     final double COUNTS_PER_BRICK = COUNTS_PER_INCH * 5;
 
@@ -79,8 +79,10 @@ public class StoneFinderOp extends TeleOpMode {
         leftLift = hardwareMap.dcMotor.get("leftLift");
         rightLift.setDirection(DcMotorSimple.Direction.REVERSE);
         leftLift.setDirection(DcMotorSimple.Direction.FORWARD);
-
-
+        rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         topClaw = hardwareMap.servo.get("top");
         botClaw = hardwareMap.servo.get("bot");
@@ -126,7 +128,7 @@ public class StoneFinderOp extends TeleOpMode {
     }
 
     @Override
-    public void updateData() {
+    public void updateData(){
         updateDriveTrain();
         updateIntake();
         updateHook();
@@ -190,33 +192,40 @@ public class StoneFinderOp extends TeleOpMode {
         rightLift.setPower(Range.clip(currentLiftPwr, - maxLiftPwr, maxLiftPwr));
     }
 
-    public void updateLift() {
+    public void updateLift(){
         double leftSlidePwr = gamepad2.left_stick_y * slidePwr;
         double rightSlidePwr = gamepad2.left_stick_y * slidePwr;
 
-        leftSlidePwr = gamepad2.left_stick_y > 0 ? 0.25 : leftSlidePwr;
-        rightSlidePwr = gamepad2.left_stick_y > 0 ? 0.25 : rightSlidePwr;
+        leftSlidePwr = gamepad2.left_stick_y > 0 ? 0.2 : leftSlidePwr;
+        rightSlidePwr = gamepad2.left_stick_y > 0 ? 0.2 : rightSlidePwr;
 
-        if (gamepad2.x) {
-            double nearest = COUNTS_PER_BRICK * Math.round((leftLift.getCurrentPosition() + rightLift.getCurrentPosition()) / 2 / COUNTS_PER_BRICK);
-            leftSlidePwr =  slidePwr * (nearest - leftLift.getCurrentPosition())/COUNTS_PER_BRICK;
-            rightSlidePwr = slidePwr * (nearest - rightLift.getCurrentPosition())/COUNTS_PER_BRICK;
-        }
+//        if (gamepad2.x) {
+//            double nearest = COUNTS_PER_BRICK * Math.round((leftLift.getCurrentPosition() + rightLift.getCurrentPosition()) / 2 / COUNTS_PER_BRICK);
+//            leftSlidePwr =  slidePwr * (nearest - leftLift.getCurrentPosition())/COUNTS_PER_BRICK;
+//            rightSlidePwr = slidePwr * (nearest - rightLift.getCurrentPosition())/COUNTS_PER_BRICK;
+//        }
 
         if (gamepad2.left_stick_y == 0) {
             leftSlidePwr = -0.0765;
             rightSlidePwr = -0.0765;
         }
 
-//        leftSlidePwr = (leftLift.getCurrentPosition() <= -3200 || rightLift.getCurrentPosition() <= -3200) && leftSlidePwr >= 0 ? 0 : leftSlidePwr;
-//        rightSlidePwr = (leftLift.getCurrentPosition() <= -3200 || rightLift.getCurrentPosition() <= -3200) && rightSlidePwr >= 0 ? 0 : rightSlidePwr;
-//        leftSlidePwr = (leftLift.getCurrentPosition() >= 500 || rightLift.getCurrentPosition() >= 500) && leftSlidePwr <= 0 ? 0 : leftSlidePwr;
-//        rightSlidePwr = (leftLift.getCurrentPosition() >= 500 || rightLift.getCurrentPosition() >= 500) && rightSlidePwr <= 0 ? 0 : rightSlidePwr;
-
 
 //        //prevent crashing
-//        if (leftLift.getCurrentPosition() < 100 && leftLift.getPower() < 0) leftSlidePwr = 0;
-//        if (rightLift.getCurrentPosition() < 100 && rightLift.getPower() < 0) rightSlidePwr = 0;
+
+        if (leftLift.getCurrentPosition() >= -50 && leftSlidePwr == -0.0765 || rightLift.getCurrentPosition() >= -50 && rightLift.getPower() == -0.0765) {
+            leftSlidePwr = gamepad2.left_stick_y * slidePwr;
+            rightSlidePwr = gamepad2.left_stick_y * slidePwr;
+
+        }
+        if (leftLift.getCurrentPosition() >= -50 || rightLift.getCurrentPosition() >= -50) {
+                leftSlidePwr = - Math.abs(leftSlidePwr);
+                rightSlidePwr = - Math.abs(rightSlidePwr);
+
+
+
+        }
+
 
         leftLift.setPower(leftSlidePwr);
         rightLift.setPower(rightSlidePwr);
