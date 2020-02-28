@@ -88,44 +88,64 @@ public class MyOdometryOpmode extends LinearOpMode {
         globalCoordinate = new GlobalCoordinate(fl, fr, bl, br, imu);
         Thread globalCoordinateThread = new Thread(globalCoordinate);
         globalCoordinateThread.start();
+        telemetry.addData("init finished", ">>");
+        telemetry.update();
         waitForStart();
-        goToPosition(0,20,0.3,90);
+        goToPosition(0,40,0.3,90);
         sleep(3000);
-        globalCoordinateThread.stop();
+        goToPosition(10,40,0.3,90);
+        //globalCoordinateThread.stop();
     }
 
     public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double gyroAngle) {
-        double allowableDistanceError = 2 * COUNTS_PER_INCH;
+        double allowableDistanceError = 1 * COUNTS_PER_INCH;
         double angle, gyroPwr = 0;
-        double distanceToXTarget = targetXPosition - globalCoordinate.getGlobalX();
-        double distanceToYTarget = targetYPosition - globalCoordinate.getGlobalY();
+        double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
+        double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
         double snipPwr = robotPower;
         double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
 
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         while (opModeIsActive() && distance > allowableDistanceError) {
 
-            distanceToXTarget = targetXPosition - globalCoordinate.getGlobalX();
-            distanceToYTarget = targetYPosition - globalCoordinate.getGlobalY();
+            distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
+            distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
             angle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
             fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr") * (snipPwr + gyroPwr));
             fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl") * (snipPwr + gyroPwr));
-            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "fr") * (snipPwr + gyroPwr));
+            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "br") * (snipPwr + gyroPwr));
             bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl") * (snipPwr + gyroPwr));
             distance = Math.hypot(distanceToXTarget, distanceToYTarget);
-
             Object[] names = {"distance", "distance to X", "distance to Y"};
             Object[] numbers = {distance, distanceToXTarget, distanceToYTarget};
-            telemetry(names, numbers);
+            Object[] names2 = {"theta"};
+            Object[] numbers2 = {angle};
+            telemetry(names,numbers,names2, numbers2);
 //            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
 //            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
 //            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
 //            double pivot_correction = desiredRobotOrientation - globalCoordinate.getNormalizedHeading();
 
         }
-
+        fl.setPower(0);
+        fr.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
     }
 
+
     public void telemetry(Object[]... maps) {
+        for (int number = 0; number < maps[0].length; number++) {
+            telemetry.addData(maps[0][number].toString(), maps[1][number].toString());
+        }
+        for (int number = 0; number < maps[2].length; number++) {
+            telemetry.addData(maps[2][number].toString(), maps[3][number].toString());
+        }
+
         telemetry.addData("globalX", globalCoordinate.getGlobalX() / COUNTS_PER_INCH);
         telemetry.addData("globalY", globalCoordinate.getGlobalY() / COUNTS_PER_INCH);
         telemetry.addData("changeHorizonal", globalCoordinate.getChangeHorizontal());
@@ -136,10 +156,10 @@ public class MyOdometryOpmode extends LinearOpMode {
         telemetry.addData("br_encoder_count", br.getCurrentPosition());
         telemetry.addData("bl_encoder_count", bl.getCurrentPosition());
 
-        for (int number = 0; number < maps[0].length; number++) {
-            telemetry.addData(maps[0][number].toString(), maps[1][number].toString());
-        }
-
+        telemetry.addData("fr_pwr", fr.getPower());
+        telemetry.addData("fl_pwr", fl.getPower());
+        telemetry.addData("br_pwr", br.getPower());
+        telemetry.addData("bl_pwr", bl.getPower());
         telemetry.update();
 
     }
@@ -372,15 +392,11 @@ public class MyOdometryOpmode extends LinearOpMode {
         bl = hardwareMap.dcMotor.get("bl");
         br = hardwareMap.dcMotor.get("br");
 
+
         fl.setDirection(DcMotorSimple.Direction.FORWARD);
         fr.setDirection(DcMotorSimple.Direction.REVERSE);
         bl.setDirection(DcMotorSimple.Direction.FORWARD);
         br.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         rs = hardwareMap.servo.get("rs");
         ls = hardwareMap.servo.get("ls");

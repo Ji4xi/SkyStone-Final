@@ -40,7 +40,7 @@ public class GlobalCoordinate implements Runnable {
         this.imu = imu;
         sleepTime = 12; //50-75 is recommended
         xMultiplier = 0.8;
-        yMultiplier = 0.66 * 11 / 4.792;
+        yMultiplier = 0.66 * 11 / 4.792 * 36 / 37.66;
     }
 
     public double getGlobalX() {
