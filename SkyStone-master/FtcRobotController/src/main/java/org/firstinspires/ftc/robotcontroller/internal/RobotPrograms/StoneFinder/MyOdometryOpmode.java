@@ -139,11 +139,13 @@ public class MyOdometryOpmode extends LinearOpMode {
 
 
     public void telemetry(Object[]... maps) {
-        for (int number = 0; number < maps[0].length; number++) {
-            telemetry.addData(maps[0][number].toString(), maps[1][number].toString());
-        }
-        for (int number = 0; number < maps[2].length; number++) {
-            telemetry.addData(maps[2][number].toString(), maps[3][number].toString());
+        if (maps[0].length != 0 && maps[1].length != 0) {
+            for (int number = 0; number < maps[0].length; number++) {
+                telemetry.addData(maps[0][number].toString(), maps[1][number].toString());
+            }
+            for (int number = 0; number < maps[2].length; number++) {
+                telemetry.addData(maps[2][number].toString(), maps[3][number].toString());
+            }
         }
 
         telemetry.addData("globalX", globalCoordinate.getGlobalX() / COUNTS_PER_INCH);
