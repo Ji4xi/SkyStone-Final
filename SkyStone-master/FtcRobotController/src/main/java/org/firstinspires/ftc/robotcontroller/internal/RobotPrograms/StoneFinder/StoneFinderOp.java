@@ -31,7 +31,7 @@ public class StoneFinderOp extends TeleOpMode {
 
     Servo extender;
 
-
+    Servo capstoneServo;
 
     DcMotor rightLift;
     DcMotor leftLift;
@@ -52,13 +52,10 @@ public class StoneFinderOp extends TeleOpMode {
     final double EXTENDER_MAX_POS = 0.8;
     final double EXTENDER_MIN_POS = 0.3;
 
-
-
     @Override
     public void init() {
         mecanumXDrive.syncOpMode(gamepad1, telemetry, hardwareMap);
         mecanumXDrive.init("fr","fl","br","bl");
-
         rightIntake = hardwareMap.dcMotor.get("rightIntake");
         leftIntake = hardwareMap.dcMotor.get("leftIntake");
 
@@ -74,6 +71,9 @@ public class StoneFinderOp extends TeleOpMode {
         ls.setDirection(Servo.Direction.REVERSE);
         rs.setPosition(0);
         ls.setPosition(0);
+
+        capstoneServo = hardwareMap.servo.get("capstoneServo");
+        capstoneServo.setDirection(Servo.Direction.REVERSE);
 
         rightLift = hardwareMap.dcMotor.get("rightLift");
         leftLift = hardwareMap.dcMotor.get("leftLift");
@@ -121,7 +121,8 @@ public class StoneFinderOp extends TeleOpMode {
         telemetry.addData("claw bottom", botClaw.getPosition());
         telemetry.addData("leftSlide_pos", leftLift.getCurrentPosition());
         telemetry.addData("rightSlide_pos", rightLift.getCurrentPosition());
-
+        telemetry.addData("cap_pos", capstoneServo.getPosition())
+;
     }
 
     @Override
@@ -134,11 +135,16 @@ public class StoneFinderOp extends TeleOpMode {
         //updateClaw();
         updateExtender();
         updateGrip();
+        updateCap();
     }
 
-    //public void updateClaw() {
-    //
-    //}
+    public void updateCap() {
+        if (gamepad1.dpad_left) {
+            capstoneServo.setPosition(0.17);
+        } else if (gamepad1.dpad_right) {
+            capstoneServo.setPosition(0.52);
+        }
+    }
 
     public void updateFoundation() {
         if (gamepad1.left_bumper) {
@@ -247,19 +253,15 @@ public class StoneFinderOp extends TeleOpMode {
 
     public void updateGrip() {
         if (gamepad1.y) {
-            grip.setPosition(0.55);
+            grip.setPosition(0.65);
         }
         else if (gamepad1.a) {
-            grip.setPosition(0.11); //0.76
+            grip.setPosition(0.2); //0.76
         }
 
         if (gamepad1.dpad_down) {
             rotate.setPosition(0.10);
-        }
-        else if (gamepad1.dpad_left) {
-            rotate.setPosition(0.465);
-        }
-        else if (gamepad1.dpad_up) {
+        } else if (gamepad1.dpad_up) {
             rotate.setPosition(0.82);
         }
     }
