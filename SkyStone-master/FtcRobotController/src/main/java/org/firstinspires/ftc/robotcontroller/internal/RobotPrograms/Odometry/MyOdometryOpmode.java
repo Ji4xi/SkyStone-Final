@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder;
+package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.Odometry;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 @Autonomous
-public class MyOdometryOpmode extends LinearOpMode {
+public class MyOdometryOpmode extends NewStoneFinder {
     double turnPwrMax = 0.3;
 
     protected BNO055IMU imu;//For detecting angles of rotation
@@ -83,6 +83,8 @@ public class MyOdometryOpmode extends LinearOpMode {
 
     double skystoneAngle;
 
+    boolean mode = true;
+
     public void runOpMode() throws InterruptedException {
         initialize();
         globalCoordinate = new GlobalCoordinate(fl, fr, bl, br, imu);
@@ -91,13 +93,12 @@ public class MyOdometryOpmode extends LinearOpMode {
         telemetry.addData("init finished", ">>");
         telemetry.update();
         waitForStart();
-        goToPosition(0,40,0.3,90);
-        sleep(3000);
-        goToPosition(10,40,0.3,90);
+
         //globalCoordinateThread.stop();
     }
 
     public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double gyroAngle) {
+        targetXPosition = mode ? targetXPosition : -targetXPosition;
         double allowableDistanceError = 1 * COUNTS_PER_INCH;
         double angle, gyroPwr = 0;
         double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
@@ -122,9 +123,7 @@ public class MyOdometryOpmode extends LinearOpMode {
             distance = Math.hypot(distanceToXTarget, distanceToYTarget);
             Object[] names = {"distance", "distance to X", "distance to Y"};
             Object[] numbers = {distance, distanceToXTarget, distanceToYTarget};
-            Object[] names2 = {"theta"};
-            Object[] numbers2 = {angle};
-            telemetry(names,numbers,names2, numbers2);
+            telemetry(names,numbers);
 //            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
 //            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
 //            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
@@ -142,9 +141,6 @@ public class MyOdometryOpmode extends LinearOpMode {
         try {
             for (int number = 0; number < maps[0].length; number++) {
                 telemetry.addData(maps[0][number].toString(), maps[1][number].toString());
-            }
-            for (int number = 0; number < maps[2].length; number++) {
-                telemetry.addData(maps[2][number].toString(), maps[3][number].toString());
             }
         } catch (IndexOutOfBoundsException e){
         }
