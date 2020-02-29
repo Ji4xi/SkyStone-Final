@@ -94,15 +94,15 @@ public class MyOdometryOpmode extends LinearOpMode {
         telemetry.addData("init finished", ">>");
         telemetry.update();
         waitForStart();
-        goToPosition(0,40,0.3,90);
+        goToPosition(30,0,0.65,90);
         sleep(3000);
-        goToPosition(10,40,0.3,90);
+        //goToPosition(10,40,0.3,90);
         sleep(5000);
         //globalCoordinateThread.stop();
     }
 
-    public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double gyroAngle) {
-        double allowableDistanceError = 1 * COUNTS_PER_INCH;
+    public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double gyroAngle) throws InterruptedException{
+        double allowableDistanceError = 1.5 * COUNTS_PER_INCH;
         double angle, gyroPwr = 1;
         double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
         double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
@@ -124,14 +124,14 @@ public class MyOdometryOpmode extends LinearOpMode {
             br.setPower(transformation(2 * angle - normalHeading, "br") * snipPwr + gyro(gyroAngle, "br") * (gyroPwr));
             bl.setPower(transformation(2 * angle - normalHeading, "bl") * snipPwr + gyro(gyroAngle, "bl") * (gyroPwr));
             distance = Math.hypot(distanceToXTarget, distanceToYTarget);
-            Object[] names = {"distance", "distance to X", "distance to Y","theta"};
-            Object[] numbers = {distance, distanceToXTarget, distanceToYTarget,angle};
+            Object[] names = {"distance", "distance to X", "distance to Y","angle","2angle-heading"};
+            Object[] numbers = {distance / COUNTS_PER_INCH, distanceToXTarget / COUNTS_PER_INCH, distanceToYTarget / COUNTS_PER_INCH,angle, 2*angle - normalHeading};
             telemetry(names,numbers);
 //            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
 //            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
 //            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
 //            double pivot_correction = desiredRobotOrientation - globalCoordinate.getNormalizedHeading();
-
+            waitOneFullHardwareCycle();
         }
         fl.setPower(0);
         fr.setPower(0);
@@ -144,9 +144,6 @@ public class MyOdometryOpmode extends LinearOpMode {
         try {
             for (int number = 0; number < maps[0].length; number++) {
                 telemetry.addData(maps[0][number].toString(), maps[1][number].toString());
-            }
-            for (int number = 0; number < maps[2].length; number++) {
-                telemetry.addData(maps[2][number].toString(), maps[3][number].toString());
             }
         } catch (IndexOutOfBoundsException e){
         }

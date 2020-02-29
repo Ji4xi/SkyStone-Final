@@ -79,10 +79,11 @@ public class StoneFinderOp extends TeleOpMode {
         leftLift = hardwareMap.dcMotor.get("leftLift");
         rightLift.setDirection(DcMotorSimple.Direction.REVERSE);
         leftLift.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLift.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        leftLift.setMode(DcMotor.RunMode.RESET_ENCODERS);
         rightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         topClaw = hardwareMap.servo.get("top");
         botClaw = hardwareMap.servo.get("bot");
@@ -101,7 +102,8 @@ public class StoneFinderOp extends TeleOpMode {
         rotate = hardwareMap.servo.get("rotate");
         grip.setDirection(Servo.Direction.FORWARD);
         rotate.setDirection(Servo.Direction.REVERSE);
-
+        telemetry.addData("init_complete", ">>");
+        telemetry.update();
     }
 
     @Override
@@ -215,10 +217,11 @@ public class StoneFinderOp extends TeleOpMode {
         if (leftLift.getCurrentPosition() >= -50 || rightLift.getCurrentPosition() >= -50) {
                 leftSlidePwr = - Math.abs(leftSlidePwr);
                 rightSlidePwr = - Math.abs(rightSlidePwr);
-
-
-
         }
+//        if (leftLift.getCurrentPosition() >= -2700 || rightLift.getCurrentPosition() >= -2700) {
+//            leftSlidePwr *= Math.abs(leftSlidePwr.)
+//            rightSlidePwr = - Math.abs(rightSlidePwr);
+//        }
 
 
         leftLift.setPower(leftSlidePwr);
