@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder;
+package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.Odometry;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -20,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import java.awt.font.NumericShaper;
 
 @Autonomous
-public class MyOdometryOpmode extends LinearOpMode {
+public class MyOdometryOpmode extends NewStoneFinder {
     double turnPwrMax = 0.3;
 
     protected BNO055IMU imu;//For detecting angles of rotation
@@ -86,6 +86,10 @@ public class MyOdometryOpmode extends LinearOpMode {
 
     double skystoneAngle;
 
+    boolean mode = true;
+
+    double previousXTarget, previousYTarget;
+
     public void runOpMode() throws InterruptedException {
         initialize();
         globalCoordinate = new GlobalCoordinate(fl, fr, bl, br, imu);
@@ -94,15 +98,17 @@ public class MyOdometryOpmode extends LinearOpMode {
         telemetry.addData("init finished", ">>");
         telemetry.update();
         waitForStart();
-        goToPosition(30,0,0.65,90);
+
         sleep(3000);
         //goToPosition(10,40,0.3,90);
         sleep(5000);
         //globalCoordinateThread.stop();
     }
 
+
     public void goToPosition(double targetXPosition, double targetYPosition, double robotPower, double gyroAngle) throws InterruptedException{
-        double allowableDistanceError = 1.5 * COUNTS_PER_INCH;
+        targetXPosition = mode ? targetXPosition : -targetXPosition;
+        double allowableDistanceError = 1 * COUNTS_PER_INCH;
         double angle, gyroPwr = 1;
         double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
         double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
@@ -137,8 +143,52 @@ public class MyOdometryOpmode extends LinearOpMode {
         fr.setPower(0);
         bl.setPower(0);
         br.setPower(0);
+        previousXTarget = targetXPosition;
+        previousYTarget = targetYPosition;
     }
 
+    public void goToPositionRelative(double targetXPosition, double targetYPosition, double robotPower, double gyroAngle) {
+        targetXPosition = mode ? targetXPosition : -targetXPosition;
+        targetXPosition = previousXTarget + targetXPosition * COUNTS_PER_INCH;
+        targetYPosition = previousYTarget + targetYPosition * COUNTS_PER_INCH;
+        previousXTarget = targetXPosition;
+        previousYTarget = targetYPosition;
+        double allowableDistanceError = 1 * COUNTS_PER_INCH;
+        double angle, gyroPwr = 1;
+        double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
+        double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
+        double snipPwr = robotPower;
+        double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        while (opModeIsActive() && distance > allowableDistanceError) {
+            double normalHeading = getNormalizedHeading();
+            distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
+            distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
+            angle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
+            fr.setPower(transformation(2 * angle - normalHeading, "fr") * snipPwr + gyro(gyroAngle, "fr") * (gyroPwr));
+            fl.setPower(transformation(2 * angle - normalHeading, "fl") * snipPwr + gyro(gyroAngle, "fl") * (gyroPwr));
+            br.setPower(transformation(2 * angle - normalHeading, "br") * snipPwr + gyro(gyroAngle, "br") * (gyroPwr));
+            bl.setPower(transformation(2 * angle - normalHeading, "bl") * snipPwr + gyro(gyroAngle, "bl") * (gyroPwr));
+            distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+            Object[] names = {"distance", "distance to X", "distance to Y","theta"};
+            Object[] numbers = {distance, distanceToXTarget, distanceToYTarget,angle};
+            telemetry(names,numbers);
+//            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
+//            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
+//            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
+//            double pivot_correction = desiredRobotOrientation - globalCoordinate.getNormalizedHeading();
+
+        }
+        fl.setPower(0);
+        fr.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
+    }
 
     public void telemetry(Object[]... maps) {
         try {

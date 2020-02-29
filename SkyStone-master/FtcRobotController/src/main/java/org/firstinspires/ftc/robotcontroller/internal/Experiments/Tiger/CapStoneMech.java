@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 
-@Disabled
+//@Disabled
 @TeleOp
 public class CapStoneMech extends TeleOpMode {
 
@@ -28,7 +28,7 @@ public class CapStoneMech extends TeleOpMode {
         if (gamepad1.y) {
             mech.setPosition(0.3);
         } else if (gamepad1.a) {
-            mech.setPosition(0.8);
+            mech.setPosition(0.55);
         }
     }
 
