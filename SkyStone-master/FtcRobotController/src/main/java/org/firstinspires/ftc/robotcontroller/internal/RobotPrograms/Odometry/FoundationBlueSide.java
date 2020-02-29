@@ -8,7 +8,7 @@ public class FoundationBlueSide extends MyOdometryOpmode {
 //        sleep(29000-how many ever milliseconds it takes for the program);
         moveFoundation();
         //park side
-        goToPosition(22.75-17.5+17.5/2+22.75, 0, 0.3, 90);
+        goToPosition(-22.75+17.5 - 17.5/2 - 22.75, 0, 0.3, 90);
     }
 
     public void moveFoundation() {

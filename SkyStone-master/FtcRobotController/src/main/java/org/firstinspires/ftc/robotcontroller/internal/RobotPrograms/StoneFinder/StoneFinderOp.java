@@ -142,7 +142,7 @@ public class StoneFinderOp extends TeleOpMode {
 
     public void updateCap() {
         if (gamepad1.dpad_left) {
-            capstoneServo.setPosition(0.17);
+            capstoneServo.setPosition(0.185);
         } else if (gamepad1.dpad_right) {
             capstoneServo.setPosition(0.52);
         }
@@ -262,7 +262,7 @@ public class StoneFinderOp extends TeleOpMode {
 
     public void updateGrip() {
         if (gamepad1.y) {
-            grip.setPosition(0.7);
+            grip.setPosition(0.675);
         }
         else if (gamepad1.a) {
             grip.setPosition(0.2); //0.76
