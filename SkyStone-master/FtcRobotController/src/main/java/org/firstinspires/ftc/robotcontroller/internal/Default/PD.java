@@ -3,11 +3,11 @@ package org.firstinspires.ftc.robotcontroller.internal.Default;
 import android.icu.lang.UScript;
 
 public class PD {
-    public double p, i, d, error, time, dt, de, integral = 0, differential = 0, target, timeSnip, threshold = 0.37; //dt = delta time, de = delta error
+    public double p, i, d, error, time, dt, de, integral = 0, differential = 0, target, timeSnip, threshold = 0; //dt = delta time, de = delta error
 
-    public PD(double p, double d) {
+    public PD(double p, double i, double d) {
         this.p = p;
-        this.i = 1;
+        this.i = i;
         this.d = d;
     }
 
@@ -23,7 +23,10 @@ public class PD {
     }
 
     public double getPContrb() {
-        return p * error / target;
+        return p * error;
+    }
+    public double getIContrb() {
+        return i * integral;
     }
     public double getDContrb() {
         return d * differential;
@@ -32,22 +35,26 @@ public class PD {
     public double actuator(double current) {
         updatePD(current);
         differentiate();
-        if (outputPower() < threshold) return threshold;
-        else if (outputPower() > 1) return 1;
+        if (outputPower() > 1) return 1;
         else return outputPower();
     }
 
     public double outputPower() {
-        return p * error / target + d * differential;
+        return p * error + d * differential + i * integral;
     }
     public void updatePD(double current) {
         current = Math.abs(current);
-        de = current - error;
+        de = (target - current) - error;
         error = target - current;
 
+
+
         timeSnip = System.nanoTime();
-        dt = timeSnip - time;
+        dt = (timeSnip - time) * Math.pow(10, -9);
         time = timeSnip;
+
+        integral += error * dt;
+        if (integral > 0.1) integral = 0.1;
     }
 }
 

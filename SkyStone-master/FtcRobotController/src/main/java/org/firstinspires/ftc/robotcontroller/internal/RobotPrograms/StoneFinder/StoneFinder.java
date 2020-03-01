@@ -442,6 +442,7 @@ public class StoneFinder extends opencvSkystoneDetector {
                 telemetry.update();
             }
         }
+
         //flipMechanic(fr, fl, br, bl);
         stopAndResetMotor();
     }

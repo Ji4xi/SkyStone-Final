@@ -208,14 +208,15 @@ public class StoneFinderOp extends TeleOpMode {
 //        }
 
         if (gamepad2.left_stick_y == 0) {
-            leftSlidePwr = -0.0765;
-            rightSlidePwr = -0.0765;
+            leftSlidePwr = -0.01;
+            rightSlidePwr = -0.01;
         }
 
 
 //        //prevent crashing
 
-        if (leftLift.getCurrentPosition() >= -50 && leftSlidePwr == -0.0765 || rightLift.getCurrentPosition() >= -50 && rightLift.getPower() == -0.0765) {
+        if (leftLift.getCurrentPosition() >= -50 && leftSlidePwr == -0.01 || rightLift.getCurrentPosition() >= -50 && rightLift.getPower() == -0.01
+        ) {
             leftSlidePwr = gamepad2.left_stick_y * slidePwr;
             rightSlidePwr = gamepad2.left_stick_y * slidePwr;
 

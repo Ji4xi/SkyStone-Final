@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi;
 
+import android.media.MediaDrm;
+
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -10,15 +12,16 @@ public class JackBlack extends TeleOpMode {
 
     Servo top;
     Servo bot;
-    double topPos = 0, botPos = 0;
+    double topPos = 0, botPos = 1;
 
     @Override
     public void init() {
         top = hardwareMap.servo.get("top");
         bot = hardwareMap.servo.get("bot");
 
-        top.setDirection(Servo.Direction.REVERSE);
-        bot.setDirection(Servo.Direction.REVERSE);
+        top.setDirection(Servo.Direction.FORWARD);
+        bot.setDirection(Servo.Direction.FORWARD);
+
     }
 
     @Override

@@ -71,7 +71,7 @@ public class OdometryTesting extends LinearOpMode {
     protected final double ROBOT_LENGTH_INCH = 17.85;
     protected final double ROBOT_WIDTH_INCH = 17.7;
 
-    PD pd = new PD(1, 1250);
+//    PD pd = new PD(1, 1250);
     GlobalCoordinate globalCoordinate;
 
     double skystoneAngle;
@@ -132,14 +132,14 @@ public class OdometryTesting extends LinearOpMode {
 
         topClaw = hardwareMap.servo.get("top");
         bottomClaw = hardwareMap.servo.get("bot");
-        topClaw.setDirection(Servo.Direction.REVERSE);
-        bottomClaw.setDirection(Servo.Direction.REVERSE);
+        topClaw.setDirection(Servo.Direction.FORWARD);
+        bottomClaw.setDirection(Servo.Direction.FORWARD);
 
         tape = hardwareMap.crservo.get("tape");
         tape.setDirection(CRServo.Direction.REVERSE);
 
-        topClaw.setPosition(0.4);
-        bottomClaw.setPosition(0.3);
+        bottomClaw.setPosition(0.1669);
+        topClaw.setPosition(0.855);
         fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

@@ -19,6 +19,23 @@ public class GlobalCoordinate implements Runnable {
     private double lastEncoderCountLeftBack, lastEncoderCountRightBack, currentEncoderCountLeftBack, currentEncoderCountRightBack;
     private double xMultiplier, yMultiplier;
     private BNO055IMU imu;
+
+    public void setLastEncoderCountLeft(double lastEncoderCountLeft) {
+        this.lastEncoderCountLeft = lastEncoderCountLeft;
+    }
+
+    public void setLastEncoderCountRight(double lastEncoderCountRight) {
+        this.lastEncoderCountRight = lastEncoderCountRight;
+    }
+
+    public void setLastEncoderCountLeftBack(double lastEncoderCountLeftBack) {
+        this.lastEncoderCountLeftBack = lastEncoderCountLeftBack;
+    }
+
+    public void setLastEncoderCountRightBack(double lastEncoderCountRightBack) {
+        this.lastEncoderCountRightBack = lastEncoderCountRightBack;
+    }
+
     /**
      * Constructor for GlobalCoordinate
      * @param encoderLeft
@@ -38,7 +55,7 @@ public class GlobalCoordinate implements Runnable {
         this.encoderLeftBack = encoderLeftBack;
         this.encoderRightBack = encoderRightBack;
         this.imu = imu;
-        sleepTime = 12; //50-75 is recommended
+        sleepTime = 50; //50-75 is recommended
         xMultiplier = 0.8;
         yMultiplier = 0.66 * 11 / 4.792 * 36 / 37.66;
     }
@@ -71,6 +88,9 @@ public class GlobalCoordinate implements Runnable {
 
     public void stop() {
         isRunning = false;
+    }
+    public void start() {
+        isRunning = true;
     }
     public double getTheta() {
         return theta;
@@ -105,14 +125,14 @@ public class GlobalCoordinate implements Runnable {
         changeHorizontal = (deltax1 - deltax2 - deltax3 + deltax4) / 2;
         changeVertical = (deltay1 + deltay2 + deltay3 + deltay4) / 4;
 
-        double tempChangeHorizontal = changeHorizontal;
-        double tempChangeVertical = changeVertical;
+        double tempChangeHorizontal = changeHorizontal / 1.3;
+        double tempChangeVertical = changeVertical * 28 / 16 / 1.3;
 
         changeHorizontal = Math.cos(theta) * tempChangeVertical + Math.sin(theta) * tempChangeHorizontal;
-        changeVertical = Math.sin(theta) * tempChangeVertical + Math.cos(theta) * tempChangeHorizontal;
+        changeVertical = Math.sin(theta) * tempChangeVertical - Math.cos(theta) * tempChangeHorizontal;
 
-        globalX += changeHorizontal * xMultiplier;
-        globalY += changeVertical * yMultiplier;
+        globalX += changeHorizontal;
+        globalY += changeVertical;
     }
 
     @Override

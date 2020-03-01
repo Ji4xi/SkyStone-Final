@@ -7,7 +7,7 @@ public class Right extends MyOdometryOpmode {
         super.runOpMode();
 //        sleep(29000-how many ever milliseconds it takes for the program);
         //park middle
-        goToPosition(0, 46-17.5-1, 0.3, 90);
-        goToPosition(17.5, 46-17.5-1, 0.3, 90);
+        goToPositionSupreme(0, 46-17.5-1, maxPwr, 90, 1);
+        goToPositionSupreme(17.5, 46-17.5-1, maxPwr, 90, 1);
     }
 }

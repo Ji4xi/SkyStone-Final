@@ -10,6 +10,10 @@ public class CalvinPID {
     double i = 0;
     double d = 0;
 
+    double proportional;
+    double integral;
+    double derivative;
+
     double minOutput = -1;
     double maxOutput = 1;
 
@@ -94,6 +98,16 @@ public class CalvinPID {
         return d;
     }
 
+    public double getProportional(){return proportional;}
+
+    public double getIntegral() {
+        return integral;
+    }
+
+    public double getDerivative() {
+        return derivative;
+    }
+
     public double getTarget() {
         return target;
     }
@@ -104,9 +118,7 @@ public class CalvinPID {
 
     public double getOutput(double currentValue) {
 
-        double proportional;
-        double integral;
-        double derivative;
+
 
         error = target - currentValue;
 
@@ -122,6 +134,8 @@ public class CalvinPID {
         }
 
         lastValue = currentValue;
+
+
 
         return Range.clip(proportional + integral + derivative, minOutput, maxOutput);
 
