@@ -76,7 +76,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
     protected final double ROBOT_WIDTH_INCH = 17.7;
 
     protected Thread globalCoordinateThread;
-    public PD pd = new PD(0.00064, 0,0.00001); //I: 0.001/ D: 0.0002/2.5 P?0.00067
+    public PD pd = new PD(0.00064, 0, 0.000009); //I: 0.001/ D: 0.0002/2.5 P?0.00067  //march 1st: 0.00064, 0.0000004, 0.000027
     CalvinPID PID = new CalvinPID(0.0000, 0.00000, 0.00000); //P: 0.012, I: 0.001, D: 0.0022
 
     double greatestY = 0;
@@ -146,7 +146,10 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         hook = hardwareMap.servo.get("hook");
         hook.setDirection(Servo.Direction.FORWARD);
         hook.setPosition(0.8);
-
+        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         globalCoordinate = new GlobalCoordinate(fl, fr, bl, br, imu);
         globalCoordinateThread = new Thread(globalCoordinate);
@@ -176,6 +179,76 @@ public class NewStoneFinder extends opencvSkystoneDetector {
 
 
 
+    public void  goToPositionHard (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError) throws InterruptedException{
+        double circ = Math.PI * (3.93701);
+        targetXPosition = mode ? targetXPosition : -targetXPosition;
+
+        double angle, gyroPwr = 1;
+        double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
+        double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
+        double snipPwr = robotPower;
+        double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+        double target = distance;
+
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+//        pd.initPD(distance);
+
+
+        while (opModeIsActive() && distance > allowableDistanceError * COUNTS_PER_INCH) {
+            double normalHeading = getNormalizedHeading();
+            distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
+            distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
+            angle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
+            distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+//            snipPwr = 0.3;
+//            snipPwr = pd.actuator(target - distance) * robotPower;
+            snipPwr = robotPower;
+//            if (distance < 1 * TILE_INCH * COUNTS_PER_INCH) section = "front";
+//            else section = "mid";
+//
+//
+//            switch (section) {
+//                case "front": snipPwr = distance / TILE_INCH * robotPower; break;
+//                case "mid": snipPwr = robotPower; break;
+//                default: snipPwr = 0; //safety
+//            }
+            fr.setPower(transformation((angle) + 90 - normalHeading, "fr") * snipPwr + gyro(gyroAngle, "fr") * (gyroPwr) + pd.getDContrb());
+            fl.setPower(transformation((angle) + 90 - normalHeading, "fl") * snipPwr + gyro(gyroAngle, "fl") * (gyroPwr) + pd.getDContrb());
+            br.setPower(transformation((angle) + 90 - normalHeading, "br") * snipPwr + gyro(gyroAngle, "br") * (gyroPwr) + pd.getDContrb());
+            bl.setPower(transformation((angle) + 90 - normalHeading, "bl") * snipPwr + gyro(gyroAngle, "bl") * (gyroPwr) + pd.getDContrb());
+
+//            Object[] names = {"gyro_con", "d", "distance", "distance to X", "distance to Y","angle","2angle-heading"};
+            Object[] names = {"p", 'i', 'd', "greatest Y"};
+//            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb()};
+//            if (Math.abs(pd.getDContrb()) > Math.abs(greatestDContribution)) {greatestDContribution = pd.getDContrb();}
+            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb(),greatestY /COUNTS_PER_INCH};
+            if (globalCoordinate.getGlobalY() > greatestY) {greatestY = globalCoordinate.getGlobalY();}
+//            if (PID.getIntegral() > greatestIContribution) {greatestDContribution = PID.getIntegral();}
+            telemetry(names, values);
+
+//            Object[] numbers = {gyro(gyroAngle, "fr"), pd.getDContrb(), distance / COUNTS_PER_INCH, distanceToXTarget / COUNTS_PER_INCH, distanceToYTarget / COUNTS_PER_INCH,angle, 2*angle - normalHeading};
+//            telemetry(names,numbers);
+//            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
+//            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
+//            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
+//            double pivot_correction = desiredRobotOrientation - globalCoordinate.getNormalizedHeading();
+            //waitOneFullHardwareCycle();
+        }
+        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fl.setPower(0);
+        fr.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
+
+    }
 
     public void  goToPositionSupreme (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError) throws InterruptedException{
         double circ = Math.PI * (3.93701);
@@ -237,6 +310,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
 //            double pivot_correction = desiredRobotOrientation - globalCoordinate.getNormalizedHeading();
             //waitOneFullHardwareCycle();
         }
+
         fl.setPower(0);
         fr.setPower(0);
         bl.setPower(0);
@@ -537,37 +611,52 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         br.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void turnPID(double angle, Direction direction, double power) {
+    public void turnPID(double angle, Direction direction, double robotPower) {
+        double power;
+        globalCoordinate.stop();
         runWithoutEncoders();
         //flipMechanic(fr, fl, br, bl);
         double angleLeft = Math.abs(getNormalizedHeading() - angle);
         double firstDiff = Math.abs(getNormalizedHeading() - angle);
         //double integral = 0.3;
-        double error = 3;
+        double error = 3.5;
         pd.initPD(angleLeft);
         if (direction == Direction.CLOCKWISE) {
             while (opModeIsActive() && angleLeft > error) {
                 angleLeft = Math.abs(getNormalizedHeading() - angle);
-                power = pd.actuator(firstDiff - angleLeft) + 0.2;
+                power = pd.actuator(firstDiff - angleLeft) *12* robotPower;
                 fr.setPower(-power);
                 fl.setPower(power);
                 br.setPower(-power);
                 bl.setPower(power);
-                telemetry();
+                telemetry.addData("pd", power / robotPower);
+                telemetry.addData("angle_left", angleLeft);
+                telemetry.update();
+                //telemetry();
             }
         } else {
             while (opModeIsActive() && angleLeft > error) {
                 angleLeft = Math.abs(getNormalizedHeading() - angle);
-                power = pd.actuator(firstDiff - angleLeft) + 0.2;
+                power = pd.actuator(firstDiff - angleLeft) *12* robotPower;
                 fr.setPower(power);
                 fl.setPower(-power);
                 br.setPower(power);
                 bl.setPower(-power);
-                telemetry();
+                telemetry.addData("pd", power / robotPower);
+                telemetry.addData("angle_left", angleLeft);
+                telemetry.update();
+                //telemetry();
             }
         }
         //flipMechanic(fr, fl, br, bl);
         stopAndResetMotor();
+
+        globalCoordinate.setLastEncoderCountLeft(0);
+        globalCoordinate.setLastEncoderCountLeftBack(0);
+        globalCoordinate.setLastEncoderCountRight(0);
+        globalCoordinate.setLastEncoderCountRightBack(0);
+        globalCoordinate.start();
+        globalCoordinateThread.start();
     }
 
     public void stopAndResetMotor() {

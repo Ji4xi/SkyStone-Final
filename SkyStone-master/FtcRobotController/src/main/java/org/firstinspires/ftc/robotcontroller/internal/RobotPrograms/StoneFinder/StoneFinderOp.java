@@ -146,7 +146,7 @@ public class StoneFinderOp extends TeleOpMode {
         if (gamepad1.dpad_left) {
             capstoneServo.setPosition(0.185);
         } else if (gamepad1.dpad_right) {
-            capstoneServo.setPosition(0.52);
+            capstoneServo.setPosition(0.54);
         }
     }
 
@@ -215,16 +215,16 @@ public class StoneFinderOp extends TeleOpMode {
 
 //        //prevent crashing
 
-        if (leftLift.getCurrentPosition() >= -50 && leftSlidePwr == -0.01 || rightLift.getCurrentPosition() >= -50 && rightLift.getPower() == -0.01
-        ) {
-            leftSlidePwr = gamepad2.left_stick_y * slidePwr;
-            rightSlidePwr = gamepad2.left_stick_y * slidePwr;
-
-        }
-        if (leftLift.getCurrentPosition() >= -50 || rightLift.getCurrentPosition() >= -50) {
-                leftSlidePwr = - Math.abs(leftSlidePwr);
-                rightSlidePwr = - Math.abs(rightSlidePwr);
-        }
+//        if (leftLift.getCurrentPosition() >= -50 && leftSlidePwr == -0.01 || rightLift.getCurrentPosition() >= -50 && rightLift.getPower() == -0.01
+//        ) {
+//            leftSlidePwr = gamepad2.left_stick_y * slidePwr;
+//            rightSlidePwr = gamepad2.left_stick_y * slidePwr;
+//
+//        }
+//        if (leftLift.getCurrentPosition() >= -50 || rightLift.getCurrentPosition() >= -50) {
+//                leftSlidePwr = - Math.abs(leftSlidePwr);
+//                rightSlidePwr = - Math.abs(rightSlidePwr);
+//        }
 //        if (leftLift.getCurrentPosition() >= -2700 || rightLift.getCurrentPosition() >= -2700) {
 //            leftSlidePwr *= Math.abs(leftSlidePwr.)
 //            rightSlidePwr = - Math.abs(rightSlidePwr);
