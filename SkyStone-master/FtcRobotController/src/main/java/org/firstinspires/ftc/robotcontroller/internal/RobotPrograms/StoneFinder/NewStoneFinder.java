@@ -79,7 +79,6 @@ public class NewStoneFinder extends opencvSkystoneDetector {
     public PD pd = new PD(0.00064, 0, 0.000009); //I: 0.001/ D: 0.0002/2.5 P?0.00067  //march 1st: 0.00064, 0.0000004, 0.000027
     CalvinPID PID = new CalvinPID(0.0000, 0.00000, 0.00000); //P: 0.012, I: 0.001, D: 0.0022
 
-    double greatestY = 0;
     double greatestDContribution = 0;
     double greatestIContribution = 0;
 
@@ -180,80 +179,67 @@ public class NewStoneFinder extends opencvSkystoneDetector {
 
 
     public void  goToPositionHard (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError) throws InterruptedException{
-        double circ = Math.PI * (3.93701);
-        targetXPosition = mode ? targetXPosition : -targetXPosition;
-
-        double angle, gyroPwr = 1;
-        double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
-        double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
-        double snipPwr = robotPower;
-        double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
-        double target = distance;
-
-        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
-//        pd.initPD(distance);
-
-
-        while (opModeIsActive() && distance > allowableDistanceError * COUNTS_PER_INCH) {
-            double normalHeading = getNormalizedHeading();
-            distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
-            distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
-            angle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
-            distance = Math.hypot(distanceToXTarget, distanceToYTarget);
-//            snipPwr = 0.3;
-//            snipPwr = pd.actuator(target - distance) * robotPower;
-            snipPwr = robotPower;
-//            if (distance < 1 * TILE_INCH * COUNTS_PER_INCH) section = "front";
-//            else section = "mid";
+//        double circ = Math.PI * (3.93701);
+//        targetXPosition = mode ? targetXPosition : -targetXPosition;
+//
+//        double angle, gyroPwr = 1;
+//        double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
+//        double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
+//        double snipPwr = robotPower;
+//        double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+//        double target = distance;
+//
+//        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //
 //
-//            switch (section) {
-//                case "front": snipPwr = distance / TILE_INCH * robotPower; break;
-//                case "mid": snipPwr = robotPower; break;
-//                default: snipPwr = 0; //safety
-//            }
-            fr.setPower(transformation((angle) + 90 - normalHeading, "fr") * snipPwr + gyro(gyroAngle, "fr") * (gyroPwr) + pd.getDContrb());
-            fl.setPower(transformation((angle) + 90 - normalHeading, "fl") * snipPwr + gyro(gyroAngle, "fl") * (gyroPwr) + pd.getDContrb());
-            br.setPower(transformation((angle) + 90 - normalHeading, "br") * snipPwr + gyro(gyroAngle, "br") * (gyroPwr) + pd.getDContrb());
-            bl.setPower(transformation((angle) + 90 - normalHeading, "bl") * snipPwr + gyro(gyroAngle, "bl") * (gyroPwr) + pd.getDContrb());
-
-//            Object[] names = {"gyro_con", "d", "distance", "distance to X", "distance to Y","angle","2angle-heading"};
-            Object[] names = {"p", 'i', 'd', "greatest Y"};
-//            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb()};
-//            if (Math.abs(pd.getDContrb()) > Math.abs(greatestDContribution)) {greatestDContribution = pd.getDContrb();}
-            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb(),greatestY /COUNTS_PER_INCH};
-            if (globalCoordinate.getGlobalY() > greatestY) {greatestY = globalCoordinate.getGlobalY();}
-//            if (PID.getIntegral() > greatestIContribution) {greatestDContribution = PID.getIntegral();}
-            telemetry(names, values);
-
-//            Object[] numbers = {gyro(gyroAngle, "fr"), pd.getDContrb(), distance / COUNTS_PER_INCH, distanceToXTarget / COUNTS_PER_INCH, distanceToYTarget / COUNTS_PER_INCH,angle, 2*angle - normalHeading};
-//            telemetry(names,numbers);
-//            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
-//            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
-//            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-//            double pivot_correction = desiredRobotOrientation - globalCoordinate.getNormalizedHeading();
-            //waitOneFullHardwareCycle();
-        }
-        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        fl.setPower(0);
-        fr.setPower(0);
-        bl.setPower(0);
-        br.setPower(0);
+////        pd.initPD(distance);
+//
+//
+//        while (opModeIsActive() && distance > allowableDistanceError * COUNTS_PER_INCH) {
+//            double normalHeading = getNormalizedHeading();
+//            distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
+//            distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
+//            angle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
+//            distance = Math.hypot(distanceToXTarget, distanceToYTarget);
+//
+//            snipPwr = robotPower;
+//            fr.setPower(transformation((angle) + 90 - normalHeading, "fr") * snipPwr + gyro(gyroAngle, "fr") * (gyroPwr) + pd.getDContrb());
+//            fl.setPower(transformation((angle) + 90 - normalHeading, "fl") * snipPwr + gyro(gyroAngle, "fl") * (gyroPwr) + pd.getDContrb());
+//            br.setPower(transformation((angle) + 90 - normalHeading, "br") * snipPwr + gyro(gyroAngle, "br") * (gyroPwr) + pd.getDContrb());
+//            bl.setPower(transformation((angle) + 90 - normalHeading, "bl") * snipPwr + gyro(gyroAngle, "bl") * (gyroPwr) + pd.getDContrb());
+//
+////            Object[] names = {"gyro_con", "d", "distance", "distance to X", "distance to Y","angle","2angle-heading"};
+//            Object[] names = {"p", 'i', 'd', "greatest Y"};
+////            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb()};
+////            if (Math.abs(pd.getDContrb()) > Math.abs(greatestDContribution)) {greatestDContribution = pd.getDContrb();}
+//            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb(),greatestY /COUNTS_PER_INCH};
+//            if (globalCoordinate.getGlobalY() > greatestY) {greatestY = globalCoordinate.getGlobalY();}
+////            if (PID.getIntegral() > greatestIContribution) {greatestDContribution = PID.getIntegral();}
+//            telemetry(names, values);
+//        }
+//
+//        fl.setPower(0);
+//        fr.setPower(0);
+//        bl.setPower(0);
+//        br.setPower(0);
 
     }
 
-    public void  goToPositionSupreme (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError) throws InterruptedException{
+    public void  goToPositionSupreme (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError) throws InterruptedException {
+        goToPositionSupreme(targetXPosition, targetYPosition, robotPower, gyroAngle, allowableDistanceError, pd.getP(), pd.getI(), pd.getD());
+    }
+    public void  goToPositionSupreme (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError, double p, double i , double d) throws InterruptedException{
         double circ = Math.PI * (3.93701);
         targetXPosition = mode ? targetXPosition : -targetXPosition;
 
+        double originalP = pd.getP();
+        double originalI = pd.getI();
+        double originalD = pd.getD();
+
+        pd.setPID(p, i, d);
         double angle, gyroPwr = 1;
         double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
         double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
@@ -261,61 +247,55 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
         double target = distance;
 
+        //for telemetry purpose
+        double initialXPos = globalCoordinate.getGlobalX();
+        double initialYPos = globalCoordinate.getGlobalY();
+        double XOvershoot = 0;
+        double YOvershoot = 0;
+
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
-//        pd.initPD(distance);
         pd.initPD(target);
 
         while (opModeIsActive() && distance > allowableDistanceError * COUNTS_PER_INCH) {
+            double globalX = globalCoordinate.getGlobalX();
+            double globalY = globalCoordinate.getGlobalY();
             double normalHeading = getNormalizedHeading();
-            distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
-            distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
+            distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalX;
+            distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalY;
             angle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
             distance = Math.hypot(distanceToXTarget, distanceToYTarget);
-//            snipPwr = 0.3;
-//            snipPwr = pd.actuator(target - distance) * robotPower;
+
             snipPwr = Math.abs(pd.actuator(target - distance)) * robotPower;
-//            if (distance < 1 * TILE_INCH * COUNTS_PER_INCH) section = "front";
-//            else section = "mid";
-//
-//
-//            switch (section) {
-//                case "front": snipPwr = distance / TILE_INCH * robotPower; break;
-//                case "mid": snipPwr = robotPower; break;
-//                default: snipPwr = 0; //safety
-//            }
-            fr.setPower(transformation((angle) + 90 - normalHeading, "fr") * snipPwr + gyro(gyroAngle, "fr") * (gyroPwr) + pd.getDContrb());
-            fl.setPower(transformation((angle) + 90 - normalHeading, "fl") * snipPwr + gyro(gyroAngle, "fl") * (gyroPwr) + pd.getDContrb());
-            br.setPower(transformation((angle) + 90 - normalHeading, "br") * snipPwr + gyro(gyroAngle, "br") * (gyroPwr) + pd.getDContrb());
-            bl.setPower(transformation((angle) + 90 - normalHeading, "bl") * snipPwr + gyro(gyroAngle, "bl") * (gyroPwr) + pd.getDContrb());
 
-//            Object[] names = {"gyro_con", "d", "distance", "distance to X", "distance to Y","angle","2angle-heading"};
-            Object[] names = {"p", 'i', 'd', "greatest Y"};
-//            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb()};
-//            if (Math.abs(pd.getDContrb()) > Math.abs(greatestDContribution)) {greatestDContribution = pd.getDContrb();}
-            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb(),greatestY /COUNTS_PER_INCH};
-            if (globalCoordinate.getGlobalY() > greatestY) {greatestY = globalCoordinate.getGlobalY();}
-//            if (PID.getIntegral() > greatestIContribution) {greatestDContribution = PID.getIntegral();}
+            fr.setPower(transformation((angle) + 90 - normalHeading, "fr") * snipPwr + gyro(gyroAngle, "fr") * (gyroPwr));
+            fl.setPower(transformation((angle) + 90 - normalHeading, "fl") * snipPwr + gyro(gyroAngle, "fl") * (gyroPwr));
+            br.setPower(transformation((angle) + 90 - normalHeading, "br") * snipPwr + gyro(gyroAngle, "br") * (gyroPwr));
+            bl.setPower(transformation((angle) + 90 - normalHeading, "bl") * snipPwr + gyro(gyroAngle, "bl") * (gyroPwr));
+
+            //overshoot
+            if (globalY - targetYPosition < 0 && targetYPosition - initialYPos < 0) YOvershoot = Math.abs(globalY - targetYPosition) > YOvershoot ? Math.abs(globalY - targetYPosition) : YOvershoot;
+            else if (globalY - targetYPosition > 0 && targetYPosition - initialYPos > 0) YOvershoot = Math.abs(globalY - targetYPosition) > YOvershoot ? Math.abs(globalY - targetYPosition) : YOvershoot;;
+
+            if (globalX - targetXPosition < 0 && targetXPosition - initialXPos < 0) XOvershoot = Math.abs(globalX - targetXPosition) > XOvershoot ? Math.abs(globalX - targetXPosition) : XOvershoot;
+            else if (globalX - targetXPosition > 0 && targetXPosition - initialXPos > 0) XOvershoot = Math.abs(globalX - targetXPosition) > XOvershoot ? Math.abs(globalX - targetXPosition) : XOvershoot;;
+
+            Object[] names = {"p_contr", "i_contr", "d_contr", "Xovershoot", "Yovershoot"};
+            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb(), XOvershoot / COUNTS_PER_INCH, YOvershoot / COUNTS_PER_INCH};
+
             telemetry(names, values);
-
-//            Object[] numbers = {gyro(gyroAngle, "fr"), pd.getDContrb(), distance / COUNTS_PER_INCH, distanceToXTarget / COUNTS_PER_INCH, distanceToYTarget / COUNTS_PER_INCH,angle, 2*angle - normalHeading};
-//            telemetry(names,numbers);
-//            double robotMovementAngle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
-//            double robot_movement_x_component = calculateX(robotMovementAngle, robotPower);
-//            double robot_movement_y_component = calculateY(robotMovementAngle, robotPower);
-//            double pivot_correction = desiredRobotOrientation - globalCoordinate.getNormalizedHeading();
-            //waitOneFullHardwareCycle();
         }
 
         fl.setPower(0);
         fr.setPower(0);
         bl.setPower(0);
         br.setPower(0);
+        pd.setPID(originalP, originalI, originalD);
     }
+
 
 
     public void telemetry(Object[]... maps) {
@@ -325,24 +305,11 @@ public class NewStoneFinder extends opencvSkystoneDetector {
             }
         } catch (IndexOutOfBoundsException e){
         }
-
-        telemetry.addData("heading_normal", getNormalizedHeading());
         telemetry.addData("globalX", globalCoordinate.getGlobalX() / COUNTS_PER_INCH);
         telemetry.addData("globalY", globalCoordinate.getGlobalY() / COUNTS_PER_INCH);
-        telemetry.addData("changeHorizonal", globalCoordinate.getChangeHorizontal());
-        telemetry.addData("changeVertical", globalCoordinate.getChangeVertical());
-
-        telemetry.addData("fr_encoder_count", fr.getCurrentPosition());
-        telemetry.addData("fl_encoder_count", fl.getCurrentPosition());
-        telemetry.addData("br_encoder_count", br.getCurrentPosition());
-        telemetry.addData("bl_encoder_count", bl.getCurrentPosition());
-
         telemetry.addData("fr_pwr", fr.getPower());
         telemetry.addData("fl_pwr", fl.getPower());
-        telemetry.addData("br_pwr", br.getPower());
-        telemetry.addData("bl_pwr", bl.getPower());
         telemetry.update();
-
     }
 
 
@@ -611,20 +578,25 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         br.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void turnPID(double angle, Direction direction, double robotPower) {
+    public void turnPID (double angle, Direction direction, double robotPower) {
+        turnPID(angle, direction, robotPower, pd.getP(), pd.getI(), pd.getD());
+    }
+
+    public void turnPID (double angle, Direction direction, double robotPower, double p, double i, double d) {
         double power;
         globalCoordinate.stop();
         runWithoutEncoders();
-        //flipMechanic(fr, fl, br, bl);
         double angleLeft = Math.abs(getNormalizedHeading() - angle);
         double firstDiff = Math.abs(getNormalizedHeading() - angle);
-        //double integral = 0.3;
         double error = 3.5;
+        double originalP = pd.getP(), originalI = pd.getI(), originalD = pd.getD();
+        pd.setPID(p, i, d);
+
         pd.initPD(angleLeft);
         if (direction == Direction.CLOCKWISE) {
             while (opModeIsActive() && angleLeft > error) {
                 angleLeft = Math.abs(getNormalizedHeading() - angle);
-                power = pd.actuator(firstDiff - angleLeft) *12* robotPower;
+                power = pd.actuator(firstDiff - angleLeft) * robotPower;
                 fr.setPower(-power);
                 fl.setPower(power);
                 br.setPower(-power);
@@ -632,12 +604,11 @@ public class NewStoneFinder extends opencvSkystoneDetector {
                 telemetry.addData("pd", power / robotPower);
                 telemetry.addData("angle_left", angleLeft);
                 telemetry.update();
-                //telemetry();
             }
         } else {
             while (opModeIsActive() && angleLeft > error) {
                 angleLeft = Math.abs(getNormalizedHeading() - angle);
-                power = pd.actuator(firstDiff - angleLeft) *12* robotPower;
+                power = pd.actuator(firstDiff - angleLeft) * robotPower;
                 fr.setPower(power);
                 fl.setPower(-power);
                 br.setPower(power);
@@ -645,11 +616,11 @@ public class NewStoneFinder extends opencvSkystoneDetector {
                 telemetry.addData("pd", power / robotPower);
                 telemetry.addData("angle_left", angleLeft);
                 telemetry.update();
-                //telemetry();
             }
         }
-        //flipMechanic(fr, fl, br, bl);
         stopAndResetMotor();
+
+        pd.setPID(originalP, originalI, originalD);
 
         globalCoordinate.setLastEncoderCountLeft(0);
         globalCoordinate.setLastEncoderCountLeftBack(0);

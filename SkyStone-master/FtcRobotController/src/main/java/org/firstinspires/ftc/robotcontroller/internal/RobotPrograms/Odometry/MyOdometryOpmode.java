@@ -25,8 +25,9 @@ public class MyOdometryOpmode extends NewStoneFinder {
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-        goToPositionHard( 0, 40,0.7,90,2);
-        telemetry();
+        pd.setPID(0.00067, 0, 0.00009); //I: 0.001/ D: 0.0002/2.5 P?0.00067  //march 1st: 0.00064, 0.0000004, 0.000027
+        maxPwr = 0.75;
+        goToPositionSupreme( 0, 4 * TILE_INCH, maxPwr,90,1.1);
         sleep(5000);
     }
 

@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 import org.firstinspires.ftc.robotcontroller.internal.RobotSystems.MecanumXDrive;
 
+import java.sql.RowId;
+
 //@Disabled
 @TeleOp
 public class StoneFinderOp extends TeleOpMode {
@@ -83,7 +85,8 @@ public class StoneFinderOp extends TeleOpMode {
         leftLift.setMode(DcMotor.RunMode.RESET_ENCODERS);
         rightLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+        rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         topClaw = hardwareMap.servo.get("top");
         botClaw = hardwareMap.servo.get("bot");
@@ -208,8 +211,8 @@ public class StoneFinderOp extends TeleOpMode {
 //        }
 
         if (gamepad2.left_stick_y == 0) {
-            leftSlidePwr = -0.01;
-            rightSlidePwr = -0.01;
+//            leftSlidePwr = -0.01;
+//            rightSlidePwr = -0.01;
         }
 
 

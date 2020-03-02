@@ -22,6 +22,9 @@ public class JackBlack extends TeleOpMode {
         top.setDirection(Servo.Direction.FORWARD);
         bot.setDirection(Servo.Direction.FORWARD);
 
+        bot.setPosition(0.1669);
+        top.setPosition(0.855);
+
     }
 
     @Override
