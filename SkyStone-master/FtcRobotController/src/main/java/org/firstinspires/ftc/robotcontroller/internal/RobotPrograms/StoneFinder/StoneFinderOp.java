@@ -43,7 +43,7 @@ public class StoneFinderOp extends TeleOpMode {
     protected final double maxLiftPwr = 0.3;
     protected double currentLiftPwr = 0;
 
-    protected final double slidePwr = 0.8;
+    protected final double slidePwr = 0.9;
 
     protected final double COUNTS_PER_REVOLUTION = 288;
     final double COUNTS_PER_INCH = COUNTS_PER_REVOLUTION / 6.69291;
@@ -90,12 +90,12 @@ public class StoneFinderOp extends TeleOpMode {
 
         topClaw = hardwareMap.servo.get("top");
         botClaw = hardwareMap.servo.get("bot");
-        topClaw.setDirection(Servo.Direction.REVERSE);
-        botClaw.setDirection(Servo.Direction.REVERSE);
+        topClaw.setDirection(Servo.Direction.FORWARD);
+        botClaw.setDirection(Servo.Direction.FORWARD);
 
 
-        topClaw.setPosition(0);
-        botClaw.setPosition(0.707);
+        topClaw.setPosition(0.47);
+        botClaw.setPosition(0.21);
 
         extender = hardwareMap.servo.get("extender");
         extender.setDirection(Servo.Direction.FORWARD);
@@ -128,8 +128,7 @@ public class StoneFinderOp extends TeleOpMode {
         telemetry.addData("claw bottom", botClaw.getPosition());
         telemetry.addData("leftSlide_pos", leftLift.getCurrentPosition());
         telemetry.addData("rightSlide_pos", rightLift.getCurrentPosition());
-        telemetry.addData("cap_pos", capstoneServo.getPosition())
-;
+        telemetry.addData("cap_pos", capstoneServo.getPosition());
     }
 
     @Override
@@ -149,7 +148,7 @@ public class StoneFinderOp extends TeleOpMode {
         if (gamepad1.dpad_left) {
             capstoneServo.setPosition(0.185);
         } else if (gamepad1.dpad_right) {
-            capstoneServo.setPosition(0.54);
+            capstoneServo.setPosition(0.52);
         }
     }
 
@@ -201,8 +200,8 @@ public class StoneFinderOp extends TeleOpMode {
         double leftSlidePwr = gamepad2.left_stick_y * slidePwr;
         double rightSlidePwr = gamepad2.left_stick_y * slidePwr;
 
-        leftSlidePwr = gamepad2.left_stick_y > 0 ? 0.2 : leftSlidePwr;
-        rightSlidePwr = gamepad2.left_stick_y > 0 ? 0.2 : rightSlidePwr;
+        leftSlidePwr = gamepad2.left_stick_y > 0 ? 0.45 : leftSlidePwr;
+        rightSlidePwr = gamepad2.left_stick_y > 0 ? 0.45 : rightSlidePwr;
 
 //        if (gamepad2.x) {
 //            double nearest = COUNTS_PER_BRICK * Math.round((leftLift.getCurrentPosition() + rightLift.getCurrentPosition()) / 2 / COUNTS_PER_BRICK);
@@ -211,8 +210,8 @@ public class StoneFinderOp extends TeleOpMode {
 //        }
 
         if (gamepad2.left_stick_y == 0) {
-//            leftSlidePwr = -0.01;
-//            rightSlidePwr = -0.01;
+            leftSlidePwr = -0.01;
+            rightSlidePwr = -0.01;
         }
 
 
@@ -269,7 +268,7 @@ public class StoneFinderOp extends TeleOpMode {
 
     public void updateGrip() {
         if (gamepad1.y) {
-            grip.setPosition(0.675);
+            grip.setPosition(0.65);
         }
         else if (gamepad1.a) {
             grip.setPosition(0.2); //0.76

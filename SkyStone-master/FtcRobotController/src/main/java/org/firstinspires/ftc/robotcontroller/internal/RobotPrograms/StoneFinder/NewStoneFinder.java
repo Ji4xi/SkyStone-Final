@@ -76,7 +76,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
     protected final double ROBOT_WIDTH_INCH = 17.7;
 
     protected Thread globalCoordinateThread;
-    public PD pd = new PD(0.00064, 0, 0.000009); //I: 0.001/ D: 0.0002/2.5 P?0.00067  //march 1st: 0.00064, 0.0000004, 0.000027
+    public PD pd = new PD(0.001, 0, 0); //I: 0.001/ D: 0.0002/2.5 P?0.00067 0.00074 .00083//march 1st: 0.00064, 0.0000004, 0.000027
     CalvinPID PID = new CalvinPID(0.0000, 0.00000, 0.00000); //P: 0.012, I: 0.001, D: 0.0022
 
     double greatestDContribution = 0;
@@ -135,8 +135,8 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         foundation(Mode.CLOSE, 0);
 
-        bottomClaw.setPosition(0.1669);
-        topClaw.setPosition(0.855);
+        bottomClaw.setPosition(0.21);
+        topClaw.setPosition(0.47);
         rightIntake = hardwareMap.dcMotor.get("rightIntake");
         leftIntake = hardwareMap.dcMotor.get("leftIntake");
         rightIntake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -278,13 +278,13 @@ public class NewStoneFinder extends opencvSkystoneDetector {
 
             //overshoot
             if (globalY - targetYPosition < 0 && targetYPosition - initialYPos < 0) YOvershoot = Math.abs(globalY - targetYPosition) > YOvershoot ? Math.abs(globalY - targetYPosition) : YOvershoot;
-            else if (globalY - targetYPosition > 0 && targetYPosition - initialYPos > 0) YOvershoot = Math.abs(globalY - targetYPosition) > YOvershoot ? Math.abs(globalY - targetYPosition) : YOvershoot;;
+            else if (globalY - targetYPosition > 0 && targetYPosition - initialYPos > 0) YOvershoot = Math.abs(globalY - targetYPosition) > YOvershoot ? Math.abs(globalY - targetYPosition) : YOvershoot;
 
             if (globalX - targetXPosition < 0 && targetXPosition - initialXPos < 0) XOvershoot = Math.abs(globalX - targetXPosition) > XOvershoot ? Math.abs(globalX - targetXPosition) : XOvershoot;
-            else if (globalX - targetXPosition > 0 && targetXPosition - initialXPos > 0) XOvershoot = Math.abs(globalX - targetXPosition) > XOvershoot ? Math.abs(globalX - targetXPosition) : XOvershoot;;
+            else if (globalX - targetXPosition > 0 && targetXPosition - initialXPos > 0) XOvershoot = Math.abs(globalX - targetXPosition) > XOvershoot ? Math.abs(globalX - targetXPosition) : XOvershoot;
 
-            Object[] names = {"p_contr", "i_contr", "d_contr", "Xovershoot", "Yovershoot"};
-            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb(), XOvershoot / COUNTS_PER_INCH, YOvershoot / COUNTS_PER_INCH};
+            Object[] names = {"p_contr", "i_contr", "d_contr", "dis_left_x", "dis_left_y"};
+            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb(), distanceToXTarget / COUNTS_PER_INCH, distanceToYTarget / COUNTS_PER_INCH};
 
             telemetry(names, values);
         }
@@ -614,6 +614,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
                 br.setPower(power);
                 bl.setPower(-power);
                 telemetry.addData("pd", power / robotPower);
+                telemetry.addData("pi", power / robotPower);
                 telemetry.addData("angle_left", angleLeft);
                 telemetry.update();
             }
