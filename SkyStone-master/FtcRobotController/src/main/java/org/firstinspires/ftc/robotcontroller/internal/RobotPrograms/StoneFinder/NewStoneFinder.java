@@ -231,7 +231,12 @@ public class NewStoneFinder extends opencvSkystoneDetector {
     public void  goToPositionSupreme (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError) throws InterruptedException {
         goToPositionSupreme(targetXPosition, targetYPosition, robotPower, gyroAngle, allowableDistanceError, pd.getP(), pd.getI(), pd.getD());
     }
-    public void  goToPositionSupreme (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError, double p, double i , double d) throws InterruptedException{
+
+    public void goToPositionSupreme(double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError, double p, double i , double d, double gyroPwr) {
+        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         double circ = Math.PI * (3.93701);
         targetXPosition = mode ? targetXPosition : -targetXPosition;
 
@@ -240,7 +245,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         double originalD = pd.getD();
 
         pd.setPID(p, i, d);
-        double angle, gyroPwr = 1;
+        double angle;
         double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
         double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
         double snipPwr = robotPower;
@@ -283,12 +288,15 @@ public class NewStoneFinder extends opencvSkystoneDetector {
             if (globalX - targetXPosition < 0 && targetXPosition - initialXPos < 0) XOvershoot = Math.abs(globalX - targetXPosition) > XOvershoot ? Math.abs(globalX - targetXPosition) : XOvershoot;
             else if (globalX - targetXPosition > 0 && targetXPosition - initialXPos > 0) XOvershoot = Math.abs(globalX - targetXPosition) > XOvershoot ? Math.abs(globalX - targetXPosition) : XOvershoot;
 
-            Object[] names = {"p_contr", "i_contr", "d_contr", "dis_left_x", "dis_left_y"};
-            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb(), distanceToXTarget / COUNTS_PER_INCH, distanceToYTarget / COUNTS_PER_INCH};
+            Object[] names = {"fr", "fl", "br", "bl","p_contr", "i_contr", "d_contr", "dis_left_x", "dis_left_y"};
+            Object[] values = {fr.getCurrentPosition(), fl.getCurrentPosition(), br.getCurrentPosition(), bl.getCurrentPosition(),pd.getPContrb(), pd.getIContrb(), pd.getDContrb(), distanceToXTarget / COUNTS_PER_INCH, distanceToYTarget / COUNTS_PER_INCH};
 
             telemetry(names, values);
         }
-
+        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fl.setPower(0);
         fr.setPower(0);
         bl.setPower(0);
@@ -296,6 +304,13 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         pd.setPID(originalP, originalI, originalD);
     }
 
+    public void  goToPositionSupreme (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError, double p, double i , double d) throws InterruptedException{
+        goToPositionSupreme(targetXPosition, targetYPosition, robotPower, gyroAngle, allowableDistanceError, p, i, d, 1);
+    }
+
+    public void  goToPositionSupreme (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError, double gyroPwr) throws InterruptedException{
+        goToPositionSupreme(targetXPosition, targetYPosition, robotPower, gyroAngle, allowableDistanceError, pd.getP(), pd.getI(), pd.getD(), gyroPwr);
+    }
 
 
     public void telemetry(Object[]... maps) {
@@ -309,6 +324,10 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         telemetry.addData("globalY", globalCoordinate.getGlobalY() / COUNTS_PER_INCH);
         telemetry.addData("fr_pwr", fr.getPower());
         telemetry.addData("fl_pwr", fl.getPower());
+        telemetry.addData("fr_pwr", fr.getCurrentPosition());
+        telemetry.addData("fl_pwr", fl.getCurrentPosition());
+        telemetry.addData("br_pwr", br.getCurrentPosition());
+        telemetry.addData("bl_pwr", bl.getCurrentPosition());
         telemetry.update();
     }
 
@@ -588,7 +607,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         runWithoutEncoders();
         double angleLeft = Math.abs(getNormalizedHeading() - angle);
         double firstDiff = Math.abs(getNormalizedHeading() - angle);
-        double error = 3.5;
+        double error = 3.8;
         double originalP = pd.getP(), originalI = pd.getI(), originalD = pd.getD();
         pd.setPID(p, i, d);
 

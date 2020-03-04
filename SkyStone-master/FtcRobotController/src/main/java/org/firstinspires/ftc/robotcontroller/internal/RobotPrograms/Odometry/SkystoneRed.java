@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.
 
 import java.util.ServiceLoader;
 
-@Autonomous
+//@Autonomous
 public class SkystoneRed extends NewStoneFinder {
 
     int count = 0;
