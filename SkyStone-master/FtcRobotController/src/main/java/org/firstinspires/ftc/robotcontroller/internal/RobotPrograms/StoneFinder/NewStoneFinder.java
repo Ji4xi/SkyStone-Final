@@ -601,13 +601,12 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         turnPID(angle, direction, robotPower, pd.getP(), pd.getI(), pd.getD());
     }
 
-    public void turnPID (double angle, Direction direction, double robotPower, double p, double i, double d) {
+    public void turnPID (double angle, Direction direction, double robotPower, double p, double i, double d, double error) {
         double power;
         globalCoordinate.stop();
         runWithoutEncoders();
         double angleLeft = Math.abs(getNormalizedHeading() - angle);
         double firstDiff = Math.abs(getNormalizedHeading() - angle);
-        double error = 3.8;
         double originalP = pd.getP(), originalI = pd.getI(), originalD = pd.getD();
         pd.setPID(p, i, d);
 
@@ -648,6 +647,9 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         globalCoordinate.setLastEncoderCountRightBack(0);
         globalCoordinate.start();
         globalCoordinateThread.start();
+    }
+    public void turnPID (double angle, Direction direction, double robotPower, double p, double i, double d) {
+        turnPID(angle, direction, robotPower, p, i, d, 3.8);
     }
 
     public void stopAndResetMotor() {
