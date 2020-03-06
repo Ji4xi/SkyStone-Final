@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -18,14 +17,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
-
- */
-//@Autonomous(name= "opencvSkystoneDetector", group="Sky autonomous")
-//@Disabled//comment out this line before using
 public class opencvSkystoneDetector extends LinearOpMode {
-    private ElapsedTime runtime = new ElapsedTime();
 
     //0 means skystone, 1 means yellow stone
     //-1 for debug, but we can keep it like this because if it works, it should change to either 0 or 255
@@ -57,23 +49,7 @@ public class opencvSkystoneDetector extends LinearOpMode {
         phoneCam.openCameraDevice();//open camera
         phoneCam.setPipeline(new StageSwitchingPipeline());//different stages
         phoneCam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);//display on RC
-        //width, height
-        //width = height in this case, because camera is in portrait mode.
-//
-//        waitForStart();
-//        runtime.reset();
-//        while (opModeIsActive()) {
-//            telemetry.addData("Values", valLeft+"   "+valMid+"   "+valRight);
-//            telemetry.addData("Height", rows);
-//            telemetry.addData("Width", cols);
-//
-//            telemetry.update();
-//            sleep(100);
-//            //call movement functions
-////            strafe(0.4, 200);
-////            moveDistance(0.4, 700);
-//
-//        }
+
     }
 
     //detection pipeline
@@ -94,6 +70,9 @@ public class opencvSkystoneDetector extends LinearOpMode {
         private Stage stageToRenderToViewport = Stage.detection;
         private Stage[] stages = Stage.values();
 
+        /**
+         * executed when controller phone screen is tapped
+         */
         @Override
         public void onViewportTapped()
         {

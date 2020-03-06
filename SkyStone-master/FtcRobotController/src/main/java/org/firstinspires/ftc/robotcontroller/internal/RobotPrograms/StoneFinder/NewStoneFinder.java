@@ -5,24 +5,17 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.PD;
-import org.firstinspires.ftc.robotcontroller.internal.Default.PID;
-import org.firstinspires.ftc.robotcontroller.internal.Default.PIDMichael;
-import org.firstinspires.ftc.robotcontroller.internal.Experiments.Calvin.CalvinPID;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 public class NewStoneFinder extends opencvSkystoneDetector {
 
-    PID pid;
     protected boolean mode = true;
-    protected double previousXTarget, previousYTarget;
 
     protected BNO055IMU imu;//For detecting angles of rotation
-    protected String section;
     protected enum Mode {OPEN, CLOSE}
     protected enum Side {LEFT, RIGHT}
     protected enum GAGE {FORWARD, REVERSE}
@@ -61,26 +54,18 @@ public class NewStoneFinder extends opencvSkystoneDetector {
     protected static final double COUNTS_PER_REVOLUTION = 537.6; //20:1
     protected static final double DRIVE_GEAR_REDUCTION = 1; //This is < 1.0 if geared up
     protected static final double WHEEL_DIAMETER_INCHES = 3.93701;
-    protected static final double WHEEL_PERIMETER_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
     protected static final double COUNTS_PER_INCH = (COUNTS_PER_REVOLUTION * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
 
     public enum Direction {CLOCKWISE, COUNTERCLOCKWISE}
-    protected double gyroPwr = 0;
+
     protected GlobalCoordinate globalCoordinate;
-    protected enum SkystonePositions {LEFT, MID, RIGHT}
+
     //Field Variables
     protected final double TILE_INCH = 22.75;
-    protected final double CONNECTION_INCH = 1.125;
     protected final double SKYSTONE_INCH = 8;
-    protected final double ROBOT_LENGTH_INCH = 17.85;
-    protected final double ROBOT_WIDTH_INCH = 17.7;
 
     protected Thread globalCoordinateThread;
     public PD pd = new PD(0.001, 0, 0); //I: 0.001/ D: 0.0002/2.5 P?0.00067 0.00074 .00083//march 1st: 0.00064, 0.0000004, 0.000027
-    CalvinPID PID = new CalvinPID(0.0000, 0.00000, 0.00000); //P: 0.012, I: 0.001, D: 0.0022
-
-    double greatestDContribution = 0;
-    double greatestIContribution = 0;
 
     public double skystoneAngle;
     public double maxPwr = 0.75;
@@ -91,6 +76,10 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         waitForStart();
     }
 
+    /**
+     * initalize hardware
+     * @throws InterruptedException
+     */
     public void initialize() throws InterruptedException {
         BNO055IMU.Parameters parameterz = new BNO055IMU.Parameters();
         parameterz.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -176,68 +165,30 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         phoneCam.closeCameraDevice();
     }
 
-
-
-    public void  goToPositionHard (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError) throws InterruptedException{
-//        double circ = Math.PI * (3.93701);
-//        targetXPosition = mode ? targetXPosition : -targetXPosition;
-//
-//        double angle, gyroPwr = 1;
-//        double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
-//        double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
-//        double snipPwr = robotPower;
-//        double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
-//        double target = distance;
-//
-//        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-//
-////        pd.initPD(distance);
-//
-//
-//        while (opModeIsActive() && distance > allowableDistanceError * COUNTS_PER_INCH) {
-//            double normalHeading = getNormalizedHeading();
-//            distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
-//            distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
-//            angle = Math.toDegrees(Math.atan2(distanceToYTarget, distanceToXTarget));
-//            distance = Math.hypot(distanceToXTarget, distanceToYTarget);
-//
-//            snipPwr = robotPower;
-//            fr.setPower(transformation((angle) + 90 - normalHeading, "fr") * snipPwr + gyro(gyroAngle, "fr") * (gyroPwr) + pd.getDContrb());
-//            fl.setPower(transformation((angle) + 90 - normalHeading, "fl") * snipPwr + gyro(gyroAngle, "fl") * (gyroPwr) + pd.getDContrb());
-//            br.setPower(transformation((angle) + 90 - normalHeading, "br") * snipPwr + gyro(gyroAngle, "br") * (gyroPwr) + pd.getDContrb());
-//            bl.setPower(transformation((angle) + 90 - normalHeading, "bl") * snipPwr + gyro(gyroAngle, "bl") * (gyroPwr) + pd.getDContrb());
-//
-////            Object[] names = {"gyro_con", "d", "distance", "distance to X", "distance to Y","angle","2angle-heading"};
-//            Object[] names = {"p", 'i', 'd', "greatest Y"};
-////            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb()};
-////            if (Math.abs(pd.getDContrb()) > Math.abs(greatestDContribution)) {greatestDContribution = pd.getDContrb();}
-//            Object[] values = {pd.getPContrb(), pd.getIContrb(), pd.getDContrb(),greatestY /COUNTS_PER_INCH};
-//            if (globalCoordinate.getGlobalY() > greatestY) {greatestY = globalCoordinate.getGlobalY();}
-////            if (PID.getIntegral() > greatestIContribution) {greatestDContribution = PID.getIntegral();}
-//            telemetry(names, values);
-//        }
-//
-//        fl.setPower(0);
-//        fr.setPower(0);
-//        bl.setPower(0);
-//        br.setPower(0);
-
-    }
-
+    /**
+     * move with default PID and gyro power
+     */
     public void  goToPositionSupreme (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError) throws InterruptedException {
         goToPositionSupreme(targetXPosition, targetYPosition, robotPower, gyroAngle, allowableDistanceError, pd.getP(), pd.getI(), pd.getD());
     }
 
+    /**
+     * move with PID and Gyro
+     * @param targetXPosition target absolute X in inches
+     * @param targetYPosition target absolute Y in inches
+     * @param robotPower movement power
+     * @param gyroAngle correct angle for imu
+     * @param allowableDistanceError acceptable margin of error in inches
+     * @param p proportional coefficient
+     * @param i integral coefficient
+     * @param d derivative coefficient
+     * @param gyroPwr gyro adjustment power
+     */
     public void goToPositionSupreme(double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError, double p, double i , double d, double gyroPwr) {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        double circ = Math.PI * (3.93701);
         targetXPosition = mode ? targetXPosition : -targetXPosition;
 
         double originalP = pd.getP();
@@ -245,10 +196,11 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         double originalD = pd.getD();
 
         pd.setPID(p, i, d);
+
         double angle;
         double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
         double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalY();
-        double snipPwr = robotPower;
+        double snipPwr;
         double distance = Math.hypot(distanceToXTarget, distanceToYTarget);
         double target = distance;
 
@@ -304,15 +256,24 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         pd.setPID(originalP, originalI, originalD);
     }
 
+    /**
+     * move with default gyro power
+     */
     public void  goToPositionSupreme (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError, double p, double i , double d) throws InterruptedException{
         goToPositionSupreme(targetXPosition, targetYPosition, robotPower, gyroAngle, allowableDistanceError, p, i, d, 1);
     }
 
+    /**
+     * move with default PID
+     */
     public void  goToPositionSupreme (double targetXPosition, double targetYPosition, double robotPower, double gyroAngle, double allowableDistanceError, double gyroPwr) throws InterruptedException{
         goToPositionSupreme(targetXPosition, targetYPosition, robotPower, gyroAngle, allowableDistanceError, pd.getP(), pd.getI(), pd.getD(), gyroPwr);
     }
 
-
+    /**
+     * updates telemetry
+     * @param maps arrays with extra telemetry values
+     */
     public void telemetry(Object[]... maps) {
         try {
             for (int number = 0; number < maps[0].length; number++) {
@@ -331,52 +292,12 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         telemetry.update();
     }
 
-
-    public void moveInchesX(double targetXPosition, double power, double angle, double gyroAngle, double allowableError) {
-        double snipPwr;
-        double distanceToXTarget = targetXPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
-        double target = distanceToXTarget;
-        pd.initPD(distanceToXTarget);
-        while (Math.abs(distanceToXTarget) > allowableError * COUNTS_PER_INCH) {
-            distanceToXTarget = target - globalCoordinate.getGlobalX();
-            snipPwr = pd.actuator(target - distanceToXTarget) * power;
-            double normalHeading = getNormalizedHeading();
-            fr.setPower(transformation(2 * angle - gyroAngle, "fr") * snipPwr + gyro(gyroAngle, "fr"));
-            fl.setPower(transformation(2 * angle - gyroAngle, "fl") * snipPwr + gyro(gyroAngle, "fl"));
-            br.setPower(transformation(2 * angle - gyroAngle, "br") * snipPwr + gyro(gyroAngle, "br"));
-            bl.setPower(transformation(2 * angle - gyroAngle, "bl") * snipPwr + gyro(gyroAngle, "bl"));
-            Object[] names = {"X_left"};
-            Object[] numbers = {distanceToXTarget};
-            telemetry(names,numbers);
-        }
-        fl.setPower(0);
-        fr.setPower(0);
-        bl.setPower(0);
-        br.setPower(0);
-    }
-    public void moveInchesY(double targetYPosition, double power, double angle, double gyroAngle, double allowableError) {
-        double snipPwr;
-        double distanceToYTarget = targetYPosition * COUNTS_PER_INCH - globalCoordinate.getGlobalX();
-        double target = distanceToYTarget;
-        pd.initPD(distanceToYTarget);
-        while (Math.abs(distanceToYTarget) > allowableError * COUNTS_PER_INCH) {
-            distanceToYTarget = target - globalCoordinate.getGlobalY();
-            snipPwr = pd.actuator(target - distanceToYTarget) * power;
-            double normalHeading = getNormalizedHeading();
-            fr.setPower(transformation(2 * angle - gyroAngle, "fr") * snipPwr + gyro(gyroAngle, "fr"));
-            fl.setPower(transformation(2 * angle - gyroAngle, "fl") * snipPwr + gyro(gyroAngle, "fl"));
-            br.setPower(transformation(2 * angle - gyroAngle, "br") * snipPwr + gyro(gyroAngle, "br"));
-            bl.setPower(transformation(2 * angle - gyroAngle, "bl") * snipPwr + gyro(gyroAngle, "bl"));
-            Object[] names = {"Y_left"};
-            Object[] numbers = {distanceToYTarget};
-            telemetry(names,numbers);
-        }
-        fl.setPower(0);
-        fr.setPower(0);
-        bl.setPower(0);
-        br.setPower(0);
-    }
-
+    /**
+     * returns gyro adjustment
+     * @param angles correct angle for imu
+     * @param motor drive motor
+     * @return calculated gyro adjustment
+     */
     public double gyro(double angles, String motor) {
         //fr fl br bl
         double a = 100; //adjusting rate
@@ -425,7 +346,12 @@ public class NewStoneFinder extends opencvSkystoneDetector {
 
     }
 
-    //angle in radians
+    /**
+     * returns transformation for mecanum wheels
+     * @param angles angle in radians
+     * @param motor drive motor
+     * @return transformed angle
+     */
     public double transformation(double angles, String motor) {
         //fr fl br bl
         angles = Math.toRadians(angles);
@@ -443,127 +369,11 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         }
     }
 
-
     /**
-     * Calculate the power in the x direction
-     *
-     * @param desiredAngle angle on the x axis
-     * @param speed        robot's speed
-     * @return the x vector
+     * updates current velocity of robot
      */
-    private double calculateX(double desiredAngle, double speed) {
-        return Math.cos(Math.toRadians(desiredAngle)) * speed;
-    }
-
-
-    /**
-     * Calculate the power in the y direction
-     *
-     * @param desiredAngle angle on the y axis
-     * @param speed        robot's speed
-     * @return the y vector
-     */
-    private double calculateY(double desiredAngle, double speed) {
-        return Math.sin(Math.toRadians(desiredAngle)) * speed;
-    }
-
-
-    public void moveInchesShort (double inches, double angle, double gyroAngle) {
-        double circ = Math.PI * (3.93701);
-        int target = (int) (inches / circ * COUNTS_PER_REVOLUTION);
-        double snipPwr, currentPos;
-        String section;
-        double maxPwr = 0.4;
-
-        fr.setTargetPosition((int) (transformation(angle, "fr") * target));
-        fl.setTargetPosition((int) (transformation(angle, "fl") * target));
-        br.setTargetPosition((int) (transformation(angle, "br") * target));
-        bl.setTargetPosition((int) (transformation(angle, "bl") * target));
-
-        target = Math.abs(fr.getTargetPosition()) + Math.abs(fl.getTargetPosition()) + Math.abs(br.getTargetPosition()) + Math.abs(bl.getTargetPosition()); //*2 for 2 motors
-
-        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        while ((Math.abs(fr.getCurrentPosition()) + Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition()) + Math.abs(br.getCurrentPosition())) < target - 15) {
-            snipPwr = 0.4;
-            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr"));
-            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl"));
-            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "br"));
-            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl"));
-            telemetry();
-        }
-        fl.setPower(0);
-        fr.setPower(0);
-        bl.setPower(0);
-        br.setPower(0);
-    }
-
-    public void moveInches (double inches, double angle, double gyroAngle) throws InterruptedException{
-        double circ = Math.PI * (3.93701);
-        int target = (int) (inches / circ * COUNTS_PER_REVOLUTION);
-        double snipPwr = 0, currentPos;
-        double maxPwr = 1;
-
-        waitOneFullHardwareCycle();
-        fr.setTargetPosition((int) (transformation(angle, "fr") * target));
-        fl.setTargetPosition((int) (transformation(angle, "fl") * target));
-        br.setTargetPosition((int) (transformation(angle, "br") * target));
-        bl.setTargetPosition((int) (transformation(angle, "bl") * target));
-
-        target = Math.abs(fr.getTargetPosition()) + Math.abs(fl.getTargetPosition()) + Math.abs(br.getTargetPosition()) + Math.abs(bl.getTargetPosition()); //*2 for 2 motors
-        double front = (TILE_INCH / 2) * 4 / circ * COUNTS_PER_REVOLUTION;
-        double end = target - (TILE_INCH) * 4 / circ * COUNTS_PER_REVOLUTION;
-        double mid = (target - end) * 4;
-
-        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
-        while ((Math.abs(fr.getCurrentPosition()) + Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition()) + Math.abs(br.getCurrentPosition())) < target - 15) {
-            updateVelocity();
-            currentPos = Math.abs(fr.getCurrentPosition()) + Math.abs(fl.getCurrentPosition()) + Math.abs(br.getCurrentPosition()) + Math.abs(bl.getCurrentPosition());
-            if (currentPos < front) section = "front";
-            else if (currentPos > end) section = "end";
-            else section = "mid";
-
-            switch (section) {
-                case "front": snipPwr = currentPos / front * (maxPwr - 0.25) + 0.25; break;
-                case "end": snipPwr = 0; gyroPwr = 0.1; break; //snipPwr = (1 - (currentPos -  end) / (target - end)) * (maxPwr - 0.1) + 0.1;
-                case "mid": snipPwr = trueVelocity < 2490 ? snipPwr + 0.01 : snipPwr - 0.01; break; //0.8 for transition
-                default: snipPwr = 0; //safety
-            }
-
-            fr.setPower(transformation(angle, "fr") * snipPwr + gyro(gyroAngle, "fr")* (snipPwr + gyroPwr));
-            fl.setPower(transformation(angle, "fl") * snipPwr + gyro(gyroAngle, "fl")* (snipPwr + gyroPwr));
-            br.setPower(transformation(angle, "br") * snipPwr + gyro(gyroAngle, "fr")* (snipPwr + gyroPwr));
-            bl.setPower(transformation(angle, "bl") * snipPwr + gyro(gyroAngle, "bl")* (snipPwr + gyroPwr));
-            telemetry();
-
-            waitOneFullHardwareCycle();
-        }
-
-        fl.setPower(0);
-        fr.setPower(0);
-        bl.setPower(0);
-        br.setPower(0);
-        gyroPwr = 0;
-    }
     public void updateVelocity() {
-        double lastCount = fr.getCurrentPosition();
+        double lastCount;
         if (fr.getTargetPosition() > fl.getTargetPosition()) {
             lastCount = fr.getCurrentPosition();
             time = System.nanoTime();
@@ -590,6 +400,9 @@ public class NewStoneFinder extends opencvSkystoneDetector {
 
     }
 
+    /**
+     * set drive motors to run without encoders
+     */
     public void runWithoutEncoders() {
         fl.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -597,10 +410,23 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         br.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    /**
+     * turn with default PID
+     */
     public void turnPID (double angle, Direction direction, double robotPower) {
         turnPID(angle, direction, robotPower, pd.getP(), pd.getI(), pd.getD());
     }
 
+    /**
+     * turn using PID
+     * @param angle angle to turn to in degrees
+     * @param direction clockwise or counterclockwise
+     * @param robotPower turn power
+     * @param p proportional coefficient
+     * @param i integral coefficient
+     * @param d derivative coefficient
+     * @param error acceptable margin of error in degrees
+     */
     public void turnPID (double angle, Direction direction, double robotPower, double p, double i, double d, double error) {
         double power;
         globalCoordinate.stop();
@@ -648,10 +474,17 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         globalCoordinate.start();
         globalCoordinateThread.start();
     }
+
+    /**
+     *turn with default error
+     */
     public void turnPID (double angle, Direction direction, double robotPower, double p, double i, double d) {
         turnPID(angle, direction, robotPower, p, i, d, 3.8);
     }
 
+    /**
+     * resets drive motors
+     */
     public void stopAndResetMotor() {
         fl.setPower(0);
         fr.setPower(0);
@@ -668,58 +501,29 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-    public void reinitialize() {
-        fr.setDirection(DcMotorSimple.Direction.REVERSE);
-        fl.setDirection(DcMotorSimple.Direction.FORWARD);
-        br.setDirection(DcMotorSimple.Direction.REVERSE);
-        bl.setDirection(DcMotorSimple.Direction.FORWARD);
-    }
-    public void runToPosition() {
-        fl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        bl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        br.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-    public void runToPosition(int target, double angle) {
-        fl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        bl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        br.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
 
-    public void runToPosition(int frtarget, int fltarget) {
-        fl.setTargetPosition(fltarget);
-        fr.setTargetPosition(frtarget);
-        bl.setTargetPosition(frtarget);
-        br.setTargetPosition(fltarget);
-
-        fl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        bl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        br.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
-
-
-
-    public void moveClaw(double position1, double position2) {
-        topClaw.setPosition(position1);
-        bottomClaw.setPosition(position2);
-    }
-
-    public void flipMechanic(DcMotor... motors) {
-        for (int i = 0; i < motors.length; i++) {
-            if (motors[i].getDirection() == DcMotorSimple.Direction.FORWARD) motors[i].setDirection(DcMotorSimple.Direction.REVERSE);
-            else motors[i].setDirection(DcMotorSimple.Direction.FORWARD);
-        }
-    }
+    /**
+     * gets heading of imu
+     * @return heading from imu
+     */
     public double getAbsoluteHeading() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC , AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
 
+    /**
+     * gets heading of imu based on unit circle
+     * @return normalized heading
+     */
     public double getNormalizedHeading() {
         return (getAbsoluteHeading() + 450) % 360;
     }
+
+    /**
+     * moves foundation servos
+     * @param position Servos up or down
+     * @param sleep Sleep time after in milliseconds
+     * @throws InterruptedException
+     */
     public void foundation(Mode position, int sleep) throws InterruptedException {
         if (position == position.CLOSE) {
             ls.setPosition(0);
@@ -732,4 +536,5 @@ public class NewStoneFinder extends opencvSkystoneDetector {
             sleep(sleep);
         }
     }
+
 }
