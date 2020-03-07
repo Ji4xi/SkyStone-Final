@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.Odometry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
@@ -9,7 +10,8 @@ import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.
 
 import java.util.ServiceLoader;
 
-//@Autonomous
+@Autonomous
+@Disabled
 public class SkystoneRed extends NewStoneFinder {
 
     int count = 0;

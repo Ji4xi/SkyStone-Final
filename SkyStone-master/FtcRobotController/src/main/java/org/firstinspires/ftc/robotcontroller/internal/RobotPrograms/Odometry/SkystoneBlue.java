@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.Odometry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.NewStoneFinder;
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.StoneFinder;
 
 @Autonomous
+@Disabled
 public class SkystoneBlue extends MyOdometryOpmode {
     @Override
     public void runOpMode() throws InterruptedException {

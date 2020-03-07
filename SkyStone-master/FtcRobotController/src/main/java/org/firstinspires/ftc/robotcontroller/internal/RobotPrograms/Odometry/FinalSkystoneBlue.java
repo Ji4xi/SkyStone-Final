@@ -26,9 +26,28 @@ public class FinalSkystoneBlue extends NewStoneFinder {
             skystone_pos = -(SKYSTONE_INCH * 2 + 11);
         }
 
-        goToPositionSupreme(skystone_pos, TILE_INCH + 2.7, maxPwr, 90, 1, 0.00106, 0, 0);
+//        if (skystoneAngle < 0) {
+//
+//        } else if (skystoneAngle == 0) {
+//
+//        } else {
+//
+//        }
 
+        //go to pick up the first stone
         if (skystoneAngle < 0) {
+            goToPositionSupreme(skystone_pos, TILE_INCH + 2.7, maxPwr, 90, 1, 0.00106, 0, 0);
+        } else if (skystoneAngle == 0) {
+            goToPositionSupreme(skystone_pos, TILE_INCH + 2.7, maxPwr, 90, 1, 0.00106, 0, 0);
+        } else {
+            goToPositionSupreme(skystone_pos, TILE_INCH + 2.7, maxPwr, 90, 1, 0.00106, 0, 0);
+        }
+
+
+        //turn to the skystone
+        if (skystoneAngle < 0) {
+            turnPID(0, Direction.CLOCKWISE, maxPwr, 0.0180, 0.01, 0.001);
+        } else if (skystoneAngle == 0) {
             turnPID(0, Direction.CLOCKWISE, maxPwr, 0.0180, 0.01, 0.001);
         } else {
             turnPID(0, Direction.CLOCKWISE, maxPwr, 0.0180, 0.01, 0.001);
@@ -38,6 +57,7 @@ public class FinalSkystoneBlue extends NewStoneFinder {
         topClaw.setPosition(0.16);
         bottomClaw.setPosition(0.617);
 
+        //go to pick up the first stone
         goToPositionSupreme(skystone_pos, TILE_INCH + 6.2, maxPwr, 0, 1,0.00253, 0.0, 0);
         topClaw.setPosition(0.855);
         sleep(300);

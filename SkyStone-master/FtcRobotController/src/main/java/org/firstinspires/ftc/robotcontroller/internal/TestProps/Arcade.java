@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcontroller.internal.RobotSystems.DriveTrain;
  */
 //@Disabled
 @TeleOp
+@Disabled
 public class Arcade extends TeleOpMode {
     ArcadeDrive arcade = new ArcadeDrive();
 

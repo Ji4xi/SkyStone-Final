@@ -2,12 +2,13 @@ package org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi;
 
 import android.media.MediaDrm;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 @TeleOp
-
+@Disabled
 public class JackBlack extends TeleOpMode {
 
     Servo top;

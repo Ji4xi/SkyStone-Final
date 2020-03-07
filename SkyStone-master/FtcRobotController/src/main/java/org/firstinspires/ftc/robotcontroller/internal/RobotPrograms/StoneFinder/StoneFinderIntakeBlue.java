@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.SkyScraper.SkyScraper;
 
 @Autonomous
+@Disabled
 public class StoneFinderIntakeBlue extends StoneFinder {
 
     @Override

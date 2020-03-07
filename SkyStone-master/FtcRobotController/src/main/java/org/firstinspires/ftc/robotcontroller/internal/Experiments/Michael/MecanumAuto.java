@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.robotcontroller.internal.Experiments.Michael;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-//@Autonomous
+@Autonomous
+@Disabled
 public class MecanumAuto extends LinearOpMode {
     DcMotor fr;
     DcMotor fl;

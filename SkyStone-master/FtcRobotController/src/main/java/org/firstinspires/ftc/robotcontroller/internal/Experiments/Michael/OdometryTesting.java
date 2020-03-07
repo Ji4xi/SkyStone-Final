@@ -2,6 +2,7 @@ package org.firstinspires.ftc.robotcontroller.internal.Experiments.Michael;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.StoneFinder;
 
 @Autonomous
+@Disabled
 public class OdometryTesting extends LinearOpMode {
     double turnPwrMax = 0.3;
 

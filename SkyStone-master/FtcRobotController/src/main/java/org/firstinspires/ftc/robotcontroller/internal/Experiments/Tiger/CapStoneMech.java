@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 
-//@Disabled
+@Disabled
 @TeleOp
 public class CapStoneMech extends TeleOpMode {
 

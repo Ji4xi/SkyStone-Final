@@ -7,6 +7,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
+/**
+ * created by AlphaGenesis 6436 2/15/2020
+ * The class will keep track of the globalX and globalY of the robot in the background Thread since initialization
+ * the class is explicitly created for 4 wheel mecanum-x drivetrain
+ */
 public class GlobalCoordinate implements Runnable {
     private int sleepTime;
     private double globalX;
@@ -17,7 +22,7 @@ public class GlobalCoordinate implements Runnable {
     private double deltas3, deltas4, deltax3, deltax4, deltay3, deltay4, changeHorizontalBack, changeVerticalBack;
     private double lastEncoderCountLeft, lastEncoderCountRight, currentEncoderCountLeft, currentEncoderCountRight;
     private double lastEncoderCountLeftBack, lastEncoderCountRightBack, currentEncoderCountLeftBack, currentEncoderCountRightBack;
-    private double xMultiplier, yMultiplier;
+    private double xMultiplier, yMultiplier; //constants to fix the not balanced encoders
     private BNO055IMU imu;
 
     public void setLastEncoderCountLeft(double lastEncoderCountLeft) {
@@ -96,6 +101,10 @@ public class GlobalCoordinate implements Runnable {
         return theta;
     }
 
+    /**
+     * update the globalX and globalY position
+     * the core concept behind the algorithm is to take snippet of dx and dy from ds and and add them together
+     */
     private void updateGlobalCoordinate() {
         theta = Math.toRadians(getNormalizedHeading());
 
@@ -135,6 +144,9 @@ public class GlobalCoordinate implements Runnable {
         globalY += changeVertical;
     }
 
+    /**
+     * Thread running in the background
+     */
     @Override
     public void run() {
         while (isRunning) {

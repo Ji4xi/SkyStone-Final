@@ -3,6 +3,7 @@ package org.firstinspires.ftc.robotcontroller.internal.Experiments.Michael;
 import android.database.sqlite.SQLiteException;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.NewStoneFinder;
 
 @Autonomous
+@Disabled
 public class RandomAuto extends NewStoneFinder {
     @Override
     public void runOpMode() throws InterruptedException {

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.robotcontroller.internal.Experiments.Jiaxi;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -7,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcontroller.internal.Default.TeleOpMode;
 
 @TeleOp
+@Disabled
 public class Claw extends TeleOpMode {
     Servo claw;
     final double max = 1;

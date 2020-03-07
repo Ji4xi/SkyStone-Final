@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcontroller.internal.TestProps.DrawerSlides;
 
 @Autonomous
+@Disabled
 public class BlueFoundation extends StoneFinder {
     @Override
     public void runOpMode() throws InterruptedException {

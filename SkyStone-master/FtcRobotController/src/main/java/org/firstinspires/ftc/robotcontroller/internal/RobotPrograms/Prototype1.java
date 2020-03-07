@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcontroller.internal.TestProps.Arcade;
 
 //@Disabled
 @TeleOp
+@Disabled
 public class Prototype1 extends JackBlack {
 
 }

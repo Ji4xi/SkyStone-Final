@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.Odometry;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+@Autonomous
 public class FoundationBlueSide extends MyOdometryOpmode {
 
     @Override

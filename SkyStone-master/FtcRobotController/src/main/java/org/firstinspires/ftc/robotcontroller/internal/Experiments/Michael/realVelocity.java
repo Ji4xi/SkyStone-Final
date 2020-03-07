@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.robotcontroller.internal.Experiments.Michael;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous
+@Disabled
 public class realVelocity extends LinearOpMode {
     DcMotor fr;
     @Override
