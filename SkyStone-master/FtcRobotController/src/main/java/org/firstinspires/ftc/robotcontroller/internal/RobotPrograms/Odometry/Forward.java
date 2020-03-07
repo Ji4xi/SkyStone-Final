@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.Odometry;
 
-public class Forward extends MyOdometryOpmode {
+import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.NewStoneFinder;
+
+public class Forward extends NewStoneFinder {
     @Override
     public void runOpMode() throws InterruptedException {
 
