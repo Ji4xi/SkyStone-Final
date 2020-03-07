@@ -4,7 +4,7 @@ public class FoundationBlueMiddle extends FoundationBlueSide{
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-//        sleep(29000-how many ever milliseconds it takes for the program);
+        sleep(20000);
         moveFoundation();
         //park middle
         goToPositionSupreme(-22.75+17.5-22.75+17.5/2, 0, maxPwr, 90, 1);

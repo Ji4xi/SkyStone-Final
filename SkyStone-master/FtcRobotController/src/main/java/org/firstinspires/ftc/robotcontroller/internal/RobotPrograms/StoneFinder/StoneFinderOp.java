@@ -189,7 +189,7 @@ public class StoneFinderOp extends TeleOpMode {
         if (gamepad2.a) {
             hook.setPosition(0.8);
         } else if (gamepad2.y) {
-            hook.setPosition(0.3);
+            hook.setPosition(0.27);
         }
         currentLiftPwr = gamepad2.left_stick_y * maxLiftPwr;
         leftLift.setPower(Range.clip(currentLiftPwr, - maxLiftPwr, maxLiftPwr));

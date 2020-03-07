@@ -53,6 +53,7 @@ public class FinalSkystoneBlue extends NewStoneFinder {
 
         bottomClaw.setPosition(0.500);
         goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8, TILE_INCH + 9.3, maxPwr, 0, 1.3,0.0022, 0.0, 0.0001); //d: 0.00033
+        sleep(150);
         topClaw.setPosition(0.2329);
         goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10) + 4 * TILE_INCH-7 + 25.5 - 8, TILE_INCH + 5, maxPwr, 0, 1.25,0.0023, 0.0, 0);
 //
@@ -73,6 +74,7 @@ public class FinalSkystoneBlue extends NewStoneFinder {
         goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8 + 10, TILE_INCH + 5.5, 0.9, 0, 1.7,0.001358, 0, 0.00025);
         bottomClaw.setPosition(0.500);
         goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8 + 10, TILE_INCH + 11.5, maxPwr, 0, 1.3,0.0021, 0.0, 0);//0.0020
+        sleep(150);
         topClaw.setPosition(0.2329);
 
         turnPID(270, Direction.CLOCKWISE, maxPwr, 0.019, 0.01, 0.001);
@@ -90,32 +92,32 @@ public class FinalSkystoneBlue extends NewStoneFinder {
 
     }
     public void deliver(double skystone_pos, double offset) throws InterruptedException{
-
-        //open up
-        topClaw.setPosition(0.16);
-        bottomClaw.setPosition(0.617);
-        sleep(100);
-        goToPositionHard(skystone_pos, TILE_INCH + 10, maxPwr-0.7+0.2, 0, 3);
-        //globalCoordinate.setGlobalX(globalCoordinate.getGlobalX() + 2 * SKYSTONE_INCH);
-
-
-        topClaw.setPosition(0.855);
-        sleep(500);
-        bottomClaw.setPosition(0.166);
-        goToPositionHard(skystone_pos+5, TILE_INCH + 4 + count*3, maxPwr-0.7+0.2, 0, 3);
-
-
-//        goToPositionSupreme(skystone_pos + 4 * TILE_INCH-4 + offset, TILE_INCH + 3.2, 0.9, 0, 2);
-
-        goToPositionSupreme(skystone_pos + 4 * TILE_INCH-4 + offset, TILE_INCH + 17, maxPwr+0.15, 0, 1.5);
-        bottomClaw.setPosition(0.500);
-        sleep(100);
-        topClaw.setPosition(0.2329);
-
-        goToPositionHard(skystone_pos + 4 * TILE_INCH-4 + offset, TILE_INCH + 12, maxPwr-0.6+0.2, 0, 3);
-        bottomClaw.setPosition(0.167);
-        topClaw.setPosition(0.855);
-        count++;
+//
+//        //open up
+//        topClaw.setPosition(0.16);
+//        bottomClaw.setPosition(0.617);
+//        sleep(100);
+//        goToPositionHard(skystone_pos, TILE_INCH + 10, maxPwr-0.7+0.2, 0, 3);
+//        //globalCoordinate.setGlobalX(globalCoordinate.getGlobalX() + 2 * SKYSTONE_INCH);
+//
+//
+//        topClaw.setPosition(0.855);
+//        sleep(500);
+//        bottomClaw.setPosition(0.166);
+//        goToPositionHard(skystone_pos+5, TILE_INCH + 4 + count*3, maxPwr-0.7+0.2, 0, 3);
+//
+//
+////        goToPositionSupreme(skystone_pos + 4 * TILE_INCH-4 + offset, TILE_INCH + 3.2, 0.9, 0, 2);
+//
+//        goToPositionSupreme(skystone_pos + 4 * TILE_INCH-4 + offset, TILE_INCH + 17, maxPwr+0.15, 0, 1.5);
+//        bottomClaw.setPosition(0.500);
+//        sleep(100);
+//        topClaw.setPosition(0.2329);
+//
+//        goToPositionHard(skystone_pos + 4 * TILE_INCH-4 + offset, TILE_INCH + 12, maxPwr-0.6+0.2, 0, 3);
+//        bottomClaw.setPosition(0.167);
+//        topClaw.setPosition(0.855);
+//        count++;
     }
 
     public double reposX(double originalX) {

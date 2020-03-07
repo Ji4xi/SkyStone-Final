@@ -20,6 +20,7 @@ public class NewStoneFinder extends opencvSkystoneDetector {
     protected enum Side {LEFT, RIGHT}
     protected enum GAGE {FORWARD, REVERSE}
 
+    protected Servo grip;
     //driveTrain
     protected DcMotor fl;
     protected DcMotor fr;
@@ -130,6 +131,10 @@ public class NewStoneFinder extends opencvSkystoneDetector {
         leftIntake = hardwareMap.dcMotor.get("leftIntake");
         rightIntake.setDirection(DcMotorSimple.Direction.REVERSE);
         leftIntake.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        grip = hardwareMap.servo.get("grip");
+        grip.setDirection(Servo.Direction.FORWARD);
+        grip.setPosition(0.65);
 
         hook = hardwareMap.servo.get("hook");
         hook.setDirection(Servo.Direction.FORWARD);

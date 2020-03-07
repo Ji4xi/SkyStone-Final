@@ -5,7 +5,7 @@ public class FoundationBlueSide extends MyOdometryOpmode {
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-//        sleep(29000-how many ever milliseconds it takes for the program);
+        sleep(20000);
         moveFoundation();
         //park side
         goToPositionSupreme(-22.75+17.5 - 17.5/2 - 22.75, 0, maxPwr, 90, 1);

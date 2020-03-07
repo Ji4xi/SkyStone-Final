@@ -5,7 +5,7 @@ public class Forward extends MyOdometryOpmode {
     public void runOpMode() throws InterruptedException {
 
         super.runOpMode();
-//        sleep(29000-how many ever milliseconds it takes for the program);
+        sleep(20000);
 
         goToPositionSupreme(0, 17.5, maxPwr, 90, 1);
     }
