@@ -1,15 +1,13 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.Odometry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.NewStoneFinder;
 
-@Disabled
 @Autonomous
-public class FinalSkystoneBlue extends NewStoneFinder {
-    int count = 0;
+public class CarefulSkystoneBlue extends NewStoneFinder {
+        int count = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -31,21 +29,21 @@ public class FinalSkystoneBlue extends NewStoneFinder {
 
         //go in front of the first stone
         if (skystoneAngle < 0) {
-            goToPositionSupreme(skystone_pos, TILE_INCH + 2.7, maxPwr, 90, 1, 0.00106, 0, 0.000);
+            goToPositionSupreme(skystone_pos, TILE_INCH + 2.4, maxPwr, 90, 1, 0.00106, 0, 0.00005);
         } else if (skystoneAngle == 0) {
-            goToPositionSupreme(skystone_pos, TILE_INCH + 2.7, maxPwr, 90, 1, 0.00106, 0, 0.000);
+            goToPositionSupreme(skystone_pos, TILE_INCH + 2.4, maxPwr, 90, 1, 0.00106, 0, 0.00001);
         } else {
-            goToPositionSupreme(skystone_pos, TILE_INCH + 2.7, maxPwr, 90, 1, 0.00106, 0, 0.0001);
+            goToPositionSupreme(skystone_pos, TILE_INCH + 2.4, maxPwr, 90, 1, 0.00106, 0, 0.0003);
         }
 
 
         //turn to the skystone
         if (skystoneAngle < 0) {
-            turnPID(0, Direction.CLOCKWISE, maxPwr, 0.0180, 0.01, 0.0011,4.5);
+            turnPID(0, Direction.CLOCKWISE, maxPwr, 0.0180, 0.01, 0.00115,4.8);
         } else if (skystoneAngle == 0) {
-            turnPID(0, Direction.CLOCKWISE, maxPwr, 0.0180, 0.01, 0.0011,4.5);
+            turnPID(0, Direction.CLOCKWISE, maxPwr, 0.0180, 0.01, 0.00115,4.8);
         } else {
-            turnPID(0, Direction.CLOCKWISE, maxPwr, 0.0180, 0.01, 0.0011,4.5);
+            turnPID(0, Direction.CLOCKWISE, maxPwr, 0.0180, 0.01, 0.00115,4.8);
         }
 
 
@@ -71,20 +69,20 @@ public class FinalSkystoneBlue extends NewStoneFinder {
         } else if (skystoneAngle == 0) {
             goToPositionSupreme(skystone_pos, TILE_INCH - 0.5, maxPwr, 0, 1,0.002, 0.0, 0);
         } else {
-            goToPositionSupreme(skystone_pos, TILE_INCH - 0.5, maxPwr, 0, 1,0.002, 0.0, 0);
+            goToPositionSupreme(skystone_pos, TILE_INCH - 0.5, maxPwr, 0, 1,0.00202, 0.0, 0);
         }
 
         //go to the foundation for the first time
         if (skystoneAngle == 0) {
             goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8, TILE_INCH + 1.5, 0.9, 0, 1.55,0.00151, 0, 0.00034); //d: 0.00033
         } else if (skystone_pos > 0) {
-            goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8, TILE_INCH + 1.5, 0.9, 0, 1.55,0.00153, 0, 0.00034);
+            goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8, TILE_INCH + 1.5, 0.9, 0, 1.55,0.00153, 0, 0.000344);
         } else {
-            goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8, TILE_INCH + 1.5, 0.9, 0, 1.55,0.00151, 0, 0.00034); //d: 0.00033
+            goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8, TILE_INCH + 1.5, 0.9, 0, 1.55,0.00151, 0, 0.000336); //d: 0.00033
         }
 
         //go into the foundation for the first time
-        bottomClaw.setPosition(0.500);
+
         if (skystoneAngle > 0) {
             goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8, TILE_INCH + 9.3, maxPwr, 0, 1.3,0.0022, 0.0, 0.0001);
         } else if (skystoneAngle == 0) {
@@ -92,7 +90,8 @@ public class FinalSkystoneBlue extends NewStoneFinder {
         } else {
             goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8, TILE_INCH + 9.3, maxPwr, 0, 1.3,0.0022, 0.0, 0.0001);
         }
-
+        sleep(100);
+        bottomClaw.setPosition(0.500);
         sleep(150);
         topClaw.setPosition(0.2329);
 
@@ -115,7 +114,7 @@ public class FinalSkystoneBlue extends NewStoneFinder {
         } else if (skystoneAngle == 0) {
             goToPositionSupreme(skystone_pos - 1 + 2, TILE_INCH + 1.5, 0.9, 0,1.5,0.00161, 0, 0.00039); //d:0.000155
         } else {
-            goToPositionSupreme(skystone_pos - 1 + 2, TILE_INCH + 1.5, 0.9, 0,1.5,0.00161, 0, 0.00039); //d:0.000155
+            goToPositionSupreme(skystone_pos - 1 + 1, TILE_INCH + 1.5, 0.9, 0,1.5,0.00162, 0, 0.00039); //d:0.000155
         }
 
         topClaw.setPosition(0.16);
@@ -126,7 +125,7 @@ public class FinalSkystoneBlue extends NewStoneFinder {
         } else if (skystoneAngle == 0) {
             goToPositionSupreme(skystone_pos - 1 + 2 - 2, TILE_INCH + 8.9, maxPwr, 0, 1.2,0.0018, 0.0, 0);
         } else {
-            goToPositionSupreme(skystone_pos - 1 + 2 - 2, TILE_INCH + 8.9, maxPwr, 0, 1.2,0.0018, 0.0, 0);
+            goToPositionSupreme(skystone_pos - 1 + 2 - 1, TILE_INCH + 8.9, maxPwr, 0, 1.2,0.0018, 0.0, 0);
         }
 
         topClaw.setPosition(0.855);
@@ -138,7 +137,7 @@ public class FinalSkystoneBlue extends NewStoneFinder {
             goToPositionSupreme(skystone_pos - 1 + 2 - 1, TILE_INCH - 0.5, maxPwr, 0, 1.35,0.00164, 0.0, 0); //0.0017
             goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8 + 10, TILE_INCH + 5.5, 0.9, 0, 1.7,0.001358, 0, 0.00025);
         } else if (skystoneAngle == 0) {
-            goToPositionSupreme(skystone_pos - 1 + 2 - 1, TILE_INCH - 0.5, maxPwr, 0, 1.35,0.00164, 0.0, 0); //0.0017
+            goToPositionSupreme(skystone_pos - 1 + 2 - 1, TILE_INCH - 0.5, maxPwr, 0, 1.35,0.00164, 0.0, 0.0001); //0.0017
             goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8 + 10, TILE_INCH + 5.5, 0.9, 0, 1.7,0.001358, 0, 0.00025);
         } else {
             goToPositionSupreme(skystone_pos - 1 + 2 - 1, TILE_INCH - 0.5, maxPwr, 0, 1.35,0.00164, 0.0, 0); //0.0017
@@ -146,17 +145,20 @@ public class FinalSkystoneBlue extends NewStoneFinder {
         }
 
         //go to foundation for the second time
-        bottomClaw.setPosition(0.500);
+
         if (skystoneAngle > 0) {
             goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8 + 10, TILE_INCH + 11.5, maxPwr, 0, 1.3,0.0021, 0.0, 0);//0.0020
         } else if (skystoneAngle == 0) {
-            goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8 + 10, TILE_INCH + 11.5, maxPwr, 0, 1.3,0.0021, 0.0, 0);//0.0020
+            goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8 + 10, TILE_INCH + 11.5, maxPwr, 0, 1.3,0.00212, 0.0, 0);//0.0020
         } else {
-            goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8 + 10, TILE_INCH + 11.5, maxPwr, 0, 1.3,0.0021, 0.0, 0);//0.0020
+            goToPositionSupreme(-(SKYSTONE_INCH * 2 + 10)+ 4 * TILE_INCH-7 + 25.5 - 8 + 10, TILE_INCH + 11.5, maxPwr, 0, 1.3,0.00212, 0.0, 0);//0.0020
         }
 
+        sleep(100);
+        bottomClaw.setPosition(0.500);
         sleep(150);
         topClaw.setPosition(0.2329);
+        sleep(100);
 
         turnPID(270, Direction.CLOCKWISE, maxPwr, 0.019, 0.01, 0.001);
         topClaw.setPosition(0.16);
@@ -175,7 +177,12 @@ public class FinalSkystoneBlue extends NewStoneFinder {
         ls.setPosition(0.5);
         rs.setPosition(0.5);
         sleep(300);
-        goToPositionSupreme(TILE_INCH*5-17.5-2, 1.2, 0.82, 270, 2.3,0.0015, 0, 0, 1.4);
+        if (skystoneAngle == 0) {
+            goToPositionSupreme(TILE_INCH*5-17.5-2, 1.9, 0.82, 270, 2.3,0.0015, 0, 0.0001, 1.4);
+        } else {
+            goToPositionSupreme(TILE_INCH*5-17.5-2, 1.9, 0.80, 270, 2.3,0.001507, 0, 0, 1.4);
+        }
+
         ls.setPosition(0);
         rs.setPosition(0);
         goToPositionSupreme(TILE_INCH*2-23.5, -0.5, 1, 270, 1.5);

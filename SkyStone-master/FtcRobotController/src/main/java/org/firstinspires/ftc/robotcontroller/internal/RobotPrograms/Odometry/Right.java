@@ -2,8 +2,10 @@ package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.Odometry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.NewStoneFinder;
+
 @Autonomous
-public class Right extends MyOdometryOpmode {
+public class Right extends NewStoneFinder {
 
     @Override
     public void runOpMode() throws InterruptedException {
