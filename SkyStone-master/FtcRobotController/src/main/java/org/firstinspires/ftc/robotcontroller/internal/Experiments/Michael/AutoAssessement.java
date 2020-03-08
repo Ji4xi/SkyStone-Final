@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcontroller.internal.Default.PIDMichael;
@@ -17,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 @Autonomous(name = "AutoAssessement")
 public class AutoAssessement extends LinearOpMode {
     protected BNO055IMU imu; //For detecting rotation
+    DcMotorEx ex;
     DcMotor rm;
     DcMotor lm;
     double error = 5;
@@ -31,6 +34,18 @@ public class AutoAssessement extends LinearOpMode {
     }
 
     public void initialize() {
+
+        // TEST OPMODE
+        ex.setPower(1.0);
+        telemetry.addData("Vleocity", ex.getVelocity());
+
+        // ACTUAL RUN
+        ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // search up official Motor PIDF TUning Guide from FTC
+        ex.setVelocityPIDFCoefficients(1.26, 0.126, 0, 12.6);
+        ex.setVelocity(3000);
+
+
         BNO055IMU.Parameters parameterz = new BNO055IMU.Parameters();
         parameterz.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameterz.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
