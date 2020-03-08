@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.Odometry;
 
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcontroller.internal.RobotPrograms.StoneFinder.NewStoneFinder;
 
-@Autonomous
+
 public class FoundationBlueSide extends NewStoneFinder {
 
     @Override
